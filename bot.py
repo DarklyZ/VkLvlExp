@@ -296,7 +296,7 @@ async def run():
 	dp.run_polling()
 
 async def on_startup():
-	print('Бот работает!')
+	print('Бот работает')
 
 if __name__ == "__main__":
 	task_manager.run(auto_reload = True, on_startup = on_startup)
