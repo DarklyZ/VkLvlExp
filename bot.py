@@ -210,7 +210,6 @@ async def hello_plus(message, data):
 		data['lvl'].add_text(text)
 		await message.answer('Приветствие полученно\n' + hello)
 
-
 @dp.message_handler(commands = ['delhello'], count_args = 0, is_admin = True, in_chat = True)
 async def hello_del(message, data):
 	data['lvl'].del_text()
