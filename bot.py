@@ -5,10 +5,11 @@ from vk.utils import TaskManager
 from vk.keyboards import Keyboard, ButtonColor
 # Уровень в боте
 from lvls import LVL
-# Стандартные модули
+# Дополнительные модули
 from random import choice
 from json import loads
 from os import getenv
+from extra import *
 from re import *
 
 dp = Dispatcher(VK(getenv('TOKEN')), getenv('GROUP_ID'))
@@ -145,43 +146,53 @@ async def echo(message, data):
 @dp.message_handler(commands = ['setsmile'], have_args = [lambda arg: len(arg) <= 4], is_admin = True, with_reply_message = True, in_chat = True)
 async def set_smile(message, data):
 	if message.reply_message.from_id > 0:
-		data['lvl'].setsmile(data['args'][0], message.reply_message.from_id)
+		data['lvl'].setsmile(message.reply_message.from_id, smile = data['args'][0])
 		await message.answer(f"{data['args'][0]} : установлен")
 
 @dp.message_handler(commands = ['delsmile'], count_args = 0, is_admin = True, with_reply_message = True, in_chat = True)
 async def del_smile(message, data):
 	if message.reply_message.from_id > 0:
-		data['lvl'].delsmile(message.reply_message.from_id)
+		data['lvl'].setsmile(message.reply_message.from_id)
 		await message.answer('Смайл удалён')
 
-@dp.message_handler(commands = ['exp'], have_args = [lambda arg: arg.isdigit() or arg[1:].isdigit()], is_admin = True, with_reply_message = True, in_chat = True)
+@dp.message_handler(commands = ['exp'], have_args = [isint], is_admin = True, with_reply_message = True, in_chat = True)
+@dp.message_handler(commands = ['exp'], have_args = [isint, isint], is_admin = True, with_reply_message = True, in_chat = True)
 async def exp(message, data):
 	if message.reply_message.from_id > 0:
 		id = message.reply_message.from_id
-		data['lvl'].insert_lvl(int(data['args'][0]), id)
+		if len(data['args']) == 2:
+			lvl, exp = int(data['args'][0]), int(data['args'][1])
+			blank = f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n"
+			data['lvl'].insert_lvl(id, lvl = lvl, exp = exp)
+		else:
+			exp = int(data['args'][0])
+			blank = f"{exp:+}Ⓔ:\n"
+			data['lvl'].insert_lvl(id, exp = exp)
 		await data['lvl'].send(id)
-		await message.answer(f"{data['args'][0]}:\n{data['lvl'][id]}")
+		await message.answer(blank + data['lvl'][id])
 
 @dp.message_handler(commands = ['exp'], have_args = [lambda arg: arg in '+-'], is_admin = True, with_reply_message = True, in_chat = True)
 async def expp(message, data):
 	if message.reply_message.from_id > 0:
 		id = message.reply_message.from_id
-		attach = str(atta(message.reply_message.text, message.reply_message.attachments))
-		data['lvl'].insert_lvl(int(data['args'][0] + attach), id)
+		exp =  int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		data['lvl'].insert_lvl(id, exp = exp)
 		await data['lvl'].send(id)
-		await message.answer(f"{data['args'][0]}{attach}:\n{data['lvl'][id]}")
+		await message.answer(f"{exp:+}Ⓔ:\n{data['lvl'][id]}")
 
-@dp.message_handler(commands = ['tele'], have_args = [lambda arg: arg.isdigit() or arg[1:].isdigit()], with_reply_message = True, in_chat = True)
+@dp.message_handler(commands = ['tele'], have_args = [ispos], with_reply_message = True, in_chat = True)
 async def tele(message, data):
 	if message.reply_message.from_id > 0:
-		count = int(data['args'][0])
+		exp = int(data['args'][0])
 		id1, id2 = message.from_id, message.reply_message.from_id
-		data['lvl'].remove_exp(count, id1)
+		data['lvl'].remove_exp(id1, exp = exp)
 		if data['lvl'].remove:
-			data['lvl'].insert_lvl(count, id2)
+			data['lvl'].insert_lvl(id2, exp = exp)
 			await data['lvl'].send(id1, id2)
-			await message.answer(f"{count}:\n{data['lvl'][id2]}\n{-count}:\n{data['lvl'][id1]}")
-		else: await message.answer('Не хватает exp!')
+			await message.answer(f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}")
+		else:
+			await data['lvl'].send(id1)
+			await message.answer(f"Не хватает exp!\n{data['lvl'][id1]}")
 
 @dp.message_handler(commands = ['ord'], count_args = 0, with_reply_message = True, in_chat = True)
 async def ordo(message, data):
@@ -190,8 +201,8 @@ async def ordo(message, data):
 
 @dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
 async def info(message, data):
-	attach = atta(message.reply_message.text, message.reply_message.attachments)
-	await message.answer(f'Стоимость сообщения {attach}')
+	exp = atta(message.reply_message.text, message.reply_message.attachments)
+	await message.answer(f'Стоимость сообщения {exp:+}')
 
 @dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
 async def hello_help(message, data):
@@ -266,23 +277,18 @@ def atta(text,attachments):
 		if attachment.type == 'photo':
 			pixel = max(size.width * size.height for size in attachment.photo.sizes)
 			count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
-		elif attachment.type == 'wall' or attachment.doc and attachment.doc.ext == 'gif':
-			count += 20
-		elif attachment.type == 'audio_message':
-			count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
-		elif attachment.type == 'video':
-			count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
-		elif attachment.type == 'sticker':
-			count += 10
-		elif attachment.type == 'audio':		
-			count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
+		elif attachment.type == 'wall' or attachment.doc and attachment.doc.ext == 'gif': count += 20
+		elif attachment.type == 'audio_message': count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
+		elif attachment.type == 'video': count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
+		elif attachment.type == 'sticker': count += 10
+		elif attachment.type == 'audio': count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
 	return count
 
 @dp.message_handler(payload = False, in_chat = True)
 async def pass_lvl(message, data):
 	if message.from_id > 0:
 		attach = atta(message.text, message.attachments)
-		data['lvl'].insert_lvl(attach, message.from_id)
+		data['lvl'].insert_lvl(message.from_id, exp = attach)
 	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f'Вы написали:\n"{message.text}".\nЯ расценила это за попытку суицида.\n[id532695720|#бля_Оля_живи!!!!!]')
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
 		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})

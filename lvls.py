@@ -1,7 +1,7 @@
 # База данных
 from psycopg2 import connect
 from psycopg2.extras import DictCursor
-# Стандартные модули
+# Дополнительные модули
 from os import getenv
 
 con = connect(getenv('DATABASE_URL'), sslmode='require')
@@ -17,8 +17,8 @@ class LVL(dict):
 		self.peer_id = peer_id
 		return self
 
-	def insert_lvl(self, exp_count, *ids):
-		cur.execute("UPDATE LVL SET EXP = EXP + %s WHERE USER_ID in %s and PEER_ID = %s",(exp_count, ids, self.peer_id))
+	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
+		cur.execute("UPDATE LVL SET LVL = LVL + %s, EXP = EXP + %s WHERE USER_ID in %s and PEER_ID = %s",(lvl, exp, ids, self.peer_id))
 		cur.execute("SELECT USER_ID,LVL,EXP FROM LVL WHERE (EXP < 0 or EXP >= LVL * 2000) and PEER_ID = %s", (self.peer_id,))
 		for row in cur.fetchall():
 			while row['exp'] >= row['lvl'] * 2000:
@@ -28,13 +28,13 @@ class LVL(dict):
 				row['lvl'] -= 1
 				row['exp'] += row['lvl'] * 2000
 			if row['lvl'] == 0: cur.execute("DELETE FROM LVL WHERE USER_ID = %s and PEER_ID = %s",(row['user_id'], self.peer_id))
-			else: cur.execute("UPDATE LVL SET LVL = %s,EXP = %s WHERE USER_ID = %s and PEER_ID = %s", (row['lvl'], row['exp'], row['user_id'], self.peer_id))
+			else: cur.execute("UPDATE LVL SET LVL = %s, EXP = %s WHERE USER_ID = %s and PEER_ID = %s", (row['lvl'], row['exp'], row['user_id'], self.peer_id))
 
-	def remove_exp(self, exp_count, id):
-		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and EXP >= %s and PEER_ID = %s",(id, exp_count, self.peer_id))
+	def remove_exp(self, id, exp = 0):
+		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and EXP >= %s and PEER_ID = %s",(id, exp, self.peer_id))
 		self.remove = bool(cur.fetchone())
 		if self.remove:
-			cur.execute("UPDATE LVL SET EXP = EXP - %s WHERE USER_ID = %s and PEER_ID = %s",(exp_count, id, self.peer_id))
+			cur.execute("UPDATE LVL SET EXP = EXP - %s WHERE USER_ID = %s and PEER_ID = %s",(exp, id, self.peer_id))
 
 	async def user(self, *ids):
 		cur.execute("SELECT USER_ID, SMILE FROM LVL WHERE USER_ID in %s and SMILE IS NOT NULL and PEER_ID = %s", (ids, self.peer_id))
@@ -64,11 +64,8 @@ class LVL(dict):
 	def add_user(self, id):
 		cur.execute("INSERT INTO LVL (USER_ID, PEER_ID) VALUES (%s, %s)", (id, self.peer_id))
 
-	def setsmile(self, char, *ids):
-		cur.execute("UPDATE LVL SET SMILE = %s WHERE USER_ID in %s and PEER_ID = %s", (char, ids, self.peer_id))
-
-	def delsmile(self, *ids):
-		cur.execute("UPDATE LVL SET SMILE = NULL WHERE USER_ID in %s and PEER_ID = %s", (ids, self.peer_id))
+	def setsmile(self, *ids, smile = None):
+		cur.execute("UPDATE LVL SET SMILE = %s WHERE USER_ID in %s and PEER_ID = %s", (smile, ids, self.peer_id))
 
 	def add_text(self, text):
 		self.hello_text()
