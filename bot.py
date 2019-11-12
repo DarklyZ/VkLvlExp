@@ -1,26 +1,27 @@
-# Для vk api
+from logging import basicConfig
 from vk import VK, types
 from vk.bot_framework import Dispatcher, NamedRule, BaseMiddleware
 from vk.utils import TaskManager
 from vk.keyboards import Keyboard, ButtonColor
-# Уровень в боте
 from lvls import LVL
-# Дополнительные модули
 from random import choice
 from json import loads
 from os import getenv
 from extra import *
 from re import *
 
+basicConfig(level="INFO")
+
 dp = Dispatcher(VK(getenv('TOKEN')), getenv('GROUP_ID'))
+task_manager = TaskManager(dp.vk.loop)
 lvl_class = LVL(dp.vk)
 
 @dp.middleware()
 class Regist(BaseMiddleware):
 	async def pre_process_event(self, event, data):
-		if event['type'] == 'message_new' and event['object']['message']['from_id'] != event['object']['message']['peer_id']:
-			data['lvl'] = lvl_class(event['object']['message']['peer_id'])
-			from_id = event['object']['message']['from_id']
+		from_id, peer_id = event['object']['message']['from_id'], event['object']['message']['peer_id']
+		if event['type'] == 'message_new' and from_id != peer_id:
+			data['lvl'] = lvl_class(peer_id)
 			data['lvl'].request_lvl(from_id)
 			if not data['lvl'].request and from_id > 0:
 				data['lvl'].add_user(from_id)
@@ -226,8 +227,6 @@ async def hello_del(message, data):
 	data['lvl'].del_text()
 	await message.answer('Приветствие удалено')
 
-#-----------------------------------------------------------------
-
 @dp.message_handler(chat_action = types.message.Action.chat_invite_user)
 async def add_user(message, data):
 	id1, id2 = message.from_id, message.action.member_id
@@ -271,19 +270,6 @@ async def add_user_link(message, data):
 		blank = data['lvl'].hello.format(title = title, user = data['lvl'][id1], name = bot_name)
 		await message.answer(blank, attachment = f'photo-{dp.group_id}_457241337')
 
-def atta(text,attachments):
-	count = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[a-zа-яё]{2,}',text,I))
-	for attachment in attachments:
-		if attachment.type == 'photo':
-			pixel = max(size.width * size.height for size in attachment.photo.sizes)
-			count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
-		elif attachment.type == 'wall' or attachment.doc and attachment.doc.ext == 'gif': count += 20
-		elif attachment.type == 'audio_message': count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
-		elif attachment.type == 'video': count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
-		elif attachment.type == 'sticker': count += 10
-		elif attachment.type == 'audio': count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
-	return count
-
 @dp.message_handler(payload = False, in_chat = True)
 async def pass_lvl(message, data):
 	if message.from_id > 0:
@@ -294,14 +280,9 @@ async def pass_lvl(message, data):
 		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
 		await message.answer(f'[id121852428|💬]Ожидайте бана…')
 
-task_manager = TaskManager(dp.vk.loop)
-
 @task_manager.add_task
 async def run():
 	dp.run_polling()
 
-async def on_startup():
-	print('Бот работает')
-
 if __name__ == "__main__":
-	task_manager.run(auto_reload = True, on_startup = on_startup)
+	task_manager.run(auto_reload = True)

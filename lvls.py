@@ -1,7 +1,5 @@
-# База данных
 from psycopg2 import connect
 from psycopg2.extras import DictCursor
-# Дополнительные модули
 from os import getenv
 
 con = connect(getenv('DATABASE_URL'), sslmode='require')
