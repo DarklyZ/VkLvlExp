@@ -1,3 +1,5 @@
+from re import *
+
 def isint(arg):
 	try: int(arg)
 	except ValueError: return False

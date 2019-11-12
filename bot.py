@@ -8,7 +8,6 @@ from random import choice
 from json import loads
 from os import getenv
 from extra import *
-from re import *
 
 basicConfig(level="INFO")
 
