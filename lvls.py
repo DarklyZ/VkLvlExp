@@ -17,7 +17,7 @@ class LVL(dict):
 
 	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
 		cur.execute("UPDATE LVL SET LVL = LVL + %s, EXP = EXP + %s WHERE USER_ID in %s and PEER_ID = %s",(lvl, exp, ids, self.peer_id))
-		cur.execute("SELECT USER_ID,LVL,EXP FROM LVL WHERE (EXP < 0 or EXP >= LVL * 2000) and PEER_ID = %s", (self.peer_id,))
+		cur.execute("SELECT USER_ID,LVL,EXP FROM LVL WHERE (EXP < 0 or LVL < 1 or EXP >= LVL * 2000) and PEER_ID = %s", (self.peer_id,))
 		for row in cur.fetchall():
 			while row['exp'] >= row['lvl'] * 2000:
 				row['exp'] -= row['lvl'] * 2000
@@ -25,8 +25,8 @@ class LVL(dict):
 			while row['exp'] < 0 and row['lvl'] > 0:
 				row['lvl'] -= 1
 				row['exp'] += row['lvl'] * 2000
-			if row['lvl'] == 0: cur.execute("DELETE FROM LVL WHERE USER_ID = %s and PEER_ID = %s",(row['user_id'], self.peer_id))
-			else: cur.execute("UPDATE LVL SET LVL = %s, EXP = %s WHERE USER_ID = %s and PEER_ID = %s", (row['lvl'], row['exp'], row['user_id'], self.peer_id))
+			if row['lvl'] > 0: cur.execute("UPDATE LVL SET LVL = %s, EXP = %s WHERE USER_ID = %s and PEER_ID = %s", (row['lvl'], row['exp'], row['user_id'], self.peer_id))
+			else: cur.execute("DELETE FROM LVL WHERE USER_ID = %s and PEER_ID = %s",(row['user_id'], self.peer_id))
 
 	def remove_exp(self, id, exp = 0):
 		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and EXP >= %s and PEER_ID = %s",(id, exp, self.peer_id))
