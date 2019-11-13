@@ -38,12 +38,11 @@ class Commands(NamedRule):
 
 	async def check(self, message, data):
 		msg = message.text.lower().split()
-		if msg and msg[0][1:] in self.commands: return True
-		else: return False
+		return msg and msg[0][1:] in self.commands
 
 @dp.setup_rule
-class Payload(NamedRule):
-	key = 'payload'
+class WithPayload(NamedRule):
+	key = 'with_payload'
 
 	def __init__(self, payload):
 		self.payload = payload
@@ -61,8 +60,7 @@ class PayloadCommands(NamedRule):
 		self.commands = commands
 
 	async def check(self, message, data):
-		if message.payload and loads(message.payload)['command'] in self.commands : return True
-		else: return False
+		return message.payload and loads(message.payload)['command'] in self.commands
 
 @dp.setup_rule
 class IsAdmin(NamedRule):
@@ -270,7 +268,7 @@ async def add_user_link(message, data):
 		blank = data['lvl'].hello.format(title = title, user = data['lvl'][id1], name = bot_name)
 		await message.answer(blank, attachment = f'photo-{dp.group_id}_457241337')
 
-@dp.message_handler(payload = False, in_chat = True)
+@dp.message_handler(with_payload = False, in_chat = True)
 async def pass_lvl(message, data):
 	if message.from_id > 0:
 		attach = atta(message.text, message.attachments)
