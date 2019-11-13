@@ -189,10 +189,11 @@ async def tele(message, data):
 		if data['lvl'].remove:
 			data['lvl'].insert_lvl(id2, exp = exp)
 			await data['lvl'].send(id1, id2)
-			await message.answer(f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}")
+			blank = f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}"
 		else:
 			await data['lvl'].send(id1)
-			await message.answer(f"Не хватает exp!\n{data['lvl'][id1]}")
+			blank = f"Не хватает Ⓔ!\n{data['lvl'][id1]}"
+		await message.answer(blank)
 
 @dp.message_handler(commands = ['ord'], count_args = 0, with_reply_message = True, in_chat = True)
 async def ordo(message, data):
@@ -202,7 +203,7 @@ async def ordo(message, data):
 @dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
 async def info(message, data):
 	exp = atta(message.reply_message.text, message.reply_message.attachments)
-	await message.answer(f'Стоимость сообщения {exp:+}')
+	await message.answer(f'Стоимость сообщения {exp:+}Ⓔ')
 
 @dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
 async def hello_help(message, data):
