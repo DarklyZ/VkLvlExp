@@ -16,10 +16,6 @@ class LVL(dict):
 		self.peer_id = peer_id
 		return self
 		
-	def __le__(self, id):
-		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and PEER_ID = %s", (id, self.peer_id))
-		return bool(cur.fetchone())
-
 	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
 		cur.execute("UPDATE LVL SET LVL = LVL + %s, EXP = EXP + %s WHERE USER_ID in %s and PEER_ID = %s",(lvl, exp, ids, self.peer_id))
 		cur.execute("SELECT USER_ID,LVL,EXP FROM LVL WHERE (EXP < 0 or LVL < 1 or EXP >= LVL * 2000) and PEER_ID = %s", (self.peer_id,))
@@ -60,6 +56,10 @@ class LVL(dict):
 			rows = cur.fetchall()
 			await self.user(*(row['user_id'] for row in rows))
 			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
+
+	def check(self, id):
+		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and PEER_ID = %s", (id, self.peer_id))
+		return bool(cur.fetchone())
 
 	def add_user(self, id):
 		cur.execute("INSERT INTO LVL (USER_ID, PEER_ID) VALUES (%s, %s)", (id, self.peer_id))

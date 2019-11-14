@@ -22,7 +22,7 @@ class Regist(BaseMiddleware):
 		if event['type'] == 'message_new' and from_id != peer_id:
 			data['lvl'] = lvl_class(peer_id)
 			data['lvl'].request_lvl(from_id)
-			if not from_id => data['lvl'] and from_id > 0:
+			if not data['lvl'].check(from_id) and from_id > 0:
 				data['lvl'].add_user(from_id)
 		return data
 
