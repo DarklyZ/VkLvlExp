@@ -12,8 +12,13 @@ class LVL(dict):
 		self.vk = vk
 
 	def __call__(self, peer_id):
+		self.clear()
 		self.peer_id = peer_id
 		return self
+		
+	def __le__(self, id):
+		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and PEER_ID = %s", (id, self.peer_id))
+		return bool(cur.fetchone())
 
 	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
 		cur.execute("UPDATE LVL SET LVL = LVL + %s, EXP = EXP + %s WHERE USER_ID in %s and PEER_ID = %s",(lvl, exp, ids, self.peer_id))
@@ -30,9 +35,10 @@ class LVL(dict):
 
 	def remove_exp(self, id, exp = 0):
 		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and EXP >= %s and PEER_ID = %s",(id, exp, self.peer_id))
-		self.remove = bool(cur.fetchone())
-		if self.remove:
+		if cur.fetchone():
 			cur.execute("UPDATE LVL SET EXP = EXP - %s WHERE USER_ID = %s and PEER_ID = %s",(exp, id, self.peer_id))
+			return True
+		else: return False
 
 	async def user(self, *ids):
 		cur.execute("SELECT USER_ID, SMILE FROM LVL WHERE USER_ID in %s and SMILE IS NOT NULL and PEER_ID = %s", (ids, self.peer_id))
@@ -49,15 +55,11 @@ class LVL(dict):
 
 	async def toplvl_size(self, x, y):
 		try: cur.execute("SELECT row_number() OVER (ORDER BY LVL DESC,EXP DESC),USER_ID,LVL,EXP FROM LVL WHERE PEER_ID = %s LIMIT %s OFFSET %s", (self.peer_id, y - x + 1, x - 1))
-		except: self.toplvl = f'Я не могу отобразить {x} - {y}'
+		except: return f'Я не могу отобразить {x} - {y}'
 		else:
 			rows = cur.fetchall()
 			await self.user(*(row['user_id'] for row in rows))
-			self.toplvl = f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
-
-	def request_lvl(self, id):
-		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and PEER_ID = %s", (id, self.peer_id))
-		self.request = bool(cur.fetchone())
+			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 
 	def add_user(self, id):
 		cur.execute("INSERT INTO LVL (USER_ID, PEER_ID) VALUES (%s, %s)", (id, self.peer_id))
@@ -66,8 +68,7 @@ class LVL(dict):
 		cur.execute("UPDATE LVL SET SMILE = %s WHERE USER_ID in %s and PEER_ID = %s", (smile, ids, self.peer_id))
 
 	def add_text(self, text):
-		self.hello_text()
-		if self.hello: cur.execute("UPDATE HELLO SET TEXT = %s WHERE PEER_ID = %s", (text, self.peer_id))
+		if self.hello_text(): cur.execute("UPDATE HELLO SET TEXT = %s WHERE PEER_ID = %s", (text, self.peer_id))
 		else: cur.execute("INSERT INTO HELLO (PEER_ID, TEXT) VALUES (%s, %s)", (self.peer_id, text))
 
 	def del_text(self):
@@ -76,4 +77,5 @@ class LVL(dict):
 	def hello_text(self):
 		cur.execute("SELECT TEXT FROM HELLO WHERE PEER_ID = %s", (self.peer_id,))
 		row = cur.fetchone()
-		self.hello = row['text'] if row else None
+		return row['text'] if row else False
+		

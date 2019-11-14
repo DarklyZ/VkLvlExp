@@ -22,7 +22,7 @@ class Regist(BaseMiddleware):
 		if event['type'] == 'message_new' and from_id != peer_id:
 			data['lvl'] = lvl_class(peer_id)
 			data['lvl'].request_lvl(from_id)
-			if not data['lvl'].request and from_id > 0:
+			if not from_id => data['lvl'] and from_id > 0:
 				data['lvl'].add_user(from_id)
 		return data
 
@@ -105,8 +105,7 @@ async def h_(message, data):
 async def toplvl_send(message, data):
 	reg_default = ('1', '10')
 	reg = (int(data.get('args', reg_default)[0]), int(data.get('args', reg_default)[1]))
-	await data['lvl'].toplvl_size(*reg)
-	await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'message' : data['lvl'].toplvl, 'disable_mentions' : True})
+	await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'message' : await data['lvl'].toplvl_size(*reg), 'disable_mentions' : True})
 
 @dp.message_handler(commands = ['mylvl'], count_args = 0, in_chat = True)
 async def mylvl(message, data):
@@ -228,13 +227,13 @@ async def hello_del(message, data):
 @dp.message_handler(chat_action = types.message.Action.chat_invite_user)
 async def add_user(message, data):
 	id1, id2 = message.from_id, message.action.member_id
-	data['lvl'].hello_text()
-	if id1 > 0 and id2 > 0 and data['lvl'].hello:
+	text = data['lvl'].hello_text()
+	if id1 > 0 and id2 > 0 and text:
 		await data['lvl'].user(id1,id2)
 		if id1 != id2:
 			title = f"* Welcome to the club, buddy. *\nВас призвал(а): {data['lvl'][id1]}"
 			bot_name = (await dp.vk.api_request('groups.getById', {'group_id' : dp.group_id}))[0]['name']
-			blank = data['lvl'].hello.format(title = title, user = data['lvl'][id2], name = bot_name)
+			blank = text.format(title = title, user = data['lvl'][id2], name = bot_name)
 			photo = 457241337
 		else:
 			blank = f"Вернулся(ась) {data['lvl'][id1]}."
@@ -244,28 +243,26 @@ async def add_user(message, data):
 @dp.message_handler(chat_action = types.message.Action.chat_kick_user, is_admin = False)
 async def remove_user(message, data):
 	id2 = message.action.member_id
-	data['lvl'].hello_text()
-	if id2 > 0 and data['lvl'].hello:
+	if id2 > 0 and data['lvl'].hello_text():
 		await data['lvl'].user(id2)
 		await message.answer(f"{data['lvl'][id2]} стал(а) натуралом(.", attachment = f'photo-{dp.group_id}_457241328')
 
 @dp.message_handler(chat_action = types.message.Action.chat_kick_user, is_admin = True)
 async def remove_user_admin(message, data):
 	id2 = message.action.member_id
-	data['lvl'].hello_text()
-	if id2 > 0 and data['lvl'].hello:
+	if id2 > 0 and data['lvl'].hello_text():
 		await data['lvl'].user(id2)
 		await message.answer(f"{data['lvl'][id2]} заебал(а) админа.", attachment = f'photo-{dp.group_id}_457241336')
 
 @dp.message_handler(chat_action = types.message.Action.chat_invite_user_by_link)
 async def add_user_link(message, data):
 	id1 = message.from_id
-	data['lvl'].hello_text()
-	if id1 > 0 and data['lvl'].hello:
+	text = data['lvl'].hello_text()
+	if id1 > 0 and text:
 		await data['lvl'].user(id1)
 		title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
 		bot_name = (await dp.vk.api_request('groups.getById', {'group_id': dp.group_id}))[0]['name']
-		blank = data['lvl'].hello.format(title = title, user = data['lvl'][id1], name = bot_name)
+		blank = text.format(title = title, user = data['lvl'][id1], name = bot_name)
 		await message.answer(blank, attachment = f'photo-{dp.group_id}_457241337')
 
 @dp.message_handler(with_payload = False, in_chat = True)
