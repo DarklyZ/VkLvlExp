@@ -30,8 +30,8 @@ class LVL(dict):
 			else: cur.execute("DELETE FROM LVL WHERE USER_ID = %s and PEER_ID = %s",(row['user_id'], self.peer_id))
 
 	def remove_exp(self, id, exp = 0):
-		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and EXP >= %s and PEER_ID = %s",(id, exp, self.peer_id))
-		if cur.fetchone():
+		cur.execute("SELECT TRUE FROM LVL WHERE USER_ID = %s and EXP >= %s and PEER_ID = %s",(id, exp, self.peer_id))
+		if cur.fetchone().get('bool'):
 			cur.execute("UPDATE LVL SET EXP = EXP - %s WHERE USER_ID = %s and PEER_ID = %s",(exp, id, self.peer_id))
 			return True
 		else: return False
@@ -58,8 +58,8 @@ class LVL(dict):
 			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 
 	def check(self, id):
-		cur.execute("SELECT USER_ID FROM LVL WHERE USER_ID = %s and PEER_ID = %s", (id, self.peer_id))
-		return bool(cur.fetchone())
+		cur.execute("SELECT TRUE FROM LVL WHERE USER_ID = %s and PEER_ID = %s", (id, self.peer_id))
+		return cur.fetchone().get('bool')
 
 	def add_user(self, id):
 		cur.execute("INSERT INTO LVL (USER_ID, PEER_ID) VALUES (%s, %s)", (id, self.peer_id))
@@ -76,6 +76,5 @@ class LVL(dict):
 
 	def hello_text(self):
 		cur.execute("SELECT TEXT FROM HELLO WHERE PEER_ID = %s", (self.peer_id,))
-		row = cur.fetchone()
-		return row['text'] if row else False
+		return cur.fetchone().get('text')
 		
