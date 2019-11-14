@@ -18,7 +18,8 @@ class LVL(dict):
 		
 	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
 		cur.execute("update lvl set lvl = lvl + %s, exp = exp + %s where user_id in %s and peer_id = %s",(lvl, exp, ids, self.peer_id))
-		cur.execute("select user_id,lvl,exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = %s", (self.peer_id,))for row in cur.fetchall():
+		cur.execute("select user_id,lvl,exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = %s", (self.peer_id,))
+		for row in cur.fetchall():
 			while row['exp'] >= row['lvl'] * 2000:
 				row['exp'] -= row['lvl'] * 2000
 				row['lvl'] += 1
