@@ -23,6 +23,7 @@ class Regist(BaseMiddleware):
 			data['lvl'] = lvl_class(peer_id)
 			if not data['lvl'].check_user(from_id) and from_id > 0:
 				data['lvl'].add_user(from_id)
+		data['message'] = event['object']['message']
 		return data
 
 	async def post_process_event(self):
@@ -181,8 +182,7 @@ async def tele(message, data):
 	if message.reply_message.from_id > 0:
 		exp = int(data['args'][0])
 		id1, id2 = message.from_id, message.reply_message.from_id
-		data['lvl'].remove_exp(id1, exp = exp)
-		if data['lvl'].remove:
+		if data['lvl'].remove_exp(id1, exp = exp):
 			data['lvl'].insert_lvl(id2, exp = exp)
 			await data['lvl'].send(id1, id2)
 			blank = f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}"
@@ -198,7 +198,7 @@ async def ordo(message, data):
 
 @dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
 async def info(message, data):
-	exp = atta(message.reply_message.text, message.reply_message.attachments)
+	exp = atta(message.reply_message.text, data['message']['reply_message']['attachments'])
 	await message.answer(f'Стоимость сообщения {exp:+}Ⓔ')
 
 @dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
