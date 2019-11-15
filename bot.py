@@ -267,12 +267,12 @@ async def add_user_link(message, data):
 @dp.message_handler(with_payload = False, in_chat = True)
 async def pass_lvl(message, data):
 	if message.from_id > 0:
-		attach = atta(message.text, message.attachments)
-		data['lvl'].insert_lvl(message.from_id, exp = attach)
+		exp = atta(message.text, message.attachments)
+		data['lvl'].insert_lvl(message.from_id, exp = exp)
 	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f'Вы написали:\n"{message.text}".\nЯ расценила это за попытку суицида.\n[id532695720|#бля_Оля_живи!!!!!]')
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
 		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
-		await message.answer(f'[id121852428|💬]Ожидайте бана…')
+		await message.answer(f'[id121852428|💬][id{message.from_id}|🃏]Ожидайте бана…')
 
 @task_manager.add_task
 async def run():
