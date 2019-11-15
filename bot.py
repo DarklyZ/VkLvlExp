@@ -182,8 +182,7 @@ async def tele(message, data):
 	if message.reply_message.from_id > 0:
 		exp = int(data['args'][0])
 		id1, id2 = message.from_id, message.reply_message.from_id
-		data['lvl'].remove_exp(id1, exp = exp)
-		if data['lvl'].remove:
+		if data['lvl'].remove_exp(id1, exp = exp):
 			data['lvl'].insert_lvl(id2, exp = exp)
 			await data['lvl'].send(id1, id2)
 			blank = f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}"
