@@ -23,7 +23,7 @@ class Regist(BaseMiddleware):
 			if from_id != peer_id:
 				data['lvl'] = lvl_class(peer_id)
 				if not data['lvl'].check_user(from_id) and from_id > 0: data['lvl'].add_user(from_id)
-			data['message'] = event['object']['message']
+			data['message_new'] = event['object']['message']
 		return data
 
 	async def post_process_event(self):
@@ -198,7 +198,7 @@ async def ordo(message, data):
 
 @dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
 async def info(message, data):
-	exp = atta(message.reply_message.text, message.reply_message.attachments, data['message']['reply_message']['attachments'])
+	exp = atta(message.reply_message.text, message.reply_message.attachments, data['message_new']['reply_message']['attachments'])
 	await message.answer(f'Стоимость сообщения {exp:+}Ⓔ')
 
 @dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
@@ -267,7 +267,7 @@ async def add_user_link(message, data):
 @dp.message_handler(with_payload = False, in_chat = True)
 async def pass_lvl(message, data):
 	if message.from_id > 0:
-		exp = atta(message.text, message.attachments, data['message']['attachments'])
+		exp = atta(message.text, message.attachments, data['message_new']['attachments'])
 		data['lvl'].insert_lvl(message.from_id, exp = exp)
 	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f'Вы написали:\n"{message.text}".\nЯ расценила это за попытку суицида.\n[id532695720|#бля_Оля_живи!!!!!]')
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
