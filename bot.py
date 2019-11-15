@@ -198,7 +198,7 @@ async def ordo(message, data):
 
 @dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
 async def info(message, data):
-	exp = atta(message.reply_message.text, data['message']['reply_message']['attachments'])
+	exp = atta(message.reply_message.text, message.reply_message.attachments)
 	await message.answer(f'Стоимость сообщения {exp:+}Ⓔ')
 
 @dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
