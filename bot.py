@@ -19,11 +19,11 @@ lvl_class = LVL(dp.vk)
 class Regist(BaseMiddleware):
 	async def pre_process_event(self, event, data):
 		from_id, peer_id = event['object']['message']['from_id'], event['object']['message']['peer_id']
-		if event['type'] == 'message_new' and from_id != peer_id:
-			data['lvl'] = lvl_class(peer_id)
-			if not data['lvl'].check_user(from_id) and from_id > 0:
-				data['lvl'].add_user(from_id)
-		data['message'] = event['object']['message']
+		if event['type'] == 'message_new':
+			if from_id != peer_id:
+				data['lvl'] = lvl_class(peer_id)
+				if not data['lvl'].check_user(from_id) and from_id > 0: data['lvl'].add_user(from_id)
+			data['message'] = event['object']['message']
 		return data
 
 	async def post_process_event(self):
