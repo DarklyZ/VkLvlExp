@@ -227,7 +227,7 @@ async def hello_del(message, data):
 async def add_user(message, data):
 	id1, id2 = message.from_id, message.action.member_id
 	text = data['lvl'].hello_text()
-	if id1 > 0 and id2 > 0 and text is not Null:
+	if id1 > 0 and id2 > 0 and text is not None:
 		await data['lvl'].user(id1,id2)
 		if id1 != id2:
 			title = f"* Welcome to the club, buddy. *\nВас призвал(а): {data['lvl'][id1]}"
@@ -242,14 +242,14 @@ async def add_user(message, data):
 @dp.message_handler(chat_action = types.message.Action.chat_kick_user, is_admin = False)
 async def remove_user(message, data):
 	id2 = message.action.member_id
-	if id2 > 0 and data['lvl'].hello_text() is not Null:
+	if id2 > 0 and data['lvl'].hello_text() is not None:
 		await data['lvl'].user(id2)
 		await message.answer(f"{data['lvl'][id2]} стал(а) натуралом(.", attachment = f'photo-{dp.group_id}_457241328')
 
 @dp.message_handler(chat_action = types.message.Action.chat_kick_user, is_admin = True)
 async def remove_user_admin(message, data):
 	id2 = message.action.member_id
-	if id2 > 0 and data['lvl'].hello_text() is not Null:
+	if id2 > 0 and data['lvl'].hello_text() is not None:
 		await data['lvl'].user(id2)
 		await message.answer(f"{data['lvl'][id2]} заебал(а) админа.", attachment = f'photo-{dp.group_id}_457241336')
 
@@ -257,7 +257,7 @@ async def remove_user_admin(message, data):
 async def add_user_link(message, data):
 	id1 = message.from_id
 	text = data['lvl'].hello_text()
-	if id1 > 0 and text is not Null:
+	if id1 > 0 and text is not None:
 		await data['lvl'].user(id1)
 		title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
 		bot_name = (await dp.vk.api_request('groups.getById', {'group_id': dp.group_id}))[0]['name']
