@@ -68,7 +68,7 @@ class LVL(dict):
 		cur.execute("update lvl set smile = %s where user_id in %s and peer_id = %s", (smile, ids, self.peer_id))
 
 	def add_text(self, text):
-		if self.hello_text(): cur.execute("update hello set text = %s where peer_id = %s", (text, self.peer_id))
+		if self.hello_text() is not Null: cur.execute("update hello set text = %s where peer_id = %s", (text, self.peer_id))
 		else: cur.execute("insert into hello (peer_id, text) values (%s, %s)", (self.peer_id, text))
 
 	def del_text(self):
