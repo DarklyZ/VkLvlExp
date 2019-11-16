@@ -8,7 +8,7 @@ con.autocommit = True
 
 class LVL(dict):
 	def __init__(self, vk):
-		super().__init__()
+		dict.__init__(self)
 		self.vk = vk
 
 	def __call__(self, peer_id):
