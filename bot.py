@@ -172,7 +172,7 @@ async def exp(message, data):
 async def expp(message, data):
 	if message.reply_message.from_id > 0:
 		id = message.reply_message.from_id
-		exp =  int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		exp =  int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments, data['message_new']['reply_message']['attachments'])}")
 		data['lvl'].insert_lvl(id, exp = exp)
 		await data['lvl'].send(id)
 		await message.answer(f"{exp:+}Ⓔ:\n{data['lvl'][id]}")
