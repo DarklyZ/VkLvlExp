@@ -20,7 +20,7 @@ def atta(text = '', attachments = [], event_attachments = []):
 			count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
 		elif attachment.type == 'wall' and event_attachment is not None:
 			wall = WallPost(**event_attachment['wall'])
-			count += atta(attachments = wall.attachments)
+			if wall.attachments is not None: count += atta(attachments = wall.attachments)
 		elif attachment.type == 'doc' and attachment.doc.ext == 'gif': count += 20
 		elif attachment.type == 'audio_message': count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
 		elif attachment.type == 'video': count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
