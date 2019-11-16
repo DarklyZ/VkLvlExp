@@ -18,12 +18,11 @@ lvl_class = LVL(dp.vk)
 @dp.middleware()
 class Regist(BaseMiddleware):
 	async def pre_process_event(self, event, data):
+		data['event'] = event
 		from_id, peer_id = event['object']['message']['from_id'], event['object']['message']['peer_id']
-		if event['type'] == 'message_new':
-			if from_id != peer_id:
-				data['lvl'] = lvl_class(peer_id)
-				if not data['lvl'].check_user(from_id) and from_id > 0: data['lvl'].add_user(from_id)
-			data['message_new'] = event['object']['message']
+		if event['type'] == 'message_new' and from_id != peer_id:
+			data['lvl'] = lvl_class(peer_id)
+			if not data['lvl'].check_user(from_id) and from_id > 0: data['lvl'].add_user(from_id)
 		return data
 
 	async def post_process_event(self):
@@ -172,7 +171,7 @@ async def exp(message, data):
 async def expp(message, data):
 	if message.reply_message.from_id > 0:
 		id = message.reply_message.from_id
-		exp =  int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments, data['message_new']['reply_message']['attachments'])}")
+		exp =  int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments, data['event']['object']['message']['reply_message']['attachments'])}")
 		data['lvl'].insert_lvl(id, exp = exp)
 		await data['lvl'].send(id)
 		await message.answer(f"{exp:+}Ⓔ:\n{data['lvl'][id]}")
@@ -198,7 +197,7 @@ async def ordo(message, data):
 
 @dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
 async def info(message, data):
-	exp = atta(message.reply_message.text, message.reply_message.attachments, data['message_new']['reply_message']['attachments'])
+	exp = atta(message.reply_message.text, message.reply_message.attachments, data['event']['object']['message']['reply_message']['attachments'])
 	await message.answer(f"Стоимость сообщения {exp:+}Ⓔ")
 
 @dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
@@ -267,12 +266,12 @@ async def add_user_link(message, data):
 @dp.message_handler(with_payload = False, in_chat = True)
 async def pass_lvl(message, data):
 	if message.from_id > 0:
-		exp = atta(message.text, message.attachments, data['message_new']['attachments'])
+		exp = atta(message.text, message.attachments, data['event']['object']['message']['attachments'])
 		data['lvl'].insert_lvl(message.from_id, exp = exp)
-	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f'Вы написали:\n"{message.text}".\nЯ расценила это за попытку суицида.\n[id532695720|#бля_Оля_живи!!!!!]')
+	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{data['lvl'].getconst('olga_id')}|#бля_Оля_живи!!!!!]")
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
 		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
-		await message.answer(f'[id121852428|💬][id{message.from_id}|🃏]Ожидайте бана…')
+		await message.answer(f"[id{data['lvl'].getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
 
 @task_manager.add_task
 async def run():

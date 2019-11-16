@@ -16,6 +16,10 @@ class LVL(dict):
 		self.peer_id = peer_id
 		return self
 		
+	def getconst(self, const):
+		cur.execute("select * from myconstants")
+		return cur.fetchone()[const]
+		
 	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
 		cur.execute("update lvl set lvl = lvl + %s, exp = exp + %s where user_id in %s and peer_id = %s",(lvl, exp, ids, self.peer_id))
 		cur.execute("select user_id,lvl,exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = %s", (self.peer_id,))
