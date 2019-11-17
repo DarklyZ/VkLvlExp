@@ -18,7 +18,8 @@ class LVL(dict):
 		self.con.close()
 
 	async def getconst(self, const):
-		return await self.con.fetchrow("select * from myconstants")[const]
+		row = await self.con.fetchrow("select * from myconstants")
+		return row[const]
 		
 	async def insert_lvl(self, *ids, lvl = 0, exp = 0):
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2 where user_id = any($3) and peer_id = $4", lvl, exp, ids, self.peer_id)
