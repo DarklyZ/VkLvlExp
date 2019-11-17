@@ -283,7 +283,7 @@ async def pass_lvl(message, data):
 	if message.from_id > 0:
 		exp = atta(message.text, data.object.message.attachments)
 		await data.lvl.insert_lvl(message.from_id, exp = exp)
-	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{data.lvl.getconst('olga_id')}|#бля_Оля_живи!!!!!]")
+	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{await data.lvl.getconst('olga_id')}|#бля_Оля_живи!!!!!]")
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
 		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
 		await message.answer(f"[id{await data.lvl.getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
