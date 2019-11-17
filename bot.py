@@ -294,7 +294,7 @@ async def run():
 	dp.run_polling()
 
 async def on_shutdown():
-	dp.vk.close()
+	await dp.vk.close()
 	await lvl_class.close_db()
 
 if __name__ == "__main__":
