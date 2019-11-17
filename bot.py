@@ -60,7 +60,7 @@ class PayloadCommands(NamedRule):
 		self.commands = commands
 
 	async def check(self, message, data):
-		return message.payload and loads(message.payload)['command'] in self.commands
+		return message.payload and loads(message.payload, object_hook = udict).command in self.commands
 
 @dp.setup_rule
 class IsAdmin(NamedRule):
