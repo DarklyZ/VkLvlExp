@@ -15,7 +15,7 @@ class LVL(dict):
 		self.con = await connect(getenv('DATABASE_URL'), ssl = 'require')
 
 	async def close_db(self):
-		self.con.close()
+		await self.con.close()
 
 	async def getconst(self, const):
 		row = await self.con.fetchrow("select * from myconstants")
