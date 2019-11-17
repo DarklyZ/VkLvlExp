@@ -1,2 +1,2 @@
-psycopg2-binary
 https://github.com/prostomarkeloff/vk.py/archive/master.zip
+asyncpg

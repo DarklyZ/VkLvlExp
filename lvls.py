@@ -1,10 +1,5 @@
-from psycopg2 import connect
-from psycopg2.extras import DictCursor
+from asyncpg import connect
 from os import getenv
-
-con = connect(getenv('DATABASE_URL'), sslmode='require')
-cur = con.cursor(cursor_factory = DictCursor)
-con.autocommit = True
 
 class LVL(dict):
 	def __init__(self, vk):
@@ -15,70 +10,75 @@ class LVL(dict):
 		self.clear()
 		self.peer_id = peer_id
 		return self
-		
-	def getconst(self, const):
-		cur.execute("select * from myconstants")
-		return cur.fetchone()[const]
-		
-	def insert_lvl(self,  *ids, lvl = 0, exp = 0):
-		cur.execute("update lvl set lvl = lvl + %s, exp = exp + %s where user_id in %s and peer_id = %s",(lvl, exp, ids, self.peer_id))
-		cur.execute("select user_id,lvl,exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = %s", (self.peer_id,))
-		for row in cur.fetchall():
-			while row['exp'] >= row['lvl'] * 2000:
-				row['exp'] -= row['lvl'] * 2000
-				row['lvl'] += 1
-			while row['exp'] < 0 and row['lvl'] > 0:
-				row['lvl'] -= 1
-				row['exp'] += row['lvl'] * 2000
-			if row['lvl'] > 0: cur.execute("update lvl set lvl = %s, exp = %s where user_id = %s and peer_id = %s", (row['lvl'], row['exp'], row['user_id'], self.peer_id))
-			else: cur.execute("delete from lvl where user_id = %s and peer_id = %s",(row['user_id'], self.peer_id))
+	
+	async def run_db(self):
+		self.con = await connect(getenv('DATABASE_URL'), ssl = 'require')
 
-	def remove_exp(self, id, exp = 0):
-		cur.execute("select count(*) > 0 as bool from lvl where user_id = %s and exp >= %s and peer_id = %s",(id, exp, self.peer_id))
-		if cur.fetchone()['bool']:
-			cur.execute("update lvl set exp = exp - %s where user_id = %s and peer_id = %s",(exp, id, self.peer_id))
+	async def close_db(self):
+		self.con.close()
+
+	async def getconst(self, const):
+		return await self.con.fetchrow("select * from myconstants")[const]
+		
+	async def insert_lvl(self, *ids, lvl = 0, exp = 0):
+		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2 where user_id = any($3) and peer_id = $4", lvl, exp, ids, self.peer_id)
+		rows = await self.con.fetch("select user_id,lvl,exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = $1", self.peer_id)
+		for row in rows:
+			row_lvl, row_exp = row['lvl'], row['exp']
+			while row_exp >= row_lvl * 2000:
+				row_exp -= row_lvl * 2000
+				row_lvl += 1
+			while row_exp < 0 and row_lvl > 0:
+				row_lvl -= 1
+				row_exp += row_lvl * 2000
+			if row_lvl > 0: await self.con.execute("update lvl set lvl = $1, exp = $2 where user_id = $3 and peer_id = $4", row_lvl, row_exp, row['user_id'], self.peer_id)
+			else: await self.con.execute("delete from lvl where user_id = $1 and peer_id = $2", row['user_id'], self.peer_id)
+
+	async def remove_exp(self, id, exp = 0):
+		row = await self.con.fetchrow("select count(*) > 0 as bool from lvl where user_id = $1 and exp >= $2 and peer_id = $3", id, exp, self.peer_id)
+		if row['bool']:
+			await self.con.execute("update lvl set exp = exp - $1 where user_id = $2 and peer_id = $3", exp, id, self.peer_id)
 			return True
 		else: return False
 
 	async def user(self, *ids):
-		cur.execute("select user_id, smile from lvl where user_id in %s and smile is not null and peer_id = %s", (ids, self.peer_id))
-		smile = {row['user_id'] : row['smile'] for row in cur.fetchall()}
-		cur.execute("select user_id from lvl where peer_id = %s order by lvl desc, exp desc limit 3", (self.peer_id,))
-		top = {row['user_id'] : smile for row, smile in zip(cur.fetchall(), ('🥇', '🥈', '🥉'))}
+		rows = await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)
+		smile = {row['user_id'] : row['smile'] for row in rows}
+		rows = await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id)
+		top = {row['user_id'] : smile for row, smile in zip(rows, ('🥇', '🥈', '🥉'))}
 		self.update({user['id'] : f"{top.get(user['id'], '')}{user['first_name']} {user['last_name'][:3]}{smile.get(user['id'], '')}" for user in await self.vk.api_request('users.get', {'user_ids' : str(ids)[1:-1]})})
 
 	async def send(self, *ids):
-		cur.execute("select user_id,lvl,exp from lvl where user_id in %s and peer_id = %s", (ids, self.peer_id))
-		lvl = {row['user_id'] : f"{row['lvl']}Ⓛ|{row['exp']}/{row['lvl'] * 2000}Ⓔ" for row in cur.fetchall()}
+		rows = await self.con.fetch("select user_id,lvl,exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)
+		lvl = {row['user_id'] : f"{row['lvl']}Ⓛ|{row['exp']}/{row['lvl'] * 2000}Ⓔ" for row in rows}
 		await self.user(*ids)
 		self.update({id : f"{self[id]}:{lvl.get(id, 'lvl:error')}" for id in ids})
 
 	async def toplvl_size(self, x, y):
-		try: cur.execute("select row_number() over (order by lvl desc,exp desc),user_id,lvl,exp from lvl where peer_id = %s limit %s offset %s", (self.peer_id, y - x + 1, x - 1))
+		try: rows = await self.con.fetch("select row_number() over (order by lvl desc,exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
 		except: return f'Я не могу отобразить {x} - {y}'
 		else:
-			rows = cur.fetchall()
 			await self.user(*(row['user_id'] for row in rows))
 			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 
-	def check_user(self, id):
-		cur.execute("select count(*) > 0 as bool from lvl where user_id = %s and peer_id = %s", (id, self.peer_id))
-		return cur.fetchone()['bool']
+	async def check_user(self, id):
+		row = await self.con.fetchrow("select count(*) > 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
+		return row['bool']
 
-	def add_user(self, id):
-		cur.execute("insert into lvl (user_id, peer_id) values (%s, %s)", (id, self.peer_id))
+	async def add_user(self, id):
+		await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
-	def setsmile(self, *ids, smile = None):
-		cur.execute("update lvl set smile = %s where user_id in %s and peer_id = %s", (smile, ids, self.peer_id))
+	async def setsmile(self, *ids, smile = None):
+		await self.con.execute("update lvl set smile = %s where user_id = any($1) and peer_id = $2", smile, ids, self.peer_id)
 
-	def add_text(self, text):
-		if self.hello_text() is not None: cur.execute("update hello set text = %s where peer_id = %s", (text, self.peer_id))
-		else: cur.execute("insert into hello (peer_id, text) values (%s, %s)", (self.peer_id, text))
+	async def add_text(self, text):
+		if self.hello_text() is not None: await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
+		else: await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
 
-	def del_text(self):
-		cur.execute("delete from hello where peer_id = %s", (self.peer_id,))
+	async def del_text(self):
+		await self.con.execute("delete from hello where peer_id = $1", self.peer_id,)
 
-	def hello_text(self):
-		cur.execute("select text from hello where peer_id = %s", (self.peer_id,))
-		return cur.fetchone().get('text')
+	async def hello_text(self):
+		row = await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)
+		return row.get('text')
 		

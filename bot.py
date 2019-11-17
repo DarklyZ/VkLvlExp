@@ -22,7 +22,7 @@ class Regist(BaseMiddleware):
 		from_id, peer_id = event.object.message.from_id, event.object.message.peer_id
 		if event.type == 'message_new' and from_id != peer_id:
 			data.lvl = lvl_class(peer_id)
-			if not data.lvl.check_user(from_id) and from_id > 0: data.lvl.add_user(from_id)
+			if not await data.lvl.check_user(from_id) and from_id > 0: await data.lvl.add_user(from_id)
 		data.update(event)
 		return data
 
@@ -143,13 +143,13 @@ async def echo(message, data):
 @dp.message_handler(commands = ['setsmile'], have_args = [lambda arg: len(arg) <= 4], is_admin = True, with_reply_message = True, in_chat = True)
 async def set_smile(message, data):
 	if message.reply_message.from_id > 0:
-		data.lvl.setsmile(message.reply_message.from_id, smile = data.args[0])
+		await data.lvl.setsmile(message.reply_message.from_id, smile = data.args[0])
 		await message.answer(f"{data.args[0]} : установлен")
 
 @dp.message_handler(commands = ['delsmile'], count_args = 0, is_admin = True, with_reply_message = True, in_chat = True)
 async def del_smile(message, data):
 	if message.reply_message.from_id > 0:
-		data.lvl.setsmile(message.reply_message.from_id)
+		await data.lvl.setsmile(message.reply_message.from_id)
 		await message.answer('Смайл удалён')
 
 @dp.message_handler(commands = ['exp'], have_args = [isint], is_admin = True, with_reply_message = True, in_chat = True)
@@ -160,11 +160,11 @@ async def exp(message, data):
 		if len(data.args) == 2:
 			lvl, exp = int(data.args[0]), int(data.args[1])
 			blank = f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n"
-			data.lvl.insert_lvl(id, lvl = lvl, exp = exp)
+			await data.lvl.insert_lvl(id, lvl = lvl, exp = exp)
 		else:
 			exp = int(data.args[0])
 			blank = f"{exp:+}Ⓔ:\n"
-			data.lvl.insert_lvl(id, exp = exp)
+			await data.lvl.insert_lvl(id, exp = exp)
 		await data.lvl.send(id)
 		await message.answer(blank + data.lvl[id])
 
@@ -172,8 +172,8 @@ async def exp(message, data):
 async def expp(message, data):
 	if message.reply_message.from_id > 0:
 		id = message.reply_message.from_id
-		exp =  int(f"{data.args[0]}{atta(message.reply_message.text, data.object.message.reply_message.attachments)}")
-		data.lvl.insert_lvl(id, exp = exp)
+		exp = int(f"{data.args[0]}{atta(message.reply_message.text, data.object.message.reply_message.attachments)}")
+		await data.lvl.insert_lvl(id, exp = exp)
 		await data.lvl.send(id)
 		await message.answer(f"{exp:+}Ⓔ:\n{data.lvl[id]}")
 
@@ -182,8 +182,8 @@ async def tele(message, data):
 	if message.reply_message.from_id > 0:
 		id1, id2 = message.from_id, message.reply_message.from_id
 		exp = int(data.args[0])
-		if data.lvl.remove_exp(id1, exp = exp):
-			data.lvl.insert_lvl(id2, exp = exp)
+		if await data.lvl.remove_exp(id1, exp = exp):
+			await data.lvl.insert_lvl(id2, exp = exp)
 			await data.lvl.send(id1, id2)
 			blank = f"{exp:+}Ⓔ:\n{data.lvl[id2]}\n{-exp:+}Ⓔ:\n{data.lvl[id1]}"
 		else:
@@ -195,9 +195,9 @@ async def tele(message, data):
 async def telep(message, data):
 	if message.reply_message.from_id > 0:
 		id1, id2 = message.from_id, message.reply_message.from_id
-		exp =  atta(message.reply_message.text, data.object.message.reply_message.attachments)
-		if data.lvl.remove_exp(id1, exp = exp):
-			data.lvl.insert_lvl(id2, exp = exp)
+		exp = atta(message.reply_message.text, data.object.message.reply_message.attachments)
+		if await data.lvl.remove_exp(id1, exp = exp):
+			await data.lvl.insert_lvl(id2, exp = exp)
 			await data.lvl.send(id1, id2)
 			blank = f"{exp:+}Ⓔ:\n{data.lvl[id2]}\n{-exp:+}Ⓔ:\n{data.lvl[id1]}"
 		else:
@@ -229,18 +229,18 @@ async def hello_plus(message, data):
 	try: hello = text.format(title = 'title', user = 'user', name = 'name')
 	except Exception as e: await message.answer(f'Ошибка "{e}"')
 	else:
-		data.lvl.add_text(text)
+		await data.lvl.add_text(text)
 		await message.answer('Приветствие полученно\n' + hello)
 
 @dp.message_handler(commands = ['delhello'], count_args = 0, is_admin = True, in_chat = True)
 async def hello_del(message, data):
-	data.lvl.del_text()
+	await data.lvl.del_text()
 	await message.answer('Приветствие удалено')
 
 @dp.message_handler(chat_action = types.message.Action.chat_invite_user)
 async def add_user(message, data):
 	id1, id2 = message.from_id, message.action.member_id
-	text = data.lvl.hello_text()
+	text = await data.lvl.hello_text()
 	if id1 > 0 and id2 > 0 and text is not None:
 		await data.lvl.user(id1,id2)
 		if id1 != id2:
@@ -256,21 +256,21 @@ async def add_user(message, data):
 @dp.message_handler(chat_action = types.message.Action.chat_kick_user, is_admin = False)
 async def remove_user(message, data):
 	id2 = message.action.member_id
-	if id2 > 0 and data.lvl.hello_text() is not None:
+	if id2 > 0 and await data.lvl.hello_text() is not None:
 		await data.lvl.user(id2)
 		await message.answer(f"{data.lvl[id2]} стал(а) натуралом(.", attachment = f'photo-{dp.group_id}_457241328')
 
 @dp.message_handler(chat_action = types.message.Action.chat_kick_user, is_admin = True)
 async def remove_user_admin(message, data):
 	id2 = message.action.member_id
-	if id2 > 0 and data.lvl.hello_text() is not None:
+	if id2 > 0 and await data.lvl.hello_text() is not None:
 		await data.lvl.user(id2)
 		await message.answer(f"{data.lvl[id2]} заебал(а) админа.", attachment = f'photo-{dp.group_id}_457241336')
 
 @dp.message_handler(chat_action = types.message.Action.chat_invite_user_by_link)
 async def add_user_link(message, data):
 	id1 = message.from_id
-	text = data.lvl.hello_text()
+	text = await data.lvl.hello_text()
 	if id1 > 0 and text is not None:
 		await data.lvl.user(id1)
 		title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
@@ -282,15 +282,23 @@ async def add_user_link(message, data):
 async def pass_lvl(message, data):
 	if message.from_id > 0:
 		exp = atta(message.text, data.object.message.attachments)
-		data.lvl.insert_lvl(message.from_id, exp = exp)
+		await data.lvl.insert_lvl(message.from_id, exp = exp)
 	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{data.lvl.getconst('olga_id')}|#бля_Оля_живи!!!!!]")
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
 		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
-		await message.answer(f"[id{data.lvl.getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
+		await message.answer(f"[id{await data.lvl.getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
+
+@task_manager.add_task
+async def run_lvl():
+	await lvl_class.run_db()
 
 @task_manager.add_task
 async def run():
 	dp.run_polling()
 
+async def on_shutdown():
+	await lvl_class.close_db()
+	task_manager.close()
+
 if __name__ == "__main__":
-	task_manager.run(auto_reload = True)
+	task_manager.run(auto_reload = True, on_shutdown = on_shutdown)
