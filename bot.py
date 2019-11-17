@@ -301,4 +301,4 @@ async def on_shutdown():
 	task_manager.close()
 
 if __name__ == "__main__":
-	task_manager.run(auto_reload = True, on_shutdown = on_shutdown)
+	task_manager.run(auto_reload = True, asyncio_debug_mode = True, on_shutdown = on_shutdown)
