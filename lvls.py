@@ -45,7 +45,7 @@ class LVL(dict):
 		rows = await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)
 		smile = {row['user_id'] : row['smile'] for row in rows}
 		rows = await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id)
-		top = {row['user_id'] : smile for row, smile in zip(rows, ('🥇', '🥈', '🥉'))}
+		top = {row['user_id'] : smile for row, smile in zip(rows, '🥇🥈🥉')}
 		self.update({user['id'] : f"{top.get(user['id'], '')}{user['first_name']} {user['last_name'][:3]}{smile.get(user['id'], '')}" for user in await self.vk.api_request('users.get', {'user_ids' : str(ids)[1:-1]})})
 
 	async def send(self, *ids):
