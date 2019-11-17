@@ -289,11 +289,8 @@ async def pass_lvl(message, data):
 		await message.answer(f"[id{await data.lvl.getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
 
 @task_manager.add_task
-async def run_lvl():
-	await lvl_class.run_db()
-
-@task_manager.add_task
 async def run():
+	await lvl_class.connect_db()
 	dp.run_polling()
 
 async def on_shutdown():

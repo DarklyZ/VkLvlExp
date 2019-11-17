@@ -11,7 +11,7 @@ class LVL(dict):
 		self.peer_id = peer_id
 		return self
 	
-	async def run_db(self):
+	async def connect_db(self):
 		self.con = await connect(getenv('DATABASE_URL'), ssl = 'require')
 
 	async def close_db(self):
