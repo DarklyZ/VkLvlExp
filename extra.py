@@ -1,10 +1,5 @@
 from re import *
 
-class udict(dict):
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-
 def isint(arg):
 	try: int(arg)
 	except ValueError: return False
@@ -21,7 +16,7 @@ def atta(text = '', attachments = []):
 		if attachment.type == 'photo':
 			pixel = max(size.width * size.height for size in attachment.photo.sizes)
 			count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
-		elif attachment.type == 'wall': count += atta(attachment.wall.text, attachment.wall.attachments)
+		elif attachment.type == 'wall': count += 40
 		elif attachment.type == 'doc' and attachment.doc.ext == 'gif': count += 20
 		elif attachment.type == 'audio_message': count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
 		elif attachment.type == 'video': count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
