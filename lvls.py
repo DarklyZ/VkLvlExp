@@ -1,5 +1,4 @@
 from asyncpg import connect
-from os import getenv
 
 class LVL(dict):
 	def __init__(self, vk):
@@ -11,8 +10,8 @@ class LVL(dict):
 		self.peer_id = peer_id
 		return self
 	
-	async def connect_db(self):
-		self.con = await connect(getenv('DATABASE_URL'), ssl = 'require')
+	async def connect_db(self, database_url):
+		self.con = await connect(database_url, ssl = 'require')
 
 	async def close_db(self):
 		await self.con.close()

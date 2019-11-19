@@ -14,9 +14,10 @@ from extra import *
 
 basicConfig(level="INFO")
 
-dp = Dispatcher(VK(getenv('TOKEN')))
-task_manager = TaskManager(dp.vk.loop)
-lvl_class = LVL(dp.vk)
+vk, group_id, database_url = VK(getenv('TOKEN')), getenv('GROUP_ID'), getenv('DATABASE_URL')
+dp = Dispatcher(vk)
+task_manager = TaskManager(vk.loop)
+lvl_class = LVL(vk)
 
 @dp.middleware()
 class Regist(BaseMiddleware):
@@ -74,7 +75,7 @@ class IsAdmin(NamedRule):
 		self.admin = admin
 	
 	async def check(self, message, data):
-		try: chat = (await dp.vk.api_request('messages.getConversationsById', {'peer_ids': message.peer_id}))['items'][0]['chat_settings']
+		try: chat = (await vk.api_request('messages.getConversationsById', {'peer_ids': message.peer_id}))['items'][0]['chat_settings']
 		except: is_admin = False
 		else: is_admin = message.from_id == chat['owner_id'] or message.from_id in chat['admin_ids']
 		if self.admin and is_admin: return True
@@ -94,22 +95,22 @@ async def help(message, data):
 @dp.message_handler(regex = r'^f+$', in_chat = True)
 async def f_f(message, data):
 	rand = choice((457241326,457241327,457241328,457241331,457241332,457241333,457241334,457241338,457241339))
-	await message.answer('Пал боец\nСмертью храбрых', attachment = f'photo-{dp.group_id}_{rand}')
+	await message.answer('Пал боец\nСмертью храбрых', attachment = f'photo-{group_id}_{rand}')
 
 @dp.message_handler(regex = r'^[^\?]*\?{3}$', in_chat = True)
 async def hm_(message, data):
-	await message.answer('', attachment = f'photo-{dp.group_id}_457241329')
+	await message.answer('', attachment = f'photo-{group_id}_457241329')
 
 @dp.message_handler(regex = r'^[^\?]*\?{2}$', in_chat = True)
 async def h_(message, data):
-	await message.answer('', attachment = f'photo-{dp.group_id}_457241330')
+	await message.answer('', attachment = f'photo-{group_id}_457241330')
 
 @dp.message_handler(commands = ['toplvl'], count_args = 0, in_chat = True)
 @dp.message_handler(commands = ['toplvl'], have_args = [lambda arg: arg.isdigit(), lambda arg: arg.isdigit()], in_chat = True)
 async def toplvl_send(message, data):
 	reg_default = ('1', '10')
 	reg = (int(data.get('args', reg_default)[0]), int(data.get('args', reg_default)[1]))
-	await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'message' : await data['lvl'].toplvl_size(*reg), 'disable_mentions' : True})
+	await vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'message' : await data['lvl'].toplvl_size(*reg), 'disable_mentions' : True})
 
 @dp.message_handler(commands = ['mylvl'], count_args = 0, in_chat = True)
 async def mylvl(message, data):
@@ -137,7 +138,7 @@ async def ban(message, data):
 
 @dp.message_handler(commands = ['echo'], count_args = 0, is_admin = True, in_chat = True)
 async def echo(message, data):
-	try: member_ids = [item['member_id'] for item in (await dp.vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != message.from_id]	
+	try: member_ids = [item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != message.from_id]	
 	except: pass
 	else:
 		id = message.from_id
@@ -249,27 +250,27 @@ async def add_user(message, data):
 		await data['lvl'].user(id1,id2)
 		if id1 != id2:
 			title = f"* Welcome to the club, buddy. *\nВас призвал(а): {data['lvl'][id1]}"
-			bot_name = (await dp.vk.api_request('groups.getById', {'group_id' : dp.group_id}))[0]['name']
+			bot_name = (await vk.api_request('groups.getById', {'group_id' : group_id}))[0]['name']
 			blank = text.format(title = title, user = data['lvl'][id2], name = bot_name)
 			photo = 457241337
 		else:
 			blank = f"Вернулся(ась) {data['lvl'][id1]}."
 			photo = 457241328
-		await message.answer(blank, attachment = f'photo-{dp.group_id}_{photo}')
+		await message.answer(blank, attachment = f'photo-{group_id}_{photo}')
 
 @dp.message_handler(chat_action = Action.chat_kick_user, is_admin = False)
 async def remove_user(message, data):
 	id2 = message.action.member_id
 	if id2 > 0 and await data['lvl'].hello_text() is not None:
 		await data['lvl'].user(id2)
-		await message.answer(f"{data['lvl'][id2]} стал(а) натуралом(.", attachment = f'photo-{dp.group_id}_457241328')
+		await message.answer(f"{data['lvl'][id2]} стал(а) натуралом(.", attachment = f'photo-{group_id}_457241328')
 
 @dp.message_handler(chat_action = Action.chat_kick_user, is_admin = True)
 async def remove_user_admin(message, data):
 	id2 = message.action.member_id
 	if id2 > 0 and await data['lvl'].hello_text() is not None:
 		await data['lvl'].user(id2)
-		await message.answer(f"{data['lvl'][id2]} заебал(а) админа.", attachment = f'photo-{dp.group_id}_457241336')
+		await message.answer(f"{data['lvl'][id2]} заебал(а) админа.", attachment = f'photo-{group_id}_457241336')
 
 @dp.message_handler(chat_action = Action.chat_invite_user_by_link)
 async def add_user_link(message, data):
@@ -278,9 +279,9 @@ async def add_user_link(message, data):
 	if id1 > 0 and text is not None:
 		await data['lvl'].user(id1)
 		title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
-		bot_name = (await dp.vk.api_request('groups.getById', {'group_id': dp.group_id}))[0]['name']
+		bot_name = (await vk.api_request('groups.getById', {'group_id': group_id}))[0]['name']
 		blank = text.format(title = title, user = data['lvl'][id1], name = bot_name)
-		await message.answer(blank, attachment = f'photo-{dp.group_id}_457241337')
+		await message.answer(blank, attachment = f'photo-{group_id}_457241337')
 
 @dp.message_handler(with_payload = False, in_chat = True)
 async def pass_lvl(message, data):
@@ -289,16 +290,16 @@ async def pass_lvl(message, data):
 		await data['lvl'].insert_lvl(message.from_id, exp = exp)
 	if search(r'смерт|суицид|умереть|гибну|окно',message.text, I): await message.answer(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{await data['lvl'].getconst('olga_id')}|#бля_Оля_живи!!!!!]")
 	if search(r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', message.text, I):
-		await dp.vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
+		await vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
 		await message.answer(f"[id{await data['lvl'].getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
 
 @task_manager.add_task
 async def run():
-	await lvl_class.connect_db()
-	dp.run_polling(getenv('GROUP_ID'))
+	await lvl_class.connect_db(database_url)
+	dp.run_polling(group_id)
 
 async def on_shutdown():
-	await dp.vk.close()
+	await vk.close()
 	await lvl_class.close_db()
 
 if __name__ == "__main__":
