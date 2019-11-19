@@ -15,8 +15,8 @@ from extra import *
 basicConfig(level="INFO")
 
 vk, group_id, database_url = VK(getenv('TOKEN')), getenv('GROUP_ID'), getenv('DATABASE_URL')
-dp = Dispatcher(vk)
 task_manager = TaskManager(vk.loop)
+dp = Dispatcher(vk)
 lvl_class = LVL(vk)
 
 @dp.middleware()
