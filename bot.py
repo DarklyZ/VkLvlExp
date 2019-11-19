@@ -9,7 +9,7 @@ from vk.types.events.community.events_list import Event
 from lvls import LVL
 from random import choice
 from string import punctuation as punc
-from json import loads, dumps
+from json import loads
 from os import getenv
 from extra import *
 
