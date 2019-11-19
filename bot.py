@@ -280,7 +280,7 @@ async def hm_(message, data):
 async def h_(message, data):
 	await message.answer('', attachment = f'photo-{group_id}_457241330')
 
-@dp.message_handler(regex = r'ня', in_chat = True)
+@dp.message_handler(regex = r'\bня\b', in_chat = True)
 async def nya(message, data):
 	await message.answer('Ня!')
 
