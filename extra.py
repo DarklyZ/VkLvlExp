@@ -1,13 +1,7 @@
 from re import *
 
-def isint(arg):
-	try: int(arg)
-	except ValueError: return False
-	else: return True
-
-def ispos(arg):
-	try: return int(arg) >= 0
-	except ValueError: return False
+isint = lambda arg: arg.isdigit() or arg[:1] in '+-' and arg[1:].isdigit()
+ispos = lambda arg: arg.isdigit()
 
 def atta(text = '', attachments = []):
 	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))

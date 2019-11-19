@@ -27,7 +27,11 @@ class Regist(BaseMiddleware):
 	async def pre_process_event(self, event, data):
 		if event.type == Event.MESSAGE_NEW and event.object.message.from_id != event.object.message.peer_id:
 			message = event.object.message
-			if message.from_id < 0 or message.reply_message is not None and message.reply_message.from_id < 0 or message.action is not None and message.action.member_id < 0: raise SkipHandler()
+			if (message.from_id < 0 or 
+				message.reply_message is not None and
+				message.reply_message.from_id < 0 or
+				message.action is not None and
+				message.action.member_id < 0): raise SkipHandler()
 			data['lvl'] = lvl_class(message.peer_id)
 			if not await data['lvl'].check_user(message.from_id): await data['lvl'].add_user(message.from_id)
 			if message.payload is None: await data['lvl'].insert_lvl(message.from_id, exp = atta(message.text, message.attachments))
@@ -42,7 +46,7 @@ class Commands(NamedRule):
 		self.commands = commands
 
 	async def check(self, message, data):
-		msg = message.text.lower().split()
+		msg = message.text.lower().split(maxsplit = 1)
 		return msg and msg[0][0] in punc and msg[0][1:] in self.commands
 
 @dp.setup_rule
@@ -96,7 +100,7 @@ async def help(message, data):
 6) /Ord <chr>+ - код в юникоде символов''')
 
 @dp.message_handler(commands = ['toplvl'], count_args = 0, in_chat = True)
-@dp.message_handler(commands = ['toplvl'], have_args = [lambda arg: arg.isdigit(), lambda arg: arg.isdigit()], in_chat = True)
+@dp.message_handler(commands = ['toplvl'], have_args = [ispos, ispos], in_chat = True)
 async def toplvl_send(message, data):
 	reg_default = ('1', '10')
 	reg = (int(data.get('args', reg_default)[0]), int(data.get('args', reg_default)[1]))
@@ -120,15 +124,14 @@ ban_key.add_text_button('Ясно-понятно', ButtonColor.POSITIVE, {'comma
 ban_key = ban_key.get_keyboard()
 @dp.message_handler(commands = ['ban'], with_reply_message = True, in_chat = True)
 async def ban(message, data):
-	if message.reply_message.from_id > 0:
-		texts = message.text.split(maxsplit = 1)
-		id = message.reply_message.from_id
-		await data['lvl'].user(id)
-		await message.answer(f"Бан пользователя:\n{data['lvl'][id]}\nПричина: {texts[1] if len(texts) == 2 else 'не указана'}", keyboard = ban_key)
+	texts = message.text.split(maxsplit = 1)
+	id = message.reply_message.from_id
+	await data['lvl'].user(id)
+	await message.answer(f"Бан пользователя:\n{data['lvl'][id]}\nПричина: {texts[1] if len(texts) == 2 else 'не указана'}", keyboard = ban_key)
 
 @dp.message_handler(commands = ['echo'], count_args = 0, is_admin = True, in_chat = True)
 async def echo(message, data):
-	try: member_ids = [item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != message.from_id]	
+	try: member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != message.from_id)
 	except: pass
 	else:
 		id = message.from_id
@@ -145,6 +148,7 @@ async def del_smile(message, data):
 	await data['lvl'].setsmile(message.reply_message.from_id)
 	await message.answer('Смайл удалён')
 
+@dp.message_handler(commands = ['exp'], have_args = [lambda arg: arg in '+-'], is_admin = True, with_reply_message = True, in_chat = True)
 @dp.message_handler(commands = ['exp'], have_args = [isint], is_admin = True, with_reply_message = True, in_chat = True)
 @dp.message_handler(commands = ['exp'], have_args = [isint, isint], is_admin = True, with_reply_message = True, in_chat = True)
 async def exp(message, data):
@@ -154,19 +158,11 @@ async def exp(message, data):
 		blank = f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n"
 		await data['lvl'].insert_lvl(id, lvl = lvl, exp = exp)
 	else:
-		exp = int(data['args'][0])
+		exp = int(data['args'][0] if data['args'][0].isdigit() else f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}")
 		blank = f"{exp:+}Ⓔ:\n"
 		await data['lvl'].insert_lvl(id, exp = exp)
 	await data['lvl'].send(id)
 	await message.answer(blank + data['lvl'][id])
-
-@dp.message_handler(commands = ['exp'], have_args = [lambda arg: arg in '+-'], is_admin = True, with_reply_message = True, in_chat = True)
-async def expp(message, data):
-	id = message.reply_message.from_id
-	exp = int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}")
-	await data['lvl'].insert_lvl(id, exp = exp)
-	await data['lvl'].send(id)
-	await message.answer(f"{exp:+}Ⓔ:\n{data['lvl'][id]}")
 
 @dp.message_handler(commands = ['tele'], have_args = [ispos], with_reply_message = True, in_chat = True)
 async def tele(message, data):
