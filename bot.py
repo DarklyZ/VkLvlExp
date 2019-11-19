@@ -86,10 +86,10 @@ class IsAdmin(NamedRule):
 async def help(message, data):
 	await message.answer('''Команды:
 1) /MyLVL - мой уровень
-2) /TopLVL[ <от>:<до>] - топ 10 участников
-3) /LVL & <id>+ - посмотреть уровни
-4) /Tele <count> & <id> - передать свою exp другому
-5) /BAN[ <причина>] & <id>+ - типо бан
+2) /TopLVL[ <от> <до>] - топ 10 участников
+3) /LVL & <rep_mes> - посмотреть уровень участника
+4) /Tele <count> & <rep_mes> - передать свою exp другому
+5) /BAN[ <причина>] & <rep_mes> - типо бан
 6) /Ord <chr>+ - код в юникоде символов''')
 
 @dp.message_handler(regex = r'^f+$', in_chat = True)
