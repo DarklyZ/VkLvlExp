@@ -278,7 +278,7 @@ async def h_(message, data):
 
 @dp.message_handler(regex = r'\bня\b', in_chat = True)
 async def nya(message, data):
-	await message.answer('', sticker_id = 9805)
+	await message.answer('', sticker_id = 9808)
 
 @dp.message_handler(regex = r'смерт|суицид|умереть|гибну|окно', in_chat = True)
 async def olga(message, data):
