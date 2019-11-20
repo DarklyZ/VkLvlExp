@@ -278,7 +278,7 @@ async def h_(message, data):
 
 @dp.message_handler(regex = r'\bня\b', in_chat = True)
 async def nya(message, data):
-	await message.answer('Ня!')
+	await vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 301})
 
 @dp.message_handler(regex = r'смерт|суицид|умереть|гибну|окно', in_chat = True)
 async def olga(message, data):
