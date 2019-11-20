@@ -158,29 +158,17 @@ async def exp(message, data):
 		blank = f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n"
 		await data['lvl'].insert_lvl(id, lvl = lvl, exp = exp)
 	else:
-		exp = int(data['args'][0] if data['args'][0].isdigit() else f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		exp = int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}" if data['args'][0] in '+-' else data['args'][0])
 		blank = f"{exp:+}Ⓔ:\n"
 		await data['lvl'].insert_lvl(id, exp = exp)
 	await data['lvl'].send(id)
 	await message.answer(blank + data['lvl'][id])
 
+@dp.message_handler(commands = ['tele'], have_args = [lambda arg: arg == '+'], with_reply_message = True, in_chat = True)
 @dp.message_handler(commands = ['tele'], have_args = [ispos], with_reply_message = True, in_chat = True)
 async def tele(message, data):
 	id1, id2 = message.from_id, message.reply_message.from_id
-	exp = int(data['args'][0])
-	if await data['lvl'].remove_exp(id1, exp = exp):
-		await data['lvl'].insert_lvl(id2, exp = exp)
-		await data['lvl'].send(id1, id2)
-		blank = f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}"
-	else:
-		await data['lvl'].send(id1)
-		blank = f"Не хватает Ⓔ!\n{data['lvl'][id1]}"
-	await message.answer(blank)
-
-@dp.message_handler(commands = ['tele'], have_args = [lambda arg: arg == '+'], with_reply_message = True, in_chat = True)
-async def telep(message, data):
-	id1, id2 = message.from_id, message.reply_message.from_id
-	exp = atta(message.reply_message.text, message.reply_message.attachments)
+	exp = int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}" if data['args'][0] == '+' else data['args'][0])
 	if await data['lvl'].remove_exp(id1, exp = exp):
 		await data['lvl'].insert_lvl(id2, exp = exp)
 		await data['lvl'].send(id1, id2)
