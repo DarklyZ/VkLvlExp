@@ -104,7 +104,7 @@ async def help(message, data):
 async def toplvl_send(message, data):
 	reg_default = ('1', '10')
 	reg = (int(data.get('args', reg_default)[0]), int(data.get('args', reg_default)[1]))
-	await vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'message' : await data['lvl'].toplvl_size(*reg), 'disable_mentions' : True})
+	await message.answer(await data['lvl'].toplvl_size(*reg), disable_mentions = True)
 
 @dp.message_handler(commands = ['mylvl'], count_args = 0, in_chat = True)
 async def mylvl(message, data):
@@ -278,7 +278,7 @@ async def h_(message, data):
 
 @dp.message_handler(regex = r'\bня\b', in_chat = True)
 async def nya(message, data):
-	await vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9808})
+	await message.answer('', sticker_id = 9805)
 
 @dp.message_handler(regex = r'смерт|суицид|умереть|гибну|окно', in_chat = True)
 async def olga(message, data):
@@ -286,7 +286,7 @@ async def olga(message, data):
 
 @dp.message_handler(regex = r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b', in_chat = True)
 async def archi(message, data):
-	await vk.api_request('messages.send', {'random_id' : 0, 'peer_id' : message.peer_id, 'sticker_id' : 9805})
+	await message.answer('', sticker_id = 9805)
 	await message.answer(f"[id{await data['lvl'].getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
 		
 @task_manager.add_task
