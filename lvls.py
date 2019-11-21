@@ -61,12 +61,9 @@ class LVL(dict):
 			await self.user(*(row['user_id'] for row in rows))
 			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 
-	async def check_user(self, id):
+	async def check_add_user(self, id):
 		row = await self.con.fetchrow("select count(*) > 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
-		return row['bool']
-
-	async def add_user(self, id):
-		await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
+		if not row['bool']: await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
 	async def setsmile(self, *ids, smile = None):
 		await self.con.execute("update lvl set smile = %s where user_id = any($1) and peer_id = $2", smile, ids, self.peer_id)
