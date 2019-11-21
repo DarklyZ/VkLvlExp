@@ -31,7 +31,7 @@ class Regist(BaseMiddleware):
 				message.reply_message is not None and
 				message.reply_message.from_id < 0 or
 				message.action is not None and
-				message.action.member_id < 0): raise SkipHandler()
+				message.action.member_id < 0): raise SkipHandler
 			data['lvl'] = lvl_class(message.peer_id)
 			if not await data['lvl'].check_user(message.from_id): await data['lvl'].add_user(message.from_id)
 			if message.payload is None: await data['lvl'].insert_lvl(message.from_id, exp = atta(message.text, message.attachments))
