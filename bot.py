@@ -287,4 +287,4 @@ async def on_shutdown():
 	await lvl_class.close_db()
 
 if __name__ == "__main__":
-	task_manager.run(auto_reload = True, on_shutdown = on_shutdown)
+	task_manager.run(on_shutdown = on_shutdown)
