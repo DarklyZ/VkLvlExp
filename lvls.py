@@ -2,7 +2,7 @@ from asyncpg import connect
 
 class LVL(dict):
 	def __init__(self, vk):
-		dict.__init__(self)
+		super().__init__()
 		self.vk = vk
 
 	def __call__(self, peer_id):
