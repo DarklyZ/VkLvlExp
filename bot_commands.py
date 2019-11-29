@@ -15,9 +15,8 @@ def load(dp, vk):
 	@dp.message_handler(commands = ['toplvl'], count_args = 0, in_chat = True)
 	@dp.message_handler(commands = ['toplvl'], have_args = [ispos, ispos], in_chat = True)
 	async def toplvl_send(message, data):
-		reg_default = ('1', '10')
-		reg = (int(data.get('args', reg_default)[0]), int(data.get('args', reg_default)[1]))
-		await message.answer(await data['lvl'].toplvl_size(*reg), disable_mentions = True)
+		top_range = map(int, data['args']) if 'args' in data else (1, 10)
+		await message.answer(await data['lvl'].toplvl_size(*top_range), disable_mentions = True)
 	
 	@dp.message_handler(commands = ['mylvl'], count_args = 0, in_chat = True)
 	async def mylvl(message, data):
@@ -27,10 +26,9 @@ def load(dp, vk):
 	
 	@dp.message_handler(commands = ['lvl'], count_args = 0, with_reply_message = True, in_chat = True)
 	async def lvl(message, data):
-		if message.reply_message.from_id > 0:
-			id = message.reply_message.from_id
-			await data['lvl'].send(id)
-			await message.answer(data['lvl'][id])
+		id = message.reply_message.from_id
+		await data['lvl'].send(id)
+		await message.answer(data['lvl'][id])
 	
 	ban_key = Keyboard(one_time = None, inline = True)
 	ban_key.add_text_button('Ясно-понятно', ButtonColor.POSITIVE, {'command' : 'ban'})

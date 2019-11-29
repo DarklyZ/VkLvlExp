@@ -12,8 +12,8 @@ def load(dp, vk):
 			self.commands = commands
 	
 		async def check(self, message, data):
-			msg = message.text.lower().split(maxsplit = 1)
-			return msg and msg[0][0] in punc and msg[0][1:] in self.commands
+			msg = message.text.lower().split(maxsplit = 1) or None
+			return msg is not None and msg[0][0] in punc and msg[0][1:] in self.commands
 	
 	@dp.setup_rule
 	class WithPayload(NamedRule):
@@ -24,8 +24,8 @@ def load(dp, vk):
 			self.payload = payload
 	
 		async def check(self, message, data):
-			if self.payload and message.payload : return True
-			elif not self.payload and not message.payload : return True
+			if self.payload and message.payload is not None : return True
+			elif not self.payload and message.payload is None : return True
 			else: return False
 	
 	@dp.setup_rule
@@ -37,7 +37,7 @@ def load(dp, vk):
 			self.commands = commands
 	
 		async def check(self, message, data):
-			return message.payload and loads(message.payload).get('command') in self.commands
+			return message.payload is not None and loads(message.payload).get('command') in self.commands
 	
 	@dp.setup_rule
 	class IsAdmin(NamedRule):
