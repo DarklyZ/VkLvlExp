@@ -36,7 +36,7 @@ import rules
 dp = rules.load(dp, vk)
 
 import bot_commands
-dp = bot_commands.load(dp)
+dp = bot_commands.load(dp, vk)
 
 import chat_action_commands
 dp = chat_action_commands.load(dp, vk, group_id)
