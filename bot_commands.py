@@ -2,6 +2,7 @@ from vk.keyboards import Keyboard, ButtonColor
 from extra import atta, isint, ispos
 
 def load(dp, vk):
+	
 	@dp.message_handler(commands = ['help'], count_args = 0, in_chat = True)
 	async def help(message, data):
 		await message.answer('''Команды:

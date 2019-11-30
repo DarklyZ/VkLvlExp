@@ -1,6 +1,7 @@
 from vk.types.message import Action
 
 def load(dp, vk, group_id):
+	
 	@dp.message_handler(commands = ['hello'], count_args = 0, is_admin = True, in_chat = True)
 	async def hello_help(message, data):
 		await message.answer('''Ключевые слова:

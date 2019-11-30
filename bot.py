@@ -1,12 +1,9 @@
 from logging import basicConfig
 from vk import VK
-from vk.bot_framework import Dispatcher, BaseMiddleware
-from vk.bot_framework.dispatcher.handler import SkipHandler
-from vk.types.events.community.events_list import Event
+from vk.bot_framework import Dispatcher
 from vk.utils import TaskManager
 from lvls import LVL
 from os import getenv
-from extra import atta
 
 basicConfig(level="INFO")
 
@@ -15,33 +12,10 @@ task_manager = TaskManager(vk.loop)
 dp = Dispatcher(vk)
 lvl_class = LVL(vk)
 
-@dp.middleware()
-class Regist(BaseMiddleware):
-	meta = {"deprecated": False}
-	
-	async def pre_process_event(self, event, data):
-		if event.type == Event.MESSAGE_NEW and event.object.message.from_id != event.object.message.peer_id:
-			message = event.object.message
-			if (message.from_id < 0 or 
-				message.reply_message is not None and
-				message.reply_message.from_id < 0 or
-				message.action is not None and
-				message.action.member_id < 0): raise SkipHandler
-			data['lvl'] = lvl_class(message.peer_id)
-			await data['lvl'].check_add_user(message.from_id)
-			if message.payload is None: await data['lvl'].insert_lvl(message.from_id, exp = atta(message.text, message.attachments))
-		return data
-
-import rules
-dp = rules.load(dp, vk)
-
-import bot_commands
+import middleware_rules, bot_commands, chat_action_commands, regex_commands
+dp = middleware_rules.load(dp, vk, lvl_class)
 dp = bot_commands.load(dp, vk)
-
-import chat_action_commands
 dp = chat_action_commands.load(dp, vk, group_id)
-
-import regex_commands
 dp = regex_commands.load(dp, group_id)
 
 @task_manager.add_task

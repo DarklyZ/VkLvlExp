@@ -1,6 +1,7 @@
 from random import choice
 
 def load(dp, group_id):
+	
 	@dp.message_handler(regex = r'^f+$', in_chat = True)
 	async def f_f(message, data):
 		rand = choice((457241326,457241327,457241328,457241331,457241332,457241333,457241334,457241338,457241339))
