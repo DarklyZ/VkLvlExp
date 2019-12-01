@@ -43,17 +43,15 @@ def load(dp, vk):
 	
 	@dp.message_handler(commands = ['echo'], count_args = 0, is_admin = True, in_chat = True)
 	async def echo(message, data):
-		try: member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != message.from_id)
-		except: pass
-		else:
-			id = message.from_id
-			await data['lvl'].user(id)
-			await message.answer(f"*{data['lvl'][id]} заорал на всю беседу*\nУслышали это:\n" + ''.join(f'[id{id}|💬]' for id in member_ids))
+		id = message.from_id
+		await data['lvl'].user(id)
+		member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != id)
+		await message.answer(f"* {data['lvl'][id]} заорал на всю беседу *\nУслышали это:\n" + ''.join(f'[id{member_id}|💬]' for member_id in member_ids))
 	
 	@dp.message_handler(commands = ['setsmile'], have_args = [lambda arg: len(arg) <= 4], is_admin = True, with_reply_message = True, in_chat = True)
 	async def set_smile(message, data):
 		await data['lvl'].setsmile(message.reply_message.from_id, smile = data['args'][0])
-		await message.answer(f"{data['args'][0]} : установлен")
+		await message.answer(f"{data['args'][0]} установлен")
 	
 	@dp.message_handler(commands = ['delsmile'], count_args = 0, is_admin = True, with_reply_message = True, in_chat = True)
 	async def del_smile(message, data):

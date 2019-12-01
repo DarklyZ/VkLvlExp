@@ -46,9 +46,7 @@ def load(dp, vk, lvl_class):
 			self.payload = payload
 	
 		async def check(self, message, data):
-			if self.payload and message.payload is not None : return True
-			elif not self.payload and message.payload is None : return True
-			else: return False
+			return self.payload and message.payload is not None or not self.payload and message.payload is None
 	
 	@dp.setup_rule
 	class PayloadCommands(NamedRule):
@@ -70,11 +68,11 @@ def load(dp, vk, lvl_class):
 			self.admin = admin
 		
 		async def check(self, message, data):
-			try: chat = (await vk.api_request('messages.getConversationsById', {'peer_ids': message.peer_id}))['items'][0]['chat_settings']
-			except: is_admin = False
-			else: is_admin = message.from_id == chat['owner_id'] or message.from_id in chat['admin_ids']
-			if self.admin and is_admin: return True
-			elif not self.admin and not is_admin: return True
+			items = (await vk.api_request('messages.getConversationsById', {'peer_ids': message.peer_id}))['items'] or None
+			if items is not None:
+				chat_settings = items[0]['chat_settings']
+				is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
+				return self.admin and is_admin or not self.admin and not is_admin
 			else: return False
 	
 	return dp
