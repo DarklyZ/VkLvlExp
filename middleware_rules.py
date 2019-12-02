@@ -38,17 +38,6 @@ def load(dp, vk, lvl_class):
 			return msg is not None and msg[0][0] in punc and msg[0][1:] in self.commands
 	
 	@dp.setup_rule
-	class WithPayload(NamedRule):
-		key = 'with_payload'
-		meta = {"deprecated": False}
-	
-		def __init__(self, payload):
-			self.payload = payload
-	
-		async def check(self, message, data):
-			return self.payload and message.payload is not None or not self.payload and message.payload is None
-	
-	@dp.setup_rule
 	class PayloadCommands(NamedRule):
 		key = 'payload_commands'
 		meta = {"deprecated": False}
