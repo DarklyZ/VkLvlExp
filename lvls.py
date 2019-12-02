@@ -73,7 +73,7 @@ class LVL(dict):
 		await self.con.execute("update lvl set smile = $1 where user_id = any($2) and peer_id = $3", smile, ids, self.peer_id)
 
 	async def add_text(self, text):
-		if self.hello_text() is not None: await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
+		if await self.hello_text() is not None: await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
 		else: await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
 
 	async def del_text(self):
