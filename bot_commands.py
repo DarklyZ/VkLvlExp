@@ -41,12 +41,13 @@ def load(dp, vk):
 		await data['lvl'].user(id)
 		await message.answer(f"Бан пользователя:\n{data['lvl'][id]}\nПричина: {texts[1] if len(texts) == 2 else 'не указана'}", keyboard = ban_key)
 	
-	@dp.message_handler(commands = ['echo'], count_args = 0, is_admin = True, in_chat = True)
+	@dp.message_handler(commands = ['echo'], is_admin = True, in_chat = True)
 	async def echo(message, data):
 		id = message.from_id
 		await data['lvl'].user(id)
 		member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != id)
-		await message.answer(f"* {data['lvl'][id]} заорал на всю беседу *\nУслышали это:\n" + ''.join(f'[id{member_id}|💬]' for member_id in member_ids))
+		msgs = message.text.split(maxsplit = 1)
+		await message.answer(f"{msgs[1] if len(msgs) == 2 else 'Глобальное упоминание'}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
 	
 	@dp.message_handler(commands = ['setsmile'], have_args = [lambda arg: len(arg) <= 4], is_admin = True, with_reply_message = True, in_chat = True)
 	async def set_smile(message, data):
