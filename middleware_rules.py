@@ -19,7 +19,7 @@ def load(dp, vk, lvl_class):
 					message.reply_message.from_id < 0 or
 					message.action is not None and
 					message.action.member_id < 0): raise SkipHandler
-				data['lvl'] = lvl_class(message.peer_id)
+				data['lvl'] = lvl_class(message.peer_id, message.date)
 				await data['lvl'].check_add_user(message.from_id)
 				exp = atta(message.text, message.attachments) or None
 				if message.payload is None and exp is not None: await data['lvl'].insert_lvl(message.from_id, exp = exp)
