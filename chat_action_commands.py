@@ -11,9 +11,10 @@ def load(dp, vk, group_id):
 	
 	@dp.message_handler(commands = ['sethello'], in_chat = True, is_admin = True)
 	async def hello_plus(message, data):
-		text = message.text.split(maxsplit = 1)[1]
-		try: hello = text.format(title = 'title', user = 'user', name = 'name')
-		except Exception as e: await message.answer(f'Ошибка "{e}"')
+		try:
+			text = message.text[10:] or '* Стандартное приветствие *'
+			hello = text.format(title = 'title', user = 'user', name = 'name')
+		except: await message.answer('Не правильный формат')
 		else:
 			await data['lvl'].add_text(text)
 			await message.answer('Приветствие полученно\n' + hello)

@@ -36,16 +36,14 @@ def load(dp, vk):
 	ban_key = ban_key.get_keyboard()
 	@dp.message_handler(commands = ['ban'], with_reply_message = True, in_chat = True)
 	async def ban(message, data):
-		texts = message.text.split(maxsplit = 1)
 		id = message.reply_message.from_id
 		await data['lvl'].user(id)
-		await message.answer(f"Бан пользователя:\n{data['lvl'][id]}\nПричина: {texts[1] if len(texts) == 2 else 'не указана'}", keyboard = ban_key)
+		await message.answer(f"Бан пользователя:\n{data['lvl'][id]}\nПричина: {message.text[5:] or 'не указана'}", keyboard = ban_key)
 	
 	@dp.message_handler(commands = ['echo'], is_admin = True, in_chat = True)
 	async def echo(message, data):
 		member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != id)
-		msgs = message.text.split(maxsplit = 1)
-		await message.answer(f"{msgs[1] if len(msgs) == 2 else 'Сообщение не указано'}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
+		await message.answer(f"{message.text[6:] or 'Сообщение не указано'}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
 	
 	@dp.message_handler(commands = ['setsmile'], have_args = [lambda arg: len(arg) <= 4], is_admin = True, with_reply_message = True, in_chat = True)
 	async def set_smile(message, data):
