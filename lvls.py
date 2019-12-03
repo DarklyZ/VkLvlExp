@@ -1,5 +1,5 @@
 from asyncpg import connect
-from datetime import datetime as dt
+from datetime import datetime
 from extra import tz, bdate
 
 class LVL(dict):
@@ -44,11 +44,12 @@ class LVL(dict):
 		else: return False
 	
 	async def user(self, *ids):
+		now = datetime.now(tz)
 		rows = await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)
 		smile = {row['user_id'] : row['smile'] for row in rows}
 		rows = await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id)
 		top = {row['user_id'] : smile for row, smile in zip(rows, '🥇🥈🥉')}
-		self.update({user['id'] : f"{top.get(user['id'], '')}{bdate(user, dt.now(tz))}{user['first_name']} {user['last_name'][:3]}{smile.get(user['id'], '')}" for user in await self.vk.api_request('users.get', {'user_ids' : str(ids)[1:-1], 'fields' : 'bdate'})})
+		self.update({user['id'] : f"{top.get(user['id'], '')}{bdate(user, now)}{user['first_name']} {user['last_name'][:3]}{smile.get(user['id'], '')}" for user in await self.vk.api_request('users.get', {'user_ids' : str(ids)[1:-1], 'fields' : 'bdate'})})
 
 	async def send(self, *ids):
 		rows = await self.con.fetch("select user_id,lvl,exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)
