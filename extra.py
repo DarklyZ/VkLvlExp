@@ -1,7 +1,9 @@
+from datetime import tzinfo, timedelta
 from re import *
 
 isint = lambda arg: arg.isdigit() or arg[:1] in '+-' and arg[1:].isdigit()
 ispos = lambda arg: arg.isdigit() or arg[:1] == '+' and arg[1:].isdigit()
+bdate = lambda user, date : '🎂' if 'bdate' in user and user['bdate'].startswith(f"{date.day}.{date.month}") else ''
 
 def atta(text = '', attachments = []):
 	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))
@@ -17,3 +19,9 @@ def atta(text = '', attachments = []):
 		elif attachment.type == 'sticker': count += 10
 		elif attachment.type == 'audio': count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
 	return count
+	
+class tz(tzinfo):
+	utcoffset = lambda self, dt : timedelta(hours = 5)
+	dst = lambda self, dt : timedelta()
+	tzname = lambda self, dt : '+05:00'
+tz = tz()
