@@ -3,8 +3,9 @@ from datetime import datetime
 from extra import tz, bdate
 
 class LVL(dict):
-	def __init__(self, vk):
+	def __init__(self, vk, database_url):
 		super().__init__()
+		self.database_url = database_url
 		self.vk = vk
 
 	def __call__(self, peer_id):
@@ -12,8 +13,8 @@ class LVL(dict):
 		self.peer_id = peer_id
 		return self
 	
-	async def connect_db(self, database_url):
-		self.con = await connect(database_url, ssl = 'require')
+	async def connect_db(self):
+		self.con = await connect(self.database_url, ssl = 'require')
 
 	async def close_db(self):
 		await self.con.close()
