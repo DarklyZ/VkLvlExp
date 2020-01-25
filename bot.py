@@ -3,6 +3,7 @@ from vkbottle import Bot
 from vbml import Patcher
 from lvls import LVL
 from re import I, S
+from extra import atta
 from os import getenv
 
 class Validators(Vals):
