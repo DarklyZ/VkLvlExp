@@ -1,31 +1,31 @@
-from logging import basicConfig
-from vk import VK
-from vk.bot_framework import Dispatcher
-from vk.utils import TaskManager
+from vkbottle.framework.bot import Vals
+from vkbottle import Bot
+from vbml import Patcher
 from lvls import LVL
+from re import I, S
 from os import getenv
 
-basicConfig(level="INFO")
+class Validators(Vals):
+	int = lambda self, value: int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
+	pos = lambda self, value: int(value) if value.isdigit() or value[:1] in '+' and value[1:].isdigit() else None
+	max = lambda self, value, extra: value if len(value) <= int(extra) else None
+	symbol = lambda self, value, extra: value if value in extra else None
 
-vk, group_id, database_url = VK(getenv('TOKEN')), getenv('GROUP_ID'), getenv('DATABASE_URL')
-task_manager = TaskManager(vk.loop)
-lvl_class = LVL(vk, database_url)
-dp = Dispatcher(vk)
+bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = True, vbml_patcher = Patcher(validators = Validators, flags = I + S))
+bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
+lvl_class = LVL(bot, getenv('DATABASE_URL'), bot.loop)
 
-import middleware_rules, bot_commands, chat_action_commands, regex_commands
-dp = middleware_rules.load(dp, vk, lvl_class)
-dp = bot_commands.load(dp, vk)
-dp = chat_action_commands.load(dp, vk, group_id)
-dp = regex_commands.load(dp, group_id)
+import bot_commands, chat_action_commands, regex_commands
+bot_commands.load(bot, lvl_class)
+chat_action_commands.load(bot, lvl_class)
+regex_commands.load(bot, lvl_class)
 
-@task_manager.add_task
-async def run():
-	dp.run_polling(group_id)
+@bot.on.pre_process()
+async def pass_lvl(message):
+	lvl_class(message.peer_id)
+	if message.peer_id == message.from_id or message.from_id < 0: return
+	await lvl_class.check_add_user(message.from_id)
+	exp = atta(message.text, message.attachments) or None
+	if not message.payload and exp: await lvl_class.insert_lvl(message.from_id, exp = exp)
 
-async def on_shutdown():
-	await vk.close()
-	await lvl_class.close_db()
-
-if __name__ == "__main__":
-	task_manager.run_task(lvl_class.connect_db)
-	task_manager.run(auto_reload = True, on_shutdown = on_shutdown)
+bot.run_polling()

@@ -1,11 +1,9 @@
-from vk.keyboards import Keyboard, ButtonColor
-from extra import atta, isint, ispos
+from extra import atta, is_admin, with_reply_message, from_id_pos
 
-def load(dp, vk):
-	
-	@dp.message_handler(commands = ['help'], count_args = 0, in_chat = True)
-	async def help(message, data):
-		await message.answer('''Команды:
+def load(bot, lvl_class):
+	@bot.on.chat_message(command = True, text = 'help')
+	async def help(message):
+		await message('''Команды:
 1) /MyLVL - мой уровень
 2) /TopLVL[ <от> <до>] - топ 10 участников
 3) /LVL & <rep_mes> - посмотреть уровень участника
@@ -13,86 +11,86 @@ def load(dp, vk):
 5) /BAN[ <причина>] & <rep_mes> - типо бан
 6) /Ord <chr>+ - код в юникоде символов''')
 	
-	@dp.message_handler(commands = ['toplvl'], count_args = 0, in_chat = True)
-	@dp.message_handler(commands = ['toplvl'], have_args = [ispos, ispos], in_chat = True)
-	async def toplvl_send(message, data):
-		top_range = map(int, data['args']) if 'args' in data else (1, 10)
-		await message.answer(await data['lvl'].toplvl_size(*top_range), disable_mentions = True)
+	@bot.on.chat_message(command = True, text = 'toplvl')
+	@bot.on.chat_message(command = True, text = 'toplvl <one:pos> <two:pos>')
+	async def toplvl_send(message, one = 1, two = 10):
+		await message(await lvl_class.toplvl_size(one, two), disable_mentions = True)
 	
-	@dp.message_handler(commands = ['mylvl'], count_args = 0, in_chat = True)
-	async def mylvl(message, data):
+	@bot.on.chat_message(text = 'mylvl', command = True)
+	async def mylvl(message):
 		id = message.from_id
-		await data['lvl'].send(id)
-		await message.answer(data['lvl'][id])
+		await lvl_class.send(id)
+		await message(lvl_class[id])
 	
-	@dp.message_handler(commands = ['lvl'], count_args = 0, with_reply_message = True, in_chat = True)
-	async def lvl(message, data):
+	@bot.on.chat_message(with_reply_message(True), text = 'lvl', command = True)
+	async def lvl(message):
 		id = message.reply_message.from_id
-		await data['lvl'].send(id)
-		await message.answer(data['lvl'][id])
+		await lvl_class.send(id)
+		await message(lvl_class[id])
 	
-	ban_key = Keyboard(one_time = None, inline = True)
-	ban_key.add_text_button('Ясно-понятно', ButtonColor.POSITIVE, {'command' : 'ban'})
-	ban_key = ban_key.get_keyboard()
-	@dp.message_handler(commands = ['ban'], with_reply_message = True, in_chat = True)
-	async def ban(message, data):
+	@bot.on.chat_message(with_reply_message(True), text = 'ban', command = True)
+	@bot.on.chat_message(with_reply_message(True), text = 'ban <text>', command = True)
+	async def ban(message, text = 'не указана'):
 		id = message.reply_message.from_id
-		await data['lvl'].user(id)
-		await message.answer(f"Бан пользователя:\n{data['lvl'][id]}\nПричина: {message.text[5:] or 'не указана'}", keyboard = ban_key)
+		await lvl_class.user(id)
+		await message(f"Бан пользователя:\n{lvl_class[id]}\nПричина: {text}")
 	
-	@dp.message_handler(commands = ['echo'], is_admin = True, in_chat = True)
-	async def echo(message, data):
+	@bot.on.chat_message(text = 'echo', command = True)
+	@bot.on.chat_message(text = 'echo <text>', command = True)
+	async def echo(message, text = 'Сообщение не указано'):
+		if not await is_admin(message): return await message('Вы (или я) не являетесь администратором!', attachment = f'photo-{bot.group_id}_457241328')
 		member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != id)
-		await message.answer(f"{message.text[6:] or 'Сообщение не указано'}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
+		await message(f"{text}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
 	
-	@dp.message_handler(commands = ['setsmile'], have_args = [lambda arg: len(arg) <= 4], is_admin = True, with_reply_message = True, in_chat = True)
-	async def set_smile(message, data):
-		await data['lvl'].setsmile(message.reply_message.from_id, smile = data['args'][0])
-		await message.answer(f"{data['args'][0]} установлен")
+	@bot.on.chat_message(with_reply_message(True), text = 'set smile <smile:max[4]>', command = True)
+	async def set_smile(message, smile):
+		if not await is_admin(message): return await message('Вы (или я) не являетесь администратором!', attachment = f'photo-{bot.group_id}_457241328')
+		await lvl_class.setsmile(message.reply_message.from_id, smile = smile)
+		await message(f"{smile} установлен")
 	
-	@dp.message_handler(commands = ['delsmile'], count_args = 0, is_admin = True, with_reply_message = True, in_chat = True)
-	async def del_smile(message, data):
-		await data['lvl'].setsmile(message.reply_message.from_id)
-		await message.answer('Смайл удалён')
+	@bot.on.chat_message(with_reply_message(True), text = 'del smile', command = True)
+	async def del_smile(message):
+		if not await is_admin(message): return await message('Вы (или я) не являетесь администратором!', attachment = f'photo-{bot.group_id}_457241328')
+		await lvl_class.setsmile(message.reply_message.from_id)
+		await message('Смайл удалён')
 	
-	@dp.message_handler(commands = ['exp'], have_args = [lambda arg: arg in '+-'], is_admin = True, with_reply_message = True, in_chat = True)
-	@dp.message_handler(commands = ['exp'], have_args = [isint], is_admin = True, with_reply_message = True, in_chat = True)
-	@dp.message_handler(commands = ['exp'], have_args = [isint, isint], is_admin = True, with_reply_message = True, in_chat = True)
-	async def exp(message, data):
+	@bot.on.chat_message(with_reply_message(True), text = 'exp <lvl:int> <exp:int>', command = True)
+	async def exp(message, lvl, exp):
+		if not await is_admin(message): return await message('Вы (или я) не являетесь администратором!', attachment = f'photo-{bot.group_id}_457241328')
 		id = message.reply_message.from_id
-		if len(data['args']) == 2:
-			lvl, exp = int(data['args'][0]), int(data['args'][1])
-			blank = f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n"
-			await data['lvl'].insert_lvl(id, lvl = lvl, exp = exp)
-		else:
-			exp = int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}" if data['args'][0] in '+-' else data['args'][0])
-			blank = f"{exp:+}Ⓔ:\n"
-			await data['lvl'].insert_lvl(id, exp = exp)
-		await data['lvl'].send(id)
-		await message.answer(blank + data['lvl'][id])
+		await lvl_class.insert_lvl(id, lvl = lvl, exp = exp)
+		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@dp.message_handler(commands = ['tele'], have_args = [lambda arg: arg == '+'], with_reply_message = True, in_chat = True)
-	@dp.message_handler(commands = ['tele'], have_args = [ispos], with_reply_message = True, in_chat = True)
-	async def tele(message, data):
+	@bot.on.chat_message(with_reply_message(True), text = 'exp <exp:symbol[+-]', command = True)
+	@bot.on.chat_message(with_reply_message(True), text = 'exp <exp:int>', command = True)
+	async def exp(message, exp):
+		if not await is_admin(message): return await message('Вы (или я) не являетесь администратором!', attachment = f'photo-{bot.group_id}_457241328')
+		id = message.reply_message.from_id
+		if type(exp) is str: int(f"{exp}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		await lvl_class.insert_lvl(id, exp = exp)
+		await lvl_class.send(id)
+		await message(f"{exp:+}Ⓔ:\n" + lvl_class[id])
+	
+	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:symbol[+]>', command = True)
+	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:pos>', command = True)
+	async def tele(message, exp):
 		id1, id2 = message.from_id, message.reply_message.from_id
-		exp = int(f"{data['args'][0]}{atta(message.reply_message.text, message.reply_message.attachments)}" if data['args'][0] == '+' else data['args'][0])
-		if await data['lvl'].remove_exp(id1, exp = exp):
-			await data['lvl'].insert_lvl(id2, exp = exp)
-			await data['lvl'].send(id1, id2)
-			blank = f"{exp:+}Ⓔ:\n{data['lvl'][id2]}\n{-exp:+}Ⓔ:\n{data['lvl'][id1]}"
+		if type(exp) is str: exp = int(f"{exp}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		if await lvl_class.remove_exp(id1, exp = exp):
+			await lvl_class.insert_lvl(id2, exp = exp)
+			await lvl_class.send(id1, id2)
+			blank = f"{exp:+}Ⓔ:\n{lvl_class[id2]}\n{-exp:+}Ⓔ:\n{lvl_class[id1]}"
 		else:
-			await data['lvl'].send(id1)
-			blank = f"Не хватает Ⓔ!\n{data['lvl'][id1]}"
-		await message.answer(blank)
+			await lvl_class.send(id1)
+			blank = f"Не хватает Ⓔ!\n{lvl_class[id1]}"
+		await message(blank)
 	
-	@dp.message_handler(commands = ['ord'], count_args = 0, with_reply_message = True, in_chat = True)
-	async def ordo(message, data):
+	@bot.on.chat_message(with_reply_message(True), text = 'ord', command = True)
+	async def ordo(message):
 		ord_list = [ord(text) for text in message.reply_message.text]
-		await message.answer(f'Не знаю зачем тебе, но получай: {ord_list}')
+		await message(f'Не знаю зачем тебе, но получай: {ord_list}')
 	
-	@dp.message_handler(commands = ['info'], count_args = 0, with_reply_message = True, in_chat = True)
-	async def info(message, data):
+	@bot.on.chat_message(with_reply_message(True), text = 'info', command = True)
+	async def info(message):
 		exp = atta(message.reply_message.text, message.reply_message.attachments)
-		await message.answer(f"Стоимость сообщения {exp:+}Ⓔ")
-	
-	return dp
+		await message(f"Стоимость сообщения {exp:+}Ⓔ")

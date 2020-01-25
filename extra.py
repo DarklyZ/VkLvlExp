@@ -1,9 +1,27 @@
-from datetime import tzinfo, timedelta
-from re import *
+from vkbottle.rule import AbstractMessageRule
+from re import findall, I
 
-isint = lambda arg: arg.isdigit() or arg[:1] in '+-' and arg[1:].isdigit()
-ispos = lambda arg: arg.isdigit() or arg[:1] == '+' and arg[1:].isdigit()
-bdate = lambda user, date : '🎂' if 'bdate' in user and user['bdate'].startswith(f"{date.day}.{date.month}") else ''
+async def is_admin(message):
+	items = (await message.api[0].messages.getConversationsById(peer_ids = message.peer_id))['items'] or None
+	if not items: return
+	chat_settings = items[0]['chat_settings']
+	return message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
+
+class with_reply_message(AbstractMessageRule):
+	def __init__(self, wrm):
+		self.wrm = wrm
+	
+	def check(self, message):
+		is_wrm = message.reply_message and message.reply_message.from_id > 0
+		return self.wrm and is_wrm or not self.wrm and not is_wrm
+
+class from_id_pos(AbstractMessageRule):
+	def __init__(self, fip):
+		self.fip = fip
+	
+	def check(self, message):
+		is_fip = message.from_id > 0
+		return self.fip and is_fip or not self.fip and not is_fip
 
 def atta(text = '', attachments = []):
 	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))
@@ -19,9 +37,3 @@ def atta(text = '', attachments = []):
 		elif attachment.type == 'sticker': count += 10
 		elif attachment.type == 'audio': count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
 	return count
-	
-class tz(tzinfo):
-	utcoffset = lambda self, dt : timedelta(hours = 5)
-	dst = lambda self, dt : timedelta()
-	tzname = lambda self, dt : '+05:00'
-tz = tz()
