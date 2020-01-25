@@ -1,2 +1,2 @@
-vk.py==1.0.0a6
+https://github.com/timoniq/vkbottle/archive/master.zip
 asyncpg==0.20.0
