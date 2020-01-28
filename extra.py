@@ -1,8 +1,8 @@
 from vkbottle.rule import AbstractMessageRule
 from re import findall, I
 
-async def is_admin(message):
-	items = (await message.api[0].messages.getConversationsById(peer_ids = message.peer_id))['items'] or None
+async def is_admin(api, message):
+	items = (await api.messages.getConversationsById(peer_ids = message.peer_id))['items'] or None
 	if not items: return
 	chat_settings = items[0]['chat_settings']
 	return message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
