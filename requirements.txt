@@ -1,2 +1,2 @@
-vkbottle==1.35
+https://github.com/DarklyZ/vkbottle/archive/master.zip
 asyncpg==0.20.0

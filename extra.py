@@ -1,17 +1,26 @@
 from vkbottle.rule import AbstractMessageRule
 from re import findall, I
 
-async def is_admin(api, message):
-	items = (await api.messages.getConversationsById(peer_ids = message.peer_id))['items'] or None
-	if not items: return
-	chat_settings = items[0]['chat_settings']
-	return message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
+class is_admin(AbstractMessageRule):
+	def __init__(self, adm):
+		self.adm = adm
+
+	@classmethod
+	def set_api(cls, api):
+		cls.api = api
+
+	async def check(self, message):
+		items = (await self.api.messages.getConversationsById(peer_ids = message.peer_id))['items']
+		if not items: return False
+		chat_settings = items[0]['chat_settings']
+		is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
+		return self.adm and is_admin or not self.adm and not is_admin
 
 class with_reply_message(AbstractMessageRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
 	
-	def check(self, message):
+	async def check(self, message):
 		is_wrm = message.reply_message and message.reply_message.from_id > 0
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
 
@@ -19,7 +28,7 @@ class from_id_pos(AbstractMessageRule):
 	def __init__(self, fip):
 		self.fip = fip
 	
-	def check(self, message):
+	async def check(self, message):
 		is_fip = message.from_id > 0
 		return self.fip and is_fip or not self.fip and not is_fip
 
