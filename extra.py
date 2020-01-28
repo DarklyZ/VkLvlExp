@@ -16,6 +16,19 @@ class is_admin(AbstractMessageRule):
 		is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
 		return self.adm and is_admin or not self.adm and not is_admin
 
+class with_text(AbstractMessageRule):
+	def __init__(self, wt):
+		self.wt = wt
+
+	@classmethod
+	def set_lvl(cls, lvl_class):
+		cls.lvl_class = lvl_class
+
+	async def check(self, message):
+		text = await self.lvl_class.hello_text()
+		self.context.kwargs = dict(text = text) if text else {}
+		return self.wt and text or not self.wt and not text
+
 class with_reply_message(AbstractMessageRule):
 	def __init__(self, wrm):
 		self.wrm = wrm

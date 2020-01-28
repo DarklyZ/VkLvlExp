@@ -1,9 +1,9 @@
+from extra import atta, is_admin, with_text
 from vkbottle.framework.bot import Vals
 from vkbottle import Bot
 from vbml import Patcher
 from lvls import LVL
 from re import I, S
-from extra import atta, is_admin
 from os import getenv
 
 class Validators(Vals):
@@ -16,6 +16,7 @@ bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = True, 
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
 lvl_class = LVL(bot, getenv('DATABASE_URL'), bot.loop)
 is_admin.set_api(bot.api)
+with_text.set_lvl(lvl_class)
 
 import bot_commands, chat_action_commands, regex_commands
 bot_commands.load(bot, lvl_class)
