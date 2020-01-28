@@ -1,2 +1,2 @@
-https://github.com/timoniq/vkbottle/archive/master.zip
+vkbottle==1.35
 asyncpg==0.20.0
