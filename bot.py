@@ -1,16 +1,15 @@
+from vbml import Patcher, PatchedValidators
 from extra import atta, is_admin, with_text
-from vkbottle.framework.bot import Vals
 from vkbottle import Bot
-from vbml import Patcher
 from lvls import LVL
 from re import I, S
 from os import getenv
 
-class Validators(Vals):
+class Validators(PatchedValidators):
 	int = lambda self, value: int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
 	pos = lambda self, value: int(value) if value.isdigit() or value[:1] in '+' and value[1:].isdigit() else None
 	max = lambda self, value, extra: value if len(value) <= int(extra) else None
-	symbol = lambda self, value, extra: value if value in extra else None
+	inc = lambda self, value, *extra: value if value.lower() in extra else None
 
 bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = True, vbml_patcher = Patcher(validators = Validators, flags = I + S))
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])

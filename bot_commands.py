@@ -57,20 +57,20 @@ def load(bot, lvl_class):
 		await lvl_class.insert_lvl(id, lvl = lvl, exp = exp)
 		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:symbol[+-]>', command = True)
+	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:inc[up,down]>', command = True)
 	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:int>', command = True)
 	async def exp(message, exp):
 		id = message.reply_message.from_id
-		if type(exp) is str: int(f"{exp}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		if exp in ('up', 'down'): exp = atta(message.reply_message.text, message.reply_message.attachments) * {'up': 1, 'down': -1}[exp]
 		await lvl_class.insert_lvl(id, exp = exp)
 		await lvl_class.send(id)
 		await message(f"{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:symbol[+]>', command = True)
+	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:inc[up]>', command = True)
 	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:pos>', command = True)
 	async def tele(message, exp):
 		id1, id2 = message.from_id, message.reply_message.from_id
-		if type(exp) is str: exp = int(f"{exp}{atta(message.reply_message.text, message.reply_message.attachments)}")
+		if exp == 'up': exp = atta(message.reply_message.text, message.reply_message.attachments)
 		if await lvl_class.remove_exp(id1, exp = exp):
 			await lvl_class.insert_lvl(id2, exp = exp)
 			await lvl_class.send(id1, id2)
