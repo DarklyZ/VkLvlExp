@@ -1,7 +1,7 @@
 from vkbottle.rule import AbstractMessageRule
 from re import findall, I
 
-class is_admin(AbstractMessageRule):
+class IsAdmin(AbstractMessageRule):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -16,7 +16,7 @@ class is_admin(AbstractMessageRule):
 		is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
 		return self.adm and is_admin or not self.adm and not is_admin
 
-class with_text(AbstractMessageRule):
+class WithText(AbstractMessageRule):
 	def __init__(self, wt):
 		self.wt = wt
 
@@ -32,7 +32,7 @@ class with_text(AbstractMessageRule):
 		elif not self.wt and not text: return True
 		else: return False
 
-class with_reply_message(AbstractMessageRule):
+class WithReplyMessage(AbstractMessageRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
 	
@@ -40,7 +40,7 @@ class with_reply_message(AbstractMessageRule):
 		is_wrm = message.reply_message and message.reply_message.from_id > 0
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
 
-class from_id_pos(AbstractMessageRule):
+class FromIdPos(AbstractMessageRule):
 	def __init__(self, fip):
 		self.fip = fip
 	

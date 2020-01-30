@@ -1,16 +1,16 @@
-from extra import is_admin, with_text
+from extra import IsAdmin, WithText
 from vkbottle.rule import ChatActionRule
 
 def load(bot, lvl_class):
-	@bot.on.chat_message(is_admin(True), text = 'hello', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = 'hello', command = True)
 	async def hello_help(message):
 		await message('''Ключевые слова:
 {title} - заголовок
 {user} - пользователь
 {name} - имя бота''')
 
-	@bot.on.chat_message(is_admin(True), text = 'set hello', command = True)
-	@bot.on.chat_message(is_admin(True), text = 'set hello <text>', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = 'set hello', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = 'set hello <text>', command = True)
 	async def hello_plus(message, text = '* Стандартное приветствие *'):
 		try: hello = text.format(title = 'title', user = 'user', name = 'name')
 		except: await message('Неправильный формат')
@@ -18,12 +18,12 @@ def load(bot, lvl_class):
 			await lvl_class.add_text(text)
 			await message('Приветствие полученно\n' + hello)
 	
-	@bot.on.chat_message(is_admin(True), text = 'del hello', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = 'del hello', command = True)
 	async def hello_del(message):
 		await lvl_class.del_text()
 		await message('Приветствие удалено')
 	
-	@bot.on.chat_message.rule(ChatActionRule('chat_invite_user'), with_text(True))
+	@bot.on.chat_message.rule(ChatActionRule('chat_invite_user'), WithText(True))
 	async def add_user(message, text):
 		id1, id2 = message.from_id, message.action.member_id
 		await lvl_class.user(id1, id2)
@@ -37,14 +37,14 @@ def load(bot, lvl_class):
 			photo = 457241328
 		await message(blank, attachment = f'photo-{bot.group_id}_{photo}')
 	
-	@bot.on.chat_message.rule(ChatActionRule('chat_kick_user'), with_text(True))
+	@bot.on.chat_message.rule(ChatActionRule('chat_kick_user'), WithText(True))
 	async def remove_user(message, text):
 		id2 = message.action.member_id
 		await lvl_class.user(id2)
-		if await is_admin(True).check(message): await message(f"{lvl_class[id2]} заебал(а) админа.", attachment = f'photo-{bot.group_id}_457241336')
+		if await IsAdmin(True).check(message): await message(f"{lvl_class[id2]} заебал(а) админа.", attachment = f'photo-{bot.group_id}_457241336')
 		else: await message(f"{lvl_class[id2]} стал(а) натуралом(.", attachment = f'photo-{bot.group_id}_457241328')
 	
-	@bot.on.chat_message.rule(ChatActionRule('chat_invite_user_by_link'), with_text(True))
+	@bot.on.chat_message.rule(ChatActionRule('chat_invite_user_by_link'), WithText(True))
 	async def add_user_link(message, text):
 		id1 = message.from_id
 		await lvl_class.user(id1)

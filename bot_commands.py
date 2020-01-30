@@ -1,4 +1,4 @@
-from extra import atta, is_admin, with_reply_message, from_id_pos
+from extra import atta, IsAdmin, WithReplyMessage, FromIdPos
 
 def load(bot, lvl_class):
 	@bot.on.chat_message(command = True, text = 'help')
@@ -22,43 +22,43 @@ def load(bot, lvl_class):
 		await lvl_class.send(id)
 		await message(lvl_class[id])
 	
-	@bot.on.chat_message(with_reply_message(True), text = 'lvl', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), text = 'lvl', command = True)
 	async def lvl(message):
 		id = message.reply_message.from_id
 		await lvl_class.send(id)
 		await message(lvl_class[id])
 	
-	@bot.on.chat_message(with_reply_message(True), text = 'ban', command = True)
-	@bot.on.chat_message(with_reply_message(True), text = 'ban <text>', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), text = 'ban', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), text = 'ban <text>', command = True)
 	async def ban(message, text = 'не указана'):
 		id = message.reply_message.from_id
 		await lvl_class.user(id)
 		await message(f"Бан пользователя:\n{lvl_class[id]}\nПричина: {text}")
 	
-	@bot.on.chat_message(is_admin(True), text = 'echo', command = True)
-	@bot.on.chat_message(is_admin(True), text = 'echo <text>', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = 'echo', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = 'echo <text>', command = True)
 	async def echo(message, text = 'Сообщение не указано'):
 		member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != id)
 		await message(f"{text}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
 	
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'set smile <smile:max[4]>', command = True)
+	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'set smile <smile:max[4]>', command = True)
 	async def set_smile(message, smile):
 		await lvl_class.setsmile(message.reply_message.from_id, smile = smile)
 		await message(f"{smile} установлен")
 	
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'del smile', command = True)
+	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'del smile', command = True)
 	async def del_smile(message):
 		await lvl_class.setsmile(message.reply_message.from_id)
 		await message('Смайл удалён')
 	
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <lvl:int> <exp:int>', command = True)
+	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'exp <lvl:int> <exp:int>', command = True)
 	async def exp(message, lvl, exp):
 		id = message.reply_message.from_id
 		await lvl_class.insert_lvl(id, lvl = lvl, exp = exp)
 		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:inc[up,down]>', command = True)
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:int>', command = True)
+	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'exp <exp:inc[up,down]>', command = True)
+	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'exp <exp:int>', command = True)
 	async def exp(message, exp):
 		id = message.reply_message.from_id
 		if exp in ('up', 'down'): exp = atta(message.reply_message.text, message.reply_message.attachments) * {'up': 1, 'down': -1}[exp]
@@ -66,8 +66,8 @@ def load(bot, lvl_class):
 		await lvl_class.send(id)
 		await message(f"{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:inc[up]>', command = True)
-	@bot.on.chat_message(with_reply_message(True), from_id_pos(True), text = 'tele <exp:pos>', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), FromIdPos(True), text = 'tele <exp:inc[up]>', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), FromIdPos(True), text = 'tele <exp:pos>', command = True)
 	async def tele(message, exp):
 		id1, id2 = message.from_id, message.reply_message.from_id
 		if exp == 'up': exp = atta(message.reply_message.text, message.reply_message.attachments)
@@ -80,12 +80,12 @@ def load(bot, lvl_class):
 			blank = f"Не хватает Ⓔ!\n{lvl_class[id1]}"
 		await message(blank)
 	
-	@bot.on.chat_message(with_reply_message(True), text = 'ord', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), text = 'ord', command = True)
 	async def ordo(message):
 		ord_list = [ord(text) for text in message.reply_message.text]
 		await message(f'Не знаю зачем тебе, но получай: {ord_list}')
 	
-	@bot.on.chat_message(with_reply_message(True), text = 'info', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), text = 'info', command = True)
 	async def info(message):
 		exp = atta(message.reply_message.text, message.reply_message.attachments)
 		await message(f"Стоимость сообщения {exp:+}Ⓔ")
