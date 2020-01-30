@@ -57,7 +57,7 @@ def load(bot, lvl_class):
 		await lvl_class.insert_lvl(id, lvl = lvl, exp = exp)
 		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:symbol[+-]', command = True)
+	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:symbol[+-]>', command = True)
 	@bot.on.chat_message(is_admin(True), with_reply_message(True), text = 'exp <exp:int>', command = True)
 	async def exp(message, exp):
 		id = message.reply_message.from_id

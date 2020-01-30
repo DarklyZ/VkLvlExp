@@ -26,8 +26,11 @@ class with_text(AbstractMessageRule):
 
 	async def check(self, message):
 		text = await self.lvl_class.hello_text()
-		self.context.kwargs = dict(text = text) if text else {}
-		return self.wt and text or not self.wt and not text
+		if self.wt and text:
+			self.context.kwargs = {'text': text}
+			return True
+		elif not self.wt and not text: return True
+		else: return False
 
 class with_reply_message(AbstractMessageRule):
 	def __init__(self, wrm):
