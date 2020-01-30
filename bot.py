@@ -11,7 +11,7 @@ class Validators(PatchedValidators):
 	max = lambda self, value, extra: value if len(value) <= int(extra) else None
 	inc = lambda self, value, *extra: value if value.lower() in extra else None
 
-bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = True, vbml_patcher = Patcher(validators = Validators, flags = I + S))
+bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = False, vbml_patcher = Patcher(validators = Validators, flags = I + S))
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
 lvl_class = LVL(bot, getenv('DATABASE_URL'), bot.loop)
 is_admin.set_api(bot.api)
