@@ -1,7 +1,10 @@
 from extra import IsAdmin, WithText
 from vkbottle.rule import ChatActionRule
+from lvls import LVL
 
-def load(bot, lvl_class):
+def load(bot):
+	lvl_class = LVL.get_current()
+	
 	@bot.on.chat_message(IsAdmin(True), text = 'hello', command = True)
 	async def hello_help(message):
 		await message('''Ключевые слова:

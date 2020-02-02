@@ -1,7 +1,10 @@
 from extra import atta, IsAdmin, WithReplyMessage, FromIdPos
+from lvls import LVL
 
-def load(bot, lvl_class):
-	@bot.on.chat_message(command = True, text = 'help')
+def load(bot):
+	lvl_class = LVL.get_current()
+	
+	@bot.on.chat_message(text = 'help', command = True)
 	async def help(message):
 		await message('''Команды:
 1) /MyLVL - мой уровень
@@ -11,8 +14,8 @@ def load(bot, lvl_class):
 5) /BAN[ <причина>] & <rep_mes> - типо бан
 6) /Ord <chr>+ - код в юникоде символов''')
 	
-	@bot.on.chat_message(command = True, text = 'toplvl')
-	@bot.on.chat_message(command = True, text = 'toplvl <one:pos> <two:pos>')
+	@bot.on.chat_message(text = 'toplvl', command = True)
+	@bot.on.chat_message(text = 'toplvl <one:pos> <two:pos>', command = True)
 	async def toplvl_send(message, one = 1, two = 10):
 		await message(await lvl_class.toplvl_size(one, two), disable_mentions = True)
 	
@@ -55,6 +58,7 @@ def load(bot, lvl_class):
 	async def exp(message, lvl, exp):
 		id = message.reply_message.from_id
 		await lvl_class.insert_lvl(id, lvl = lvl, exp = exp)
+		await lvl_class.send(id)
 		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
 	
 	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'exp <exp:inc[up,down]>', command = True)

@@ -1,6 +1,6 @@
 from vbml import Patcher, PatchedValidators
-from extra import atta, IsAdmin, WithText
 from vkbottle import Bot
+from extra import atta
 from lvls import LVL
 from re import I, S
 from os import getenv
@@ -15,13 +15,11 @@ Patcher(validators = Validators, flags = I + S)
 bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = False)
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
 lvl_class = LVL(bot, getenv('DATABASE_URL'), bot.loop)
-IsAdmin.set_api(bot.api)
-WithText.set_lvl(lvl_class)
 
 import bot_commands, chat_action_commands, regex_commands
-bot_commands.load(bot, lvl_class)
-chat_action_commands.load(bot, lvl_class)
-regex_commands.load(bot, lvl_class)
+bot_commands.load(bot)
+chat_action_commands.load(bot)
+regex_commands.load(bot)
 
 @bot.on.pre_process()
 async def pass_lvl(message):

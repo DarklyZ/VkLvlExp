@@ -1,6 +1,7 @@
 from asyncpg import connect
 from asyncio import get_event_loop
 from datetime import datetime, tzinfo, timedelta
+from vkbottle.utils import ContextInstanceMixin
 
 bdate = lambda user, date : '🎂' if 'bdate' in user and user['bdate'].startswith(f"{date.day}.{date.month}") else ''
 
@@ -9,10 +10,11 @@ class tz(tzinfo):
 	dst = lambda self, dt : timedelta()
 	tzname = lambda self, dt : '+05:00'
 
-class LVL(dict):
+class LVL(dict, ContextInstanceMixin):
 	def __init__(self, bot, database_url, loop = get_event_loop(), tz = tz()):
 		super().__init__()
 		self.tz, self.bot = tz, bot
+		self.set_current(self)
 		loop.run_until_complete(self.connect_db(database_url))
 
 	def __call__(self, peer_id):
