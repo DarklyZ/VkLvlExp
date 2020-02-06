@@ -1,2 +1,2 @@
-https://github.com/timoniq/vkbottle/archive/master.zip
-asyncpg==0.20.0
+https://github.com/DarklyZ/vkbottle/archive/master.zip
+asyncpg==0.20.1

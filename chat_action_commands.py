@@ -12,8 +12,7 @@ def load(bot):
 {user} - пользователь
 {name} - имя бота''')
 
-	@bot.on.chat_message(IsAdmin(True), text = 'set hello', command = True)
-	@bot.on.chat_message(IsAdmin(True), text = 'set hello <text>', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = ['set hello <text>', 'set hello'], command = True)
 	async def hello_plus(message, text = '* Стандартное приветствие *'):
 		try: hello = text.format(title = 'title', user = 'user', name = 'name')
 		except: await message('Неправильный формат')

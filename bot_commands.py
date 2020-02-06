@@ -1,5 +1,6 @@
 from extra import atta, IsAdmin, WithReplyMessage, FromIdPos
 from lvls import LVL
+from vbml import Pattern
 
 def load(bot):
 	lvl_class = LVL.get_current()
@@ -14,8 +15,7 @@ def load(bot):
 5) /BAN[ <причина>] & <rep_mes> - типо бан
 6) /Ord <chr>+ - код в юникоде символов''')
 	
-	@bot.on.chat_message(text = 'toplvl', command = True)
-	@bot.on.chat_message(text = 'toplvl <one:pos> <two:pos>', command = True)
+	@bot.on.chat_message(text = ['toplvl <one:pos> <two:pos>', 'toplvl'], command = True)
 	async def toplvl_send(message, one = 1, two = 10):
 		await message(await lvl_class.toplvl_size(one, two), disable_mentions = True)
 	
@@ -31,15 +31,13 @@ def load(bot):
 		await lvl_class.send(id)
 		await message(lvl_class[id])
 	
-	@bot.on.chat_message(WithReplyMessage(True), text = 'ban', command = True)
-	@bot.on.chat_message(WithReplyMessage(True), text = 'ban <text>', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), text = ['ban <text>', 'ban'], command = True)
 	async def ban(message, text = 'не указана'):
 		id = message.reply_message.from_id
 		await lvl_class.user(id)
 		await message(f"Бан пользователя:\n{lvl_class[id]}\nПричина: {text}")
 	
-	@bot.on.chat_message(IsAdmin(True), text = 'echo', command = True)
-	@bot.on.chat_message(IsAdmin(True), text = 'echo <text>', command = True)
+	@bot.on.chat_message(IsAdmin(True), text = ['echo <text>', 'echo'], command = True)
 	async def echo(message, text = 'Сообщение не указано'):
 		member_ids = (item['member_id'] for item in (await vk.api_request('messages.getConversationMembers', {'peer_id' : message.peer_id}))['items'] if item['member_id'] > 0 and item['member_id'] != id)
 		await message(f"{text}\n{''.join(f'[id{member_id}|💬]' for member_id in member_ids)}")
@@ -61,8 +59,7 @@ def load(bot):
 		await lvl_class.send(id)
 		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'exp <exp:inc[up,down]>', command = True)
-	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = 'exp <exp:int>', command = True)
+	@bot.on.chat_message(IsAdmin(True), WithReplyMessage(True), text = ['exp <exp:int>','exp <exp:inc[up,down]>'], command = True)
 	async def exp(message, exp):
 		id = message.reply_message.from_id
 		if exp in ('up', 'down'): exp = atta(message.reply_message.text, message.reply_message.attachments) * {'up': 1, 'down': -1}[exp]
@@ -70,8 +67,7 @@ def load(bot):
 		await lvl_class.send(id)
 		await message(f"{exp:+}Ⓔ:\n" + lvl_class[id])
 	
-	@bot.on.chat_message(WithReplyMessage(True), FromIdPos(True), text = 'tele <exp:inc[up]>', command = True)
-	@bot.on.chat_message(WithReplyMessage(True), FromIdPos(True), text = 'tele <exp:pos>', command = True)
+	@bot.on.chat_message(WithReplyMessage(True), FromIdPos(True), text = ['tele <exp:pos>', 'tele <exp:inc[up]>'], command = True)
 	async def tele(message, exp):
 		id1, id2 = message.from_id, message.reply_message.from_id
 		if exp == 'up': exp = atta(message.reply_message.text, message.reply_message.attachments)
