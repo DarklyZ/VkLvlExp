@@ -25,7 +25,7 @@ class WithText(AbstractMessageRule):
 		if self.wt and text:
 			self.context.kwargs = {'text': text}
 			return True
-		else: return not self.wt and not text
+		return not self.wt and not text
 
 class WithReplyMessage(AbstractMessageRule):
 	def __init__(self, wrm):
