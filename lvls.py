@@ -1,21 +1,34 @@
 from asyncpg import connect
-from asyncio import get_event_loop
 from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
+from re import findall, I
 
 bdate = lambda user, date : '🎂' if 'bdate' in user and user['bdate'].startswith(f"{date.day}.{date.month}") else ''
 
-class tz(tzinfo):
+class timezone(tzinfo):
 	utcoffset = lambda self, dt : timedelta(hours = 5)
 	dst = lambda self, dt : timedelta()
 	tzname = lambda self, dt : '+05:00'
 
 class LVL(dict, ContextInstanceMixin):
-	def __init__(self, bot, database_url, loop = get_event_loop(), tz = tz()):
+	def __init__(self, database_url, api = None, loop = None, tz = None):
 		super().__init__()
-		self.tz, self.bot = tz, bot
-		self.set_current(self)
+
+		self.tz = tz or timezone()
+
+		if not api:
+			from vkbottle.api import Api
+			api = Api.get_current()
+
+		self.api = api
+
+		if not loop:
+			from asyncio import get_event_loop
+			loop = get_event_loop()
+
 		loop.run_until_complete(self.connect_db(database_url))
+
+		self.set_current(self)
 
 	def __call__(self, peer_id):
 		self.clear()
@@ -57,7 +70,7 @@ class LVL(dict, ContextInstanceMixin):
 		smile = {row['user_id'] : row['smile'] for row in rows}
 		rows = await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id)
 		top = {row['user_id'] : smile for row, smile in zip(rows, '🥇🥈🥉')}
-		self.update({user['id'] : f"{top.get(user['id'], '')}{bdate(user, now)}{user['first_name']} {user['last_name'][:3]}{smile.get(user['id'], '')}" for user in await self.bot.api.users.get(user_ids = ids, fields = 'bdate')})
+		self.update({user['id'] : f"{top.get(user['id'], '')}{bdate(user, now)}{user['first_name']} {user['last_name'][:3]}{smile.get(user['id'], '')}" for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
 	async def send(self, *ids):
 		rows = await self.con.fetch("select user_id,lvl,exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)
@@ -89,4 +102,25 @@ class LVL(dict, ContextInstanceMixin):
 	async def hello_text(self):
 		row = await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)
 		return row.get('text')
-		
+
+	async def atta(self, text='', attachments=[], id = None, negative = False):
+		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))
+		count = s if s < 50 else 50
+		for attachment in attachments:
+			if attachment.type == 'photo':
+				pixel = max(size.width * size.height for size in attachment.photo.sizes)
+				count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
+			elif attachment.type == 'wall':
+				count += 40
+			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
+				count += 20
+			elif attachment.type == 'audio_message':
+				count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
+			elif attachment.type == 'video':
+				count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
+			elif attachment.type == 'sticker':
+				count += 10
+			elif attachment.type == 'audio':
+				count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
+		if id and count: await self.insert_lvl(id, exp = count if not negative else -count)
+		return count

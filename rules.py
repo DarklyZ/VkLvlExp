@@ -1,12 +1,22 @@
-from vkbottle.rule import AbstractMessageRule
-from vkbottle.api import Api
-from lvls import LVL
-from re import findall, I
+from vkbottle.rule import AbstractMessageRule, ChatActionRule
 
+class add_rule:
+	from vkbottle.handler.handler import COL_RULES
+
+	def __init__(self, name):
+		self.name = name
+
+	def __call__(self, func):
+		self.COL_RULES[self.name] = func
+		return func
+
+@add_rule('is_admin')
 class IsAdmin(AbstractMessageRule):
+	from vkbottle.api import Api as api
+
 	def __init__(self, adm):
 		self.adm = adm
-		self.api = Api.get_current()
+		self.api = self.api.get_current()
 
 	async def check(self, message):
 		items = (await self.api.messages.getConversationsById(peer_ids = message.peer_id))['items']
@@ -15,10 +25,13 @@ class IsAdmin(AbstractMessageRule):
 		is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
 		return self.adm and is_admin or not self.adm and not is_admin
 
+@add_rule('with_text')
 class WithText(AbstractMessageRule):
+	from lvls import LVL as lvl_class
+
 	def __init__(self, wt):
 		self.wt = wt
-		self.lvl_class = LVL.get_current()
+		self.lvl_class = self.lvl_class.get_current()
 
 	async def check(self, message):
 		text = await self.lvl_class.hello_text()
@@ -27,6 +40,7 @@ class WithText(AbstractMessageRule):
 			return True
 		return not self.wt and not text
 
+@add_rule('with_reply_message')
 class WithReplyMessage(AbstractMessageRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
@@ -35,6 +49,7 @@ class WithReplyMessage(AbstractMessageRule):
 		is_wrm = message.reply_message and message.reply_message.from_id > 0
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
 
+@add_rule('from_id_pos')
 class FromIdPos(AbstractMessageRule):
 	def __init__(self, fip):
 		self.fip = fip
@@ -43,17 +58,4 @@ class FromIdPos(AbstractMessageRule):
 		is_fip = message.from_id > 0
 		return self.fip and is_fip or not self.fip and not is_fip
 
-def atta(text = '', attachments = []):
-	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))
-	count = s if s < 50 else 50
-	for attachment in attachments:
-		if attachment.type == 'photo':
-			pixel = max(size.width * size.height for size in attachment.photo.sizes)
-			count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
-		elif attachment.type == 'wall': count += 40
-		elif attachment.type == 'doc' and attachment.doc.ext == 'gif': count += 20
-		elif attachment.type == 'audio_message': count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
-		elif attachment.type == 'video': count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
-		elif attachment.type == 'sticker': count += 10
-		elif attachment.type == 'audio': count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
-	return count
+add_rule('chat_action_rule')(ChatActionRule)

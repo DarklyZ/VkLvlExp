@@ -1,6 +1,5 @@
 from vbml import Patcher, PatchedValidators
 from vkbottle import Bot
-from extra import atta
 from lvls import LVL
 from re import I, S
 from os import getenv
@@ -12,11 +11,11 @@ class Validators(PatchedValidators):
 	inc = lambda self, value, *extra: value if value.lower() in extra else None
 
 Patcher(validators = Validators, flags = I + S)
-bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = False)
+bot = Bot(token = getenv('TOKEN'), group_id = getenv('GROUP_ID'), debug = True)
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
-lvl_class = LVL(bot, getenv('DATABASE_URL'), bot.loop)
+lvl_class = LVL(getenv('DATABASE_URL'), loop = bot.loop)
 
-import bot_commands, chat_action_commands, regex_commands
+import rules, bot_commands, chat_action_commands, regex_commands
 bot_commands.load(bot)
 chat_action_commands.load(bot)
 regex_commands.load(bot)
@@ -26,7 +25,6 @@ async def pass_lvl(message):
 	lvl_class(message.peer_id)
 	if message.peer_id == message.from_id or message.from_id < 0: return
 	await lvl_class.check_add_user(message.from_id)
-	exp = atta(message.text, message.attachments) or None
-	if not message.payload and exp: await lvl_class.insert_lvl(message.from_id, exp = exp)
+	if not message.payload: await lvl_class.atta(message.text, message.attachments, message.from_id)
 
 bot.run_polling()
