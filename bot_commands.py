@@ -1,6 +1,5 @@
 from extra import atta, IsAdmin, WithReplyMessage, FromIdPos
 from lvls import LVL
-from vbml import Pattern
 
 def load(bot):
 	lvl_class = LVL.get_current()
