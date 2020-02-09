@@ -1,4 +1,5 @@
 def load(bot):
+	from vkbottle.api.keyboard import keyboard_gen
 	from lvls import LVL as lvl_class
 	lvl_class = lvl_class.get_current()
 	
@@ -27,12 +28,14 @@ def load(bot):
 		id = message.reply_message.from_id
 		await lvl_class.send(id)
 		await message(lvl_class[id])
-	
+
 	@bot.on.chat_message(text = ['ban <text>', 'ban'], command = True, with_reply_message = True)
 	async def ban(message, text = 'не указана'):
 		id = message.reply_message.from_id
 		await lvl_class.user(id)
-		await message(f"Бан пользователя:\n{lvl_class[id]}\nПричина: {text}")
+		await message(f"Бан пользователя:\n{lvl_class[id]}\nПричина: {text}", keyboard = keyboard_gen([
+			[{'text': 'Ясно-понятно', 'color': 'positive', 'payload': {'command': 'ban'}}]
+		], inline = True))
 	
 	@bot.on.chat_message(text = ['echo <text>', 'echo'], command = True, is_admin = True)
 	async def echo(message, text = 'Сообщение не указано'):
