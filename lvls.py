@@ -93,7 +93,7 @@ class LVL(dict, ContextInstanceMixin):
 		await self.con.execute("update lvl set smile = $1 where user_id = any($2) and peer_id = $3", smile, ids, self.peer_id)
 
 	async def add_text(self, text):
-		if await self.hello_text() is not None: await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
+		if await self.hello_text(): await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
 		else: await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
 
 	async def del_text(self):
@@ -101,7 +101,7 @@ class LVL(dict, ContextInstanceMixin):
 
 	async def hello_text(self):
 		row = await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)
-		return row.get('text')
+		return row and row['text']
 
 	async def atta(self, text='', attachments=[], id = None, negative = False):
 		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))
