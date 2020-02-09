@@ -3,7 +3,7 @@ from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
 from re import findall, I
 
-bdate = lambda user, date : '🎂' if 'bdate' in user and user['bdate'].startswith(f"{date.day}.{date.month}") else ''
+bdate = lambda user, date: '🎂' if 'bdate' in user and user['bdate'].startswith(f"{date.day}.{date.month}") else ''
 
 class timezone(tzinfo):
 	utcoffset = lambda self, dt : timedelta(hours = 5)
