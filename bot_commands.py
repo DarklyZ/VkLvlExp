@@ -1,5 +1,5 @@
 def load(bot):
-	from vkbottle.api.keyboard import keyboard_gen
+	from vkbottle import keyboard_gen
 	from lvls import LVL as lvl_class
 	lvl_class = lvl_class.get_current()
 	
