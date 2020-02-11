@@ -1,2 +1,3 @@
 https://github.com/timoniq/vkbottle/archive/master.zip
-asyncpg==0.20.1
+asyncpg
+loguru
