@@ -63,7 +63,7 @@ def load(bot):
 	async def exp(message, exp):
 		id = message.reply_message.from_id
 		if isinstance(exp, int): await lvl_class.insert_lvl(id, exp = exp)
-		else: exp = await lvl_class.atta(message.reply_message.text, message.reply_message.attachments, id, {'up': False, 'down': True}[exp])
+		else: exp = await lvl_class.atta(message.reply_message.text, message.reply_message.attachments, id, exp == 'down')
 		await lvl_class.send(id)
 		await message(f"{exp:+}Ⓔ:\n" + lvl_class[id])
 	
