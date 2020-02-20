@@ -109,13 +109,13 @@ class LVL(dict, ContextInstanceMixin):
 		for attachment in attachments:
 			if attachment.type == 'photo':
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
-				count += round(pixel / (1280 * 720 / 70)) if pixel < 1280 * 720 else 70
+				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
 			elif attachment.type == 'wall': count += await self.atta(attachment.wall.text, attachment.wall.attachments)
 			elif attachment.type == 'wall_reply': count += await self.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
 			elif attachment.type == 'doc' and attachment.doc.ext == 'gif': count += 20
-			elif attachment.type == 'audio_message': count += round(attachment.audio_message.duration) if attachment.audio_message.duration < 25 else 25
-			elif attachment.type == 'video': count += round(attachment.video.duration / 1.5) if attachment.video.duration < 60 * 2 else 80
+			elif attachment.type == 'audio_message': count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
+			elif attachment.type == 'video': count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
 			elif attachment.type == 'sticker': count += 10
-			elif attachment.type == 'audio': count += round(attachment.audio.duration / 3) if attachment.audio.duration < 60 * 3 else 60
+			elif attachment.type == 'audio': count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
 		if id and count: await self.insert_lvl(id, exp = count if not negative else -count)
 		return count
