@@ -19,13 +19,12 @@ def load(bot):
 	
 	@bot.on.chat_message(text = 'del hello', command = True, is_admin = True)
 	async def hello_del(message):
-		await lvl_class.del_text()
+		await lvl_class.add_text()
 		await message('Приветствие удалено')
 	
 	@bot.on.chat_message(chat_action_rule = 'chat_invite_user', with_text = True)
 	async def add_user(message, text):
-		id1, id2 = message.from_id, message.action.member_id
-		await lvl_class.user(id1, id2)
+		await lvl_class.user(id1 := message.from_id, id2 := message.action.member_id)
 		if id1 != id2:
 			title = f"* Welcome to the club, buddy. *\nВас призвал(а): {lvl_class[id1]}"
 			bot_name = (await bot.api.groups.getById(group_id = bot.group_id))[0]['name']
@@ -38,20 +37,17 @@ def load(bot):
 	
 	@bot.on.chat_message(chat_action_rule = 'chat_kick_user', with_text = True, is_admin = True)
 	async def remove_user(message, text):
-		id2 = message.action.member_id
-		await lvl_class.user(id2)
+		await lvl_class.user(id2 := message.action.member_id)
 		await message(f"{lvl_class[id2]} заебал(а) админа.", attachment = f'photo-{bot.group_id}_457241336')
 
 	@bot.on.chat_message(chat_action_rule = 'chat_kick_user', with_text = True, is_admin = False)
 	async def remove_user(message, text):
-		id2 = message.action.member_id
-		await lvl_class.user(id2)
+		await lvl_class.user(id2 := message.action.member_id)
 		await message(f"{lvl_class[id2]} стал(а) натуралом(.", attachment = f'photo-{bot.group_id}_457241328')
 	
 	@bot.on.chat_message(chat_action_rule = 'chat_invite_user_by_link', with_text = True)
 	async def add_user_link(message, text):
-		id1 = message.from_id
-		await lvl_class.user(id1)
+		await lvl_class.user(id1 := message.from_id)
 		title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
 		bot_name = (await bot.api.groups.getById(group_id = bot.group_id))[0]['name']
 		await message(text.format(title = title, user = lvl_class[id1], name = bot_name), attachment = f'photo-{bot.group_id}_457241337')

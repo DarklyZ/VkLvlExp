@@ -23,8 +23,7 @@ class IsAdmin(AbstractMessageRule):
 			chat_settings = items[0]['chat_settings']
 			is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
 			return self.adm and is_admin or not self.adm and not is_admin
-		else:
-			return False
+		else: return False
 
 @add_rule('with_text')
 class WithText(AbstractMessageRule):
@@ -35,11 +34,8 @@ class WithText(AbstractMessageRule):
 		self.lvl_class = self.lvl_class.get_current()
 
 	async def check(self, message):
-		if self.wt and (text := await self.lvl_class.hello_text()):
-			self.context.kwargs = {'text': text}
-			return True
-		else:
-			return not self.wt and not text
+		if text := await self.lvl_class.hello_text(): self.context.kwargs = {'text': text}
+		return self.wt and text or not self.wt and not text
 
 @add_rule('with_reply_message')
 class WithReplyMessage(AbstractMessageRule):
