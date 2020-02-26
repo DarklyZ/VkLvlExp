@@ -117,5 +117,6 @@ class LVL(dict, ContextInstanceMixin):
 			elif attachment.type == 'video': count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
 			elif attachment.type == 'sticker': count += 10
 			elif attachment.type == 'audio': count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
-		if id and count: await self.insert_lvl(id, exp = count if not negative else -count)
+		if negative: count = -count
+		if id and count: await self.insert_lvl(id, exp = count)
 		return count
