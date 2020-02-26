@@ -15,10 +15,10 @@ bot = Bot(token = getenv('TOKEN'), debug = False)
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
 lvl_class = LVL(getenv('DATABASE_URL'), loop = bot.loop)
 
-import rules, bot_commands, chat_action_commands, regex_commands
-bot_commands.load(bot)
-chat_action_commands.load(bot)
-regex_commands.load(bot)
+import rules, commands
+commands.bot.load(bot)
+commands.chat_action.load(bot)
+commands.regex.load(bot)
 
 @bot.on.pre_process()
 async def pass_lvl(message):
