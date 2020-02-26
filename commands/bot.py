@@ -49,19 +49,13 @@ def load(bot):
 	async def del_smile(message):
 		await lvl_class.setsmile(message.reply_message.from_id)
 		await message('Смайл удалён')
-	
-	@bot.on.chat_message(text = 'exp <lvl:int> <exp:int>', command = True, is_admin = True, with_reply_message = True)
-	async def exp(message, lvl, exp):
-		await lvl_class.insert_lvl(id := message.reply_message.from_id, lvl = lvl, exp = exp)
-		await lvl_class.send(id)
-		await message(f"{lvl:+}Ⓛ|{exp:+}Ⓔ:\n" + lvl_class[id])
-	
-	@bot.on.chat_message(text = ['exp <exp:int>','exp <exp:inc[up,down]>'], command = True, is_admin = True, with_reply_message = True)
-	async def exp(message, exp):
+
+	@bot.on.chat_message(text = ['exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'], command = True, is_admin = True, with_reply_message = True)
+	async def exp(message, exp, lvl = 0):
 		if exp in ('up', 'down'): exp = atta(message.reply_message.text, message.reply_message.attachments, exp == 'down')
-		await lvl_class.insert_lvl(id := message.reply_message.from_id, exp = exp)
+		await lvl_class.insert_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
 		await lvl_class.send(id)
-		await message(f"{exp:+}Ⓔ:\n" + lvl_class[id])
+		await message((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + lvl_class[id])
 	
 	@bot.on.chat_message(text = ['tele <exp:pos>', 'tele <exp:inc[up]>'], command = True, with_reply_message = True, from_id_pos = True)
 	async def tele(message, exp):
