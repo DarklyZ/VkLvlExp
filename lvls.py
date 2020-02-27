@@ -89,9 +89,8 @@ class LVL(dict, ContextInstanceMixin):
 	async def toplvl_size(self, x, y):
 		try: rows = await self.con.fetch("select row_number() over (order by lvl desc,exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
 		except: return f'Я не могу отобразить {x} - {y}'
-		else:
-			await self.user(*(row['user_id'] for row in rows))
-			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
+		await self.user(*(row['user_id'] for row in rows))
+		return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 
 	async def check_add_user(self, id):
 		if (await self.con.fetchrow("select count(*) = 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['bool']:
