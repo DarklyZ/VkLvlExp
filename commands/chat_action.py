@@ -12,10 +12,9 @@ def load(bot):
 	@bot.on.chat_message(text = ['set hello <text>', 'set hello'], command = True, is_admin = True)
 	async def hello_plus(message, text = '* Стандартное приветствие *'):
 		try: hello = text.format(title = 'title', user = 'user', name = 'name')
-		except: await message('Неправильный формат')
-		else:
-			await lvl_class.add_text(text)
-			await message('Приветствие полученно\n' + hello)
+		except: return await message('Неправильный формат')
+		await lvl_class.add_text(text)
+		await message('Приветствие полученно\n' + hello)
 	
 	@bot.on.chat_message(text = 'del hello', command = True, is_admin = True)
 	async def hello_del(message):
