@@ -1,6 +1,7 @@
 from vbml import Patcher, PatchedValidators
 from vkbottle import Bot
 from lvls import LVL, atta
+from vkbottle.ext import Middleware
 from re import I, S
 from os import getenv
 
@@ -20,11 +21,12 @@ commands.bot.load(bot)
 commands.chat_action.load(bot)
 commands.regex.load(bot)
 
-@bot.on.pre_process()
-async def pass_lvl(message):
-	lvl_class(message.peer_id)
-	if message.peer_id == message.from_id or message.from_id < 0: return
-	await lvl_class.check_add_user(message.from_id)
-	if not message.payload and (exp := atta(message.text, message.attachments)): await lvl_class.insert_lvl(message.from_id, exp = exp)
+@bot.middleware.middleware_handler()
+class Register(Middleware):
+	async def middleware(message):
+		lvl_class(message.peer_id)
+		if message.peer_id == message.from_id or message.from_id < 0: return
+		await lvl_class.check_add_user(message.from_id)
+		if not message.payload and (exp := atta(message.text, message.attachments)): await lvl_class.insert_lvl(message.from_id, exp = exp)
 
 bot.run_polling()
