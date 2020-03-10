@@ -23,7 +23,7 @@ commands.regex.load(bot)
 
 @bot.middleware.middleware_handler()
 class Register(Middleware):
-	async def middleware(message):
+	async def middleware(self, message):
 		lvl_class(message.peer_id)
 		if message.peer_id == message.from_id or message.from_id < 0: return
 		await lvl_class.check_add_user(message.from_id)
