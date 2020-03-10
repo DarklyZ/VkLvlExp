@@ -1,4 +1,5 @@
 def load(bot):
+	return "Не работает"
 	from random import choice
 	from lvls import LVL as lvl_class
 	lvl_class = lvl_class.get_current()
