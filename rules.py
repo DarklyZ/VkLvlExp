@@ -59,6 +59,6 @@ class FromIdPos(AbstractMessageRule):
 @add_rule('regex')
 class RegexRule(VBMLRule):
 	def __init__(self, regex):
-		super().__init__(Pattern(pattern = regex))
+		super().__init__(Pattern(text = '', pattern = regex))
 
 add_rule('chat_action_rule')(ChatActionRule)
