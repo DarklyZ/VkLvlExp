@@ -1,4 +1,5 @@
-from vkbottle.rule import AbstractMessageRule, ChatActionRule
+from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
+from vbml import Pattern
 
 class add_rule:
 	from vkbottle.handler.handler import COL_RULES
@@ -54,5 +55,10 @@ class FromIdPos(AbstractMessageRule):
 	async def check(self, message):
 		is_fip = message.from_id > 0
 		return self.fip and is_fip or not self.fip and not is_fip
+
+@add_rule('regex')
+class RegexRule(VBMLRule):
+	def __init__(self, regex):
+		super().__init__(Pattern(pattern = regex))
 
 add_rule('chat_action_rule')(ChatActionRule)
