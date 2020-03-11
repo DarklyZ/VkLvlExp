@@ -1,6 +1,6 @@
 def load(bot):
-	from lvls import LVL as lvl_class
-	lvl_class = lvl_class.get_current()
+	from lvls import LVL
+	lvl_class = LVL.get_current()
 	
 	@bot.on.chat_message(text = 'hello', command = True, is_admin = True)
 	async def hello_help(message):

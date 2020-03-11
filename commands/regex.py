@@ -1,7 +1,7 @@
 def load(bot):
 	from random import choice
-	from lvls import LVL as lvl_class
-	lvl_class = lvl_class.get_current()
+	from lvls import LVL
+	lvl_class = LVL.get_current()
 	
 	@bot.on.chat_message(regex = r'^f+$')
 	async def f_f(message):
