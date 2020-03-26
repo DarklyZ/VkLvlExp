@@ -8,9 +8,9 @@ class add_rule:
 	def __init__(self, name):
 		self.name = name
 
-	def __call__(self, func):
-		self.COL_RULES[self.name] = func
-		return func
+	def __call__(self, cls):
+		self.COL_RULES[self.name] = cls
+		return cls
 
 @add_rule('is_admin')
 class IsAdmin(AbstractMessageRule):

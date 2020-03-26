@@ -18,7 +18,7 @@ def load(bot):
 	
 	@bot.on.chat_message(regex = r'\bня\b')
 	async def nya(message):
-		await message('', sticker_id = 9808)
+		await message(sticker_id = 9808)
 	
 	@bot.on.chat_message(regex = r'смерт|суицид|умереть|гибну|окно')
 	async def olga(message):
@@ -26,5 +26,5 @@ def load(bot):
 	
 	@bot.on.chat_message(regex = r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b')
 	async def archi(message):
-		await message('', sticker_id = 9805)
+		await message(sticker_id = 9805)
 		await message(f"[id{await lvl_class.getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
