@@ -1,6 +1,4 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
-from vbml import Patcher
-Patcher = Patcher.get_current
 
 class add_rule:
 	from vkbottle.handler.handler import COL_RULES
@@ -59,7 +57,10 @@ class FromIdPos(AbstractMessageRule):
 
 @add_rule('regex')
 class RegexRule(VBMLRule):
+	from vbml import Patcher as _patcher
+
 	def __init__(self, regex):
-		super().__init__(Patcher().pattern('', pattern = regex))
+		self._patcher = self._patcher.get_current()
+		self.data = {"pattern": [self._patcher.pattern('', pattern = regex)]}
 
 add_rule('chat_action_rule')(ChatActionRule)
