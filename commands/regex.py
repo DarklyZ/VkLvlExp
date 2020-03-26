@@ -10,11 +10,11 @@ def load(bot):
 	
 	@bot.on.chat_message(regex = r'^[^\?]*\?\?\?$')
 	async def hm_(message):
-		await message('', attachment = f'photo-{bot.group_id}_457241329')
+		await message(attachment = f'photo-{bot.group_id}_457241329')
 	
 	@bot.on.chat_message(regex = r'^[^\?]*\?\?$')
 	async def h_(message):
-		await message('', attachment = f'photo-{bot.group_id}_457241330')
+		await message(attachment = f'photo-{bot.group_id}_457241330')
 	
 	@bot.on.chat_message(regex = r'\bня\b')
 	async def nya(message):
