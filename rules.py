@@ -61,6 +61,6 @@ class RegexRule(VBMLRule):
 
 	def __init__(self, regex):
 		self._patcher = self._patcher.get_current()
-		self.data = {"pattern": [self._patcher.pattern('', pattern = regex)]}
+		self.data = {"pattern": [self._patcher.pattern('', pattern = f"^{regex}$")]}
 
 add_rule('chat_action_rule')(ChatActionRule)
