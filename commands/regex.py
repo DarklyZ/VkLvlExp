@@ -20,7 +20,7 @@ def load(bot):
 	async def nya(message):
 		await message(sticker_id = 9808)
 	
-	@bot.on.chat_message(regex = r'смерт|суицид|умереть|гибну|окно')
+	@bot.on.chat_message(regex = r'(?:смерт|суицид|умереть|гибну|окно)')
 	async def olga(message):
 		await message(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{await lvl_class.getconst('olga_id')}|#бля_Оля_живи!!!!!]")
 	
