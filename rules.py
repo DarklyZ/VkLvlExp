@@ -1,4 +1,7 @@
-from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
+from vkbottle.rule import AbstractMessageRule, ChatActionRule
+from vkbottle.api import Api
+from lvls import LVL
+from re import compile, I, S
 
 class add_rule:
 	from vkbottle.handler.handler import COL_RULES
@@ -12,11 +15,9 @@ class add_rule:
 
 @add_rule('is_admin')
 class IsAdmin(AbstractMessageRule):
-	from vkbottle.api import Api as api
-
 	def __init__(self, adm):
 		self.adm = adm
-		self.api = self.api.get_current()
+		self.api = Api.get_current()
 
 	async def check(self, message):
 		if items := (await self.api.messages.getConversationsById(peer_ids = message.peer_id))['items']:
@@ -27,11 +28,9 @@ class IsAdmin(AbstractMessageRule):
 
 @add_rule('with_text')
 class WithText(AbstractMessageRule):
-	from lvls import LVL as lvl_class
-
 	def __init__(self, wt):
 		self.wt = wt
-		self.lvl_class = self.lvl_class.get_current()
+		self.lvl_class = LVL.get_current()
 
 	async def check(self, message):
 		if text := await self.lvl_class.hello_text(): self.context.kwargs = {'text': text}
@@ -56,11 +55,12 @@ class FromIdPos(AbstractMessageRule):
 		return self.fip and is_fip or not self.fip and not is_fip
 
 @add_rule('regex')
-class RegexRule(VBMLRule):
-	from vbml import Patcher as _patcher
-
+class RegexRule(AbstractMessageRule):
 	def __init__(self, regex):
-		self._patcher = self._patcher.get_current()
-		self.data = {"pattern": [self._patcher.pattern('', pattern = f"^{regex}$")]}
+		self.compile = compile(regex, flags = I + S)
+
+	async def check(self, message):
+		return bool(self.compile.search(message.text))
+
 
 add_rule('chat_action_rule')(ChatActionRule)
