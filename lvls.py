@@ -75,14 +75,15 @@ class LVL(dict, ContextInstanceMixin):
 	async def user(self, *ids):
 		now = datetime.now(self.tz)
 		smile = {row['user_id'] : row['smile']
-				 for row in await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)}
+				for row in await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)}
 		top = {row['user_id'] : smile
-			   for row, smile in zip(await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id), '🥇🥈🥉')}
-		self.update({user.id : f"{top.get(user.id, '')}{bdate(user, now)}{user.first_name} {user.last_name[:3]}{smile.get(user.id, '')}" for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
+				for row, smile in zip(await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id), '🥇🥈🥉')}
+		self.update({user.id : f"{top.get(user.id, '')}{bdate(user, now)}{user.first_name} {user.last_name[:3]}{smile.get(user.id, '')}"
+		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
 	async def send(self, *ids):
 		lvl = {row['user_id'] : f"{row['lvl']}Ⓛ|{row['exp']}/{row['lvl'] * 2000}Ⓔ"
-			   for row in await self.con.fetch("select user_id,lvl,exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)}
+				for row in await self.con.fetch("select user_id,lvl,exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)}
 		await self.user(*ids)
 		self.update({id : f"{self[id]}:{lvl.get(id, 'lvl:error')}" for id in ids})
 
@@ -90,7 +91,7 @@ class LVL(dict, ContextInstanceMixin):
 		try: rows = await self.con.fetch("select row_number() over (order by lvl desc,exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
 		except: return f'Я не могу отобразить {x} - {y}'
 		await self.user(*(row['user_id'] for row in rows))
-		return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
+		return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ"for row in rows)
 
 	async def check_add_user(self, id):
 		if (await self.con.fetchrow("select count(*) = 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['bool']:

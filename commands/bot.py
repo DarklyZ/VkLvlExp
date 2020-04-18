@@ -37,8 +37,8 @@ def load(bot):
 	@bot.on.chat_message(text = ['echo <text>', 'echo'], command = True, is_admin = True)
 	async def echo(message, text = 'Сообщение не указано'):
 		await message(f'{text}\n' + ''.join(f"[id{item['member_id']}|💬]"
-											for item in (await bot.api.messages.getConversationMembers(peer_id = message.peer_id))['items']
-											if item['member_id'] > 0 and item['member_id'] != message.from_id))
+				for item in (await bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
+				if item['member_id'] > 0 and item['member_id'] != message.from_id))
 	
 	@bot.on.chat_message(text = 'set smile <smile:max[4]>', command = True, is_admin = True, with_reply_message = True)
 	async def set_smile(message, smile):

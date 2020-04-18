@@ -20,9 +20,9 @@ class IsAdmin(AbstractMessageRule):
 		self.api = Api.get_current()
 
 	async def check(self, message):
-		if items := (await self.api.messages.getConversationsById(peer_ids = message.peer_id))['items']:
-			chat_settings = items[0]['chat_settings']
-			is_admin = message.from_id == chat_settings['owner_id'] or message.from_id in chat_settings['admin_ids']
+		if items := (await self.api.messages.get_conversations_by_id(peer_ids = message.peer_id)).items:
+			chat_settings = items[0].chat_settings
+			is_admin = message.from_id == chat_settings.owner_id or message.from_id in chat_settings.admin_ids
 			return self.adm and is_admin or not self.adm and not is_admin
 		else: return False
 
