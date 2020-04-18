@@ -12,7 +12,7 @@ class Validators(PatchedValidators):
 	inc = lambda self, value, *extra: value if value.lower() in extra else None
 
 Patcher(validators = Validators, flags = I + S)
-bot = Bot(token = getenv('TOKEN'), debug = False)
+bot = Bot(getenv('TOKEN'), debug = False)
 bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
 lvl_class = LVL(getenv('DATABASE_URL'), loop = bot.loop)
 
