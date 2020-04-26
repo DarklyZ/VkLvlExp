@@ -26,7 +26,7 @@ def load(bot):
 		await lvl_class.user(id1 := message.from_id, id2 := message.action.member_id)
 		if id1 != id2:
 			title = f"* Welcome to the club, buddy. *\nВас призвал(а): {lvl_class[id1]}"
-			bot_name = (await bot.api.groups.getById(group_id = bot.group_id))[0]['name']
+			bot_name = (await bot.api.groups.get_by_id(group_id = bot.group_id))[0].name
 			blank = text.format(title = title, user = lvl_class[id2], name = bot_name)
 			photo = 457241337
 		else:
