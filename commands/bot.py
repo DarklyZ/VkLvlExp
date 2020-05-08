@@ -12,11 +12,7 @@ def load(bot):
 4) /Tele <count> & <rep_mes> - передать свою exp другому
 5) /BAN[ <причина>] & <rep_mes> - типо бан
 6) /Ord <chr>+ - код в юникоде символов''')
-	
-	@bot.on.chat_message(text = ['toplvl <one:pos> <two:pos>', 'toplvl'], command = True)
-	async def toplvl_send(message, one = 1, two = 10):
-		await message(await lvl_class.toplvl_size(one, two), disable_mentions = True)
-	
+
 	@bot.on.chat_message(text = 'mylvl', command = True)
 	async def mylvl(message):
 		await lvl_class.send(id := message.from_id)
