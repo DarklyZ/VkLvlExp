@@ -1,11 +1,11 @@
 def load(bot, run):
 	from asyncio import sleep
 	from lvls import LVL
+	from datetime import timedelta
 	lvl_class = LVL.get_current()
 
 	def temp_new():
-		temp = lvl_class.now
-		return temp.replace(day=temp.day + 1, hour=0, minute=0, second=0)
+		return lvl_class.now + timedelta(days = 1)
 
 	@run
 	async def async_top_loop():
