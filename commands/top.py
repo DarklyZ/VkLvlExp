@@ -20,5 +20,5 @@ def load(bot, run):
 		await message(await lvl_class.toplvl_size(one, two), disable_mentions = True)
 
 	@bot.on.chat_message(text = ['toptemp <one:pos> <two:pos>', 'toptemp'], command = True)
-	async def toplvl_send(message, one = 1, two = 10):
+	async def toptemp_send(message, one = 1, two = 10):
 		await message(await lvl_class.toptemp_size(one, two), disable_mentions = True)
