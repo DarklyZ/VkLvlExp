@@ -31,6 +31,10 @@ def atta(text = '', attachments = [], negative = False):
 	return -count if negative else count
 
 class LVL(dict, ContextInstanceMixin):
+	dict_boost = {1 : 3, 2 : 2, 3 : 2, 4 : 2}
+	dict_top = {1 : '🥇', 2 : '🥈', 3 : '🥉'}
+	dict_topboost = {1 : '❸', 2 : '❷', 3 : '❷', 4 : '❷'}
+
 	def __init__(self, database_url, run):
 		super().__init__()
 		self.api = Api.get_current()
@@ -60,7 +64,7 @@ class LVL(dict, ContextInstanceMixin):
 
 	async def insert_lvl(self, *ids, lvl = 0, exp = 0, boost = False, temp = False):
 		if boost:
-			boost_ids = {row['user_id']: 2 if row['row_number'] == 1 else 1
+			boost_ids = {row['user_id']: self.dict_boost[row['row_number']]
 			            for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where peer_id = $1 limit 4", self.peer_id)
 						if row['user_id'] in ids}
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
@@ -86,10 +90,10 @@ class LVL(dict, ContextInstanceMixin):
 	async def user(self, *ids):
 		smile = {row['user_id'] : row['smile']
 				for row in await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)}
-		top = {row['user_id'] : smile
-				for row, smile in zip(await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit 3", self.peer_id), '🥇🥈🥉')}
-		topboost = {row['user_id'] : smile
-				for row, smile in zip(await self.con.fetch("select user_id from lvl where peer_id = $1 order by temp_exp desc limit 4", self.peer_id), '❸❷❷❷')}
+		top = {row['user_id'] : self.dict_top[row['row_number']]
+				for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
+		topboost = {row['user_id'] : self.dict_topboost[row['row_number']]
+				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where peer_id = $1 limit 4", self.peer_id)}
 		self.update({user.id : f"{top.get(user.id, '')}{topboost.get(user.id, '')}{bdate(user, self.now)}{user.first_name} {user.last_name[:3]}{smile.get(user.id, '')}"
 		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
