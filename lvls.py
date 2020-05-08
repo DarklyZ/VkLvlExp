@@ -64,7 +64,7 @@ class LVL(dict, ContextInstanceMixin):
 			if boost_ids:
 				if boost_ids[0] in ids:
 					await self.con.execute("update lvl set exp = exp + $1 * 2 where user_id = $2 and peer_id = $3", exp, boost_ids[0], self.peer_id)
-				if one_boost := [id for id in boost_ids[1:] if id in ids]:
+				if double_boost := tuple(id for id in boost_ids[1:] if id in ids):
 					await self.con.execute("update lvl set exp = exp + $1 where user_id = any($2) and peer_id = $3", exp, one_boost, self.peer_id)
 
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
