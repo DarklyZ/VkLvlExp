@@ -5,8 +5,7 @@ def load(bot, run):
 	lvl_class = LVL.get_current()
 
 	def temp_new():
-		time = lvl_class.now + timedelta(days = 1)
-		return time.replace(hour = 0, minute = 0, second = 0)
+		return lvl_class.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
 	@run
 	async def async_top_loop():
