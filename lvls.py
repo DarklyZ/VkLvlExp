@@ -93,7 +93,7 @@ class LVL(dict, ContextInstanceMixin):
 		top = {row['user_id'] : self.dict_top[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
 		topboost = {row['user_id'] : self.dict_topboost[row['row_number']]
-				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where peer_id = $1 limit 4", self.peer_id)}
+				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 4", self.peer_id)}
 		self.update({user.id : f"{top.get(user.id, '')}{topboost.get(user.id, '')}{bdate(user, self.now)}{user.first_name} {user.last_name[:3]}{smile.get(user.id, '')}"
 		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
