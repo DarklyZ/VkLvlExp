@@ -64,7 +64,7 @@ class LVL(dict, ContextInstanceMixin):
 			            for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where peer_id = $1 limit 4", self.peer_id)
 						if row['user_id'] in ids}
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
-				await self.con.execute("update lvl set exp = exp + $1 * $2 where user_id = any($3) and peer_id = $4", exp, key, tuple(group), self.peer_id)
+				await self.con.execute("update lvl set exp = exp + $1 where user_id = any($2) and peer_id = $3", exp * key, tuple(group), self.peer_id)
 
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
 		for row in await self.con.fetch("select user_id, lvl, exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = $1", self.peer_id):
