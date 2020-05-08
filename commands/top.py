@@ -5,15 +5,13 @@ def load(bot, run):
 
 	def temp_new():
 		temp = lvl_class.now
-		#return temp.replace(day=temp.day + 8 - temp.weekday(), hour=0, minute=0, second=0)
-		return temp.replace(minute = temp.minute + 20)
+		return temp.replace(day=temp.day + 1, hour=0, minute=0, second=0)
 
 	@run
 	async def async_top_loop():
 		temp = temp_new()
 		while not await sleep(5 * 60):
 			if lvl_class.now < temp: continue
-			print('Очистка')
 			await lvl_class.temp_reset()
 			temp = temp_new()
 
