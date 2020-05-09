@@ -15,7 +15,7 @@ class timezone(tzinfo):
 tz = timezone()
 
 def atta(text = '', attachments = [], negative = False):
-	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b[a-zа-яё]{3,}\b', text, I))
+	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b\w{3,}\b', text, I))
 	count = s if s < 50 else 50
 	for attachment in attachments:
 		if attachment.type == 'photo':

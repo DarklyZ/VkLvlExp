@@ -8,11 +8,11 @@ def load(bot):
 		rand = choice((457241326,457241327,457241328,457241331,457241332,457241333,457241334,457241338,457241339))
 		await message('Пал боец\nСмертью храбрых', attachment = f'photo-{bot.group_id}_{rand}')
 	
-	@bot.on.chat_message(regex = r'^[^\?]*\?\?\?$')
+	@bot.on.chat_message(regex = r'^[^\?]*\?{3}$')
 	async def hm_(message):
 		await message(attachment = f'photo-{bot.group_id}_457241329')
 	
-	@bot.on.chat_message(regex = r'^[^\?]*\?\?$')
+	@bot.on.chat_message(regex = r'^[^\?]*\?{2}$')
 	async def h_(message):
 		await message(attachment = f'photo-{bot.group_id}_457241330')
 	
