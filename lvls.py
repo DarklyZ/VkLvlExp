@@ -63,6 +63,8 @@ class LVL(dict, ContextInstanceMixin):
 		await self.con.execute("update lvl set temp_exp = 0")
 
 	async def insert_lvl(self, *ids, lvl = 0, exp = 0, boost = False, temp = False):
+		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
+
 		if boost:
 			boost_ids = {row['user_id']: self.dict_boost[row['row_number']]
 					for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 4", self.peer_id)
@@ -70,7 +72,6 @@ class LVL(dict, ContextInstanceMixin):
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
 				await self.con.execute("update lvl set exp = exp + $1 where user_id = any($2) and peer_id = $3", exp * key, tuple(group), self.peer_id)
 
-		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
 		for row in await self.con.fetch("select user_id, lvl, exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = $1", self.peer_id):
 			row_lvl, row_exp = row['lvl'], row['exp']
 			while row_exp >= row_lvl * 2000:
