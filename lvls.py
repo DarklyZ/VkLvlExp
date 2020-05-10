@@ -126,9 +126,10 @@ class LVL(dict, ContextInstanceMixin):
 
 	async def add_text(self, text = None):
 		if text:
-			if await self.hello_text(): await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
+			if await self.hello_text: await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
 			else: await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
 		else: await self.con.execute("delete from hello where peer_id = $1", self.peer_id)
 
+	@property
 	async def hello_text(self):
 		return (row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)) and row['text']

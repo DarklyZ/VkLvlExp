@@ -33,7 +33,7 @@ class WithText(AbstractMessageRule):
 		self.lvl_class = LVL.get_current()
 
 	async def check(self, message):
-		if text := await self.lvl_class.hello_text(): self.context.kwargs = {'text': text}
+		if text := await self.lvl_class.hello_text: self.context.kwargs['text'] = text
 		return self.wt and text or not self.wt and not text
 
 @add_rule('with_reply_message')
