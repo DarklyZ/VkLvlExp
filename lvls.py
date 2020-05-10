@@ -62,7 +62,7 @@ class LVL(dict, ContextInstanceMixin):
 	async def temp_reset(self):
 		await self.con.execute("update lvl set temp_exp = 0")
 
-	async def insert_lvl(self, *ids, lvl = 0, exp = 0, boost = False, temp = False):
+	async def update_lvl(self, *ids, lvl = 0, exp = 0, boost = False, temp = False):
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
 
 		if boost:
@@ -85,7 +85,7 @@ class LVL(dict, ContextInstanceMixin):
 
 	async def remove_exp(self, id, exp = 0):
 		if allow := (await self.con.fetchrow("select count(*) > 0 as bool from lvl where user_id = $1 and exp >= $2 and peer_id = $3", id, exp, self.peer_id))['bool']:
-			await self.insert_lvl(id, exp = -exp)
+			await self.update_lvl(id, exp = -exp)
 		return allow
 
 	async def user(self, *ids):

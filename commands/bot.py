@@ -49,7 +49,7 @@ def load(bot):
 	@bot.on.chat_message(text = ['exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'], command = True, is_admin = True, with_reply_message = True)
 	async def exp(message, exp, lvl = 0):
 		if exp in ('up', 'down'): exp = atta(message.reply_message.text, message.reply_message.attachments, exp == 'down')
-		await lvl_class.insert_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
+		await lvl_class.update_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
 		await lvl_class.send(id)
 		await message((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + lvl_class[id])
 	
@@ -57,7 +57,7 @@ def load(bot):
 	async def tele(message, exp):
 		if exp == 'up': exp = atta(message.reply_message.text, message.reply_message.attachments)
 		if await lvl_class.remove_exp(id1 := message.from_id, exp = exp):
-			await lvl_class.insert_lvl(id2 := message.reply_message.from_id, exp = exp)
+			await lvl_class.update_lvl(id2 := message.reply_message.from_id, exp = exp)
 			await lvl_class.send(id1, id2)
 			blank = f"{exp:+}Ⓔ:\n{lvl_class[id2]}\n{-exp:+}Ⓔ:\n{lvl_class[id1]}"
 		else:

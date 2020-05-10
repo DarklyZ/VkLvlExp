@@ -34,6 +34,6 @@ class Register(Middleware):
 		if message.peer_id == message.from_id or message.from_id < 0: return
 		await lvl_class.check_add_user(message.from_id)
 		if not message.payload and (exp := atta(message.text, message.attachments)):
-			await lvl_class.insert_lvl(message.from_id, exp = exp, boost = True, temp = True)
+			await lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
 
 task.run()
