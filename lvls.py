@@ -31,9 +31,9 @@ def atta(text = '', attachments = [], negative = False):
 	return -count if negative else count
 
 class LVL(dict, ContextInstanceMixin):
-	dict_boost = {1 : 3, 2 : 2, 3 : 2, 4 : 2}
+	dict_boost = {1 : 2, 3 : 2, 5 : 1, 7 : 1}
 	dict_top = {1 : '🥇', 2 : '🥈', 3 : '🥉'}
-	dict_topboost = {1 : '❸', 2 : '❷', 3 : '❷', 4 : '❷'}
+	dict_topboost = {1 : '❸', 3 : '❸', 5 : '❷', 7 : '❷'}
 
 	def __init__(self, database_url, run):
 		super().__init__()
@@ -67,10 +67,10 @@ class LVL(dict, ContextInstanceMixin):
 
 		if boost:
 			boost_ids = {row['user_id']: self.dict_boost[row['row_number']]
-					for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 4", self.peer_id)
-					if row['user_id'] in ids}
+					for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
+					if row['user_id'] in ids and row['row_number'] % 2 != 0}
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
-				await self.con.execute("update lvl set exp = exp + $1, temp_exp = temp_exp - $2 where user_id = any($3) and peer_id = $4", exp * key, round(exp - exp / key) if temp else 0, tuple(group), self.peer_id)
+				await self.con.execute("update lvl set exp = exp + $1, temp_exp = temp_exp - $2 where user_id = any($3) and peer_id = $4", exp * key, round(exp * key / (key + 1)) if temp else 0, tuple(group), self.peer_id)
 
 		for row in await self.con.fetch("select user_id, lvl, exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = $1", self.peer_id):
 			row_lvl, row_exp = row['lvl'], row['exp']
@@ -94,7 +94,8 @@ class LVL(dict, ContextInstanceMixin):
 		top = {row['user_id'] : self.dict_top[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
 		topboost = {row['user_id'] : self.dict_topboost[row['row_number']]
-				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 4", self.peer_id)}
+				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
+				if row['row_number'] % 2 != 0}
 		self.update({user.id : f"{top.get(user.id, '')}{topboost.get(user.id, '')}{bdate(user, self.now)}{user.first_name} {user.last_name[:3]}{smile.get(user.id, '')}"
 		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
