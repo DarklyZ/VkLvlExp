@@ -89,14 +89,14 @@ class LVL(dict, ContextInstanceMixin):
 		return allow
 
 	async def user(self, *ids):
-		smile = {row['user_id'] : row['smile']
-				for row in await self.con.fetch("select user_id, smile from lvl where user_id = any($1) and smile is not null and peer_id = $2", ids, self.peer_id)}
+		nick = {row['user_id'] : row['nick']
+				for row in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id)}
 		top = {row['user_id'] : self.dict_top[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
 		topboost = {row['user_id'] : self.dict_topboost[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 				if row['row_number'] % 2 != 0}
-		self.update({user.id : f"{top.get(user.id, '')}{topboost.get(user.id, '')}{bdate(user, self.now)}{user.first_name} {user.last_name[:3]}{smile.get(user.id, '')}"
+		self.update({user.id : f"{top.get(user.id, '')}{topboost.get(user.id, '')}{bdate(user, self.now)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
 		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
 	async def send(self, *ids):
@@ -121,8 +121,8 @@ class LVL(dict, ContextInstanceMixin):
 		if (await self.con.fetchrow("select count(*) = 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['bool']:
 			await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
-	async def setsmile(self, *ids, smile = None):
-		await self.con.execute("update lvl set smile = $1 where user_id = any($2) and peer_id = $3", smile, ids, self.peer_id)
+	async def update_nick(self, *ids, nick = None):
+		await self.con.execute("update lvl set nick = $1 where user_id = any($2) and peer_id = $3", nick, ids, self.peer_id)
 
 	async def update_text(self, text = None):
 		if text:

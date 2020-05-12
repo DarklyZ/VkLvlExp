@@ -35,16 +35,26 @@ def load(bot):
 		await message(f'{text}\n' + ''.join(f"[id{item['member_id']}|💬]"
 				for item in (await bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
 				if item['member_id'] > 0 and item['member_id'] != message.from_id))
+
+	@bot.on.chat_message(text = 'set nick <nick:max[12]>', command = True, with_reply_message = False)
+	async def set_nick(message, nick):
+		await lvl_class.update_nick(message.from_id, nick = nick)
+		await message(f'Ник: "{nick}" установлен')
+
+	@bot.on.chat_message(text = 'set nick <nick:max[12]>', command = True, is_admin = True, with_reply_message = True)
+	async def set_nick(message, nick):
+		await lvl_class.update_nick(message.reply_message.from_id, nick = nick)
+		await message(f'Ник: "{nick}" установлен')
 	
-	@bot.on.chat_message(text = 'set smile <smile:max[4]>', command = True, is_admin = True, with_reply_message = True)
-	async def set_smile(message, smile):
-		await lvl_class.setsmile(message.reply_message.from_id, smile = smile)
-		await message(f"{smile} установлен")
-	
-	@bot.on.chat_message(text = 'del smile', command = True, is_admin = True, with_reply_message = True)
-	async def del_smile(message):
-		await lvl_class.setsmile(message.reply_message.from_id)
-		await message('Смайл удалён')
+	@bot.on.chat_message(text = 'del nick', command = True, with_reply_message = False)
+	async def del_nick(message):
+		await lvl_class.update_nick(message.from_id)
+		await message('Ник удалён')
+
+	@bot.on.chat_message(text = 'del nick', command = True, is_admin = True, with_reply_message = True)
+	async def del_nick(message):
+		await lvl_class.update_nick(message.reply_message.from_id)
+		await message('Ник удалён')
 
 	@bot.on.chat_message(text = ['exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'], command = True, is_admin = True, with_reply_message = True)
 	async def exp(message, exp, lvl = 0):
