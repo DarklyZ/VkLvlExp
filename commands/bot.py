@@ -25,7 +25,7 @@ dict_help = {
 }
 
 def replace_smile(str):
-	for smile in ('🥇', '🥈', '🥉', '❸', '❷'):
+	for smile in ('🥇', '🥈', '🥉', '❸', '❷', '\n'):
 		str = str.replace(smile, '⛔')
 	return str
 
