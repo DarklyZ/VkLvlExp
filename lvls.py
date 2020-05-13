@@ -35,6 +35,7 @@ class LVL(dict, ContextInstanceMixin):
 	dict_boost = {1 : 2, 3 : 2, 5 : 1, 7 : 1}
 	dict_top = {1 : '🥇', 2 : '🥈', 3 : '🥉'}
 	dict_topboost = {1 : '❸', 3 : '❸', 5 : '❷', 7 : '❷'}
+	list_smile = ['🥇', '🥈', '🥉', '❸', '❷']
 
 	def __init__(self, database_url, run):
 		super().__init__()
@@ -90,7 +91,7 @@ class LVL(dict, ContextInstanceMixin):
 		return allow
 
 	async def user(self, *ids):
-		nick = {row['user_id'] : f">{row['nick']}<"
+		nick = {row['user_id'] : row['nick']
 				for row in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id)}
 		top = {row['user_id'] : self.dict_top[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
@@ -123,6 +124,7 @@ class LVL(dict, ContextInstanceMixin):
 			await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
 	async def update_nick(self, *ids, nick = None):
+		if nick and nick[:1] in self.list_smile: '⛔' + nick[1:]
 		await self.con.execute("update lvl set nick = $1 where user_id = any($2) and peer_id = $3", nick, ids, self.peer_id)
 
 	async def update_text(self, text = None):
