@@ -8,10 +8,13 @@ def load(bot):
 		await message('''Команды:
 1) /MyLVL - мой уровень
 2) /TopLVL[ <от> <до>] - топ 10 участников
-3) /LVL & <rep_mes> - посмотреть уровень участника
-4) /Tele <count> & <rep_mes> - передать свою exp другому
-5) /BAN[ <причина>] & <rep_mes> - типо бан
-6) /Ord <chr>+ - код в юникоде символов''')
+3) /TopTemp[ <от> <до>] - временный топ 10 участников
+4) /Set Nick <Ник> - заменить имя на ник
+5) /Del Nick - вернуть имя
+6) /LVL & <rep_mes> - посмотреть уровень участника
+7) /Tele <count> & <rep_mes> - передать свою exp другому
+8) /BAN[ <причина>] & <rep_mes> - типо бан
+9) /Ord <chr>+ - код в юникоде символов''')
 
 	@bot.on.chat_message(text = 'mylvl', command = True)
 	async def mylvl(message):
