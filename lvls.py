@@ -6,6 +6,7 @@ from vkbottle.api import Api
 from re import findall, I
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
+get = lambda dict, key: dict.get(key, '')
 
 class timezone(tzinfo):
 	utcoffset = lambda self, dt : timedelta(hours = 5)
@@ -89,14 +90,14 @@ class LVL(dict, ContextInstanceMixin):
 		return allow
 
 	async def user(self, *ids):
-		nick = {row['user_id'] : row['nick']
+		nick = {row['user_id'] : f">{row['nick']}<"
 				for row in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id)}
 		top = {row['user_id'] : self.dict_top[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
 		topboost = {row['user_id'] : self.dict_topboost[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 				if row['row_number'] % 2 != 0}
-		self.update({user.id : f"{top.get(user.id, '')}{topboost.get(user.id, '')}{bdate(user, self.now)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
+		self.update({user.id : f"{get(top, user.id)}{get(topboost, user.id)}{bdate(user, self.now)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
 		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
 
 	async def send(self, *ids):
