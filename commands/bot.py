@@ -1,20 +1,37 @@
+dict_help = {
+	'' : [
+		'/Help Top - топ',
+		'/Help LVL - уровни',
+		'/Help Nick - ники',
+		'/Help Extra - доп. команды'
+	],
+	'top' : [
+		'/TopLVL[ <от> <до>] - топ 10 участников',
+		'/TopTemp[ <от> <до>] - временный топ 10 участников'
+	],
+	'lvl' : [
+		'/MyLVL - мой уровень',
+		'/LVL & <rep_mes> - посмотреть уровень участника',
+		'/Tele <count> & <rep_mes> - передать свою exp другому',
+	],
+	'nick' : [
+		'/Set Nick <Ник> - заменить имя на ник',
+		'/Del Nick - вернуть имя'
+	],
+	'extra' : [
+		'/BAN[ <причина>] & <rep_mes> - типо бан'
+		'/Ord <chr>+ - код в юникоде символов'
+	]
+}
+
 def load(bot):
 	from vkbottle import keyboard_gen
 	from lvls import LVL, atta
 	lvl_class = LVL.get_current()
 	
-	@bot.on.chat_message(text = 'help', command = True)
-	async def help(message):
-		await message('''Команды:
-1) /MyLVL - мой уровень
-2) /TopLVL[ <от> <до>] - топ 10 участников
-3) /TopTemp[ <от> <до>] - временный топ 10 участников
-4) /Set Nick <Ник> - заменить имя на ник
-5) /Del Nick - вернуть имя
-6) /LVL & <rep_mes> - посмотреть уровень участника
-7) /Tele <count> & <rep_mes> - передать свою exp другому
-8) /BAN[ <причина>] & <rep_mes> - типо бан
-9) /Ord <chr>+ - код в юникоде символов''')
+	@bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
+	async def help(message, extra = ''):
+		await message('Команды:\n' + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(dict_help[extra.lower()])))
 
 	@bot.on.chat_message(text = 'mylvl', command = True)
 	async def mylvl(message):
