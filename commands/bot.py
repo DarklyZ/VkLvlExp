@@ -24,6 +24,11 @@ dict_help = {
 	]
 }
 
+def replace_smile(str):
+	for smile in ('🥇', '🥈', '🥉', '❸', '❷'):
+		str = str.replace(smile, '⛔')
+	return str
+
 def load(bot):
 	from vkbottle import keyboard_gen
 	from lvls import LVL, atta
@@ -58,11 +63,13 @@ def load(bot):
 
 	@bot.on.chat_message(text = 'set nick <nick:max[12]>', command = True, with_reply_message = False)
 	async def set_nick(message, nick):
+		nick = replace_smile(nick)
 		await lvl_class.update_nick(message.from_id, nick = nick)
 		await message(f'Ник: "{nick}" установлен')
 
 	@bot.on.chat_message(text = 'set nick <nick:max[12]>', command = True, is_admin = True, with_reply_message = True)
 	async def set_nick(message, nick):
+		nick = replace_smile(nick)
 		await lvl_class.update_nick(message.reply_message.from_id, nick = nick)
 		await message(f'Ник: "{nick}" установлен')
 	

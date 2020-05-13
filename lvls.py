@@ -35,7 +35,6 @@ class LVL(dict, ContextInstanceMixin):
 	dict_boost = {1 : 2, 3 : 2, 5 : 1, 7 : 1}
 	dict_top = {1 : '🥇', 2 : '🥈', 3 : '🥉'}
 	dict_topboost = {1 : '❸', 3 : '❸', 5 : '❷', 7 : '❷'}
-	list_smile = ['🥇', '🥈', '🥉', '❸', '❷']
 
 	def __init__(self, database_url, run):
 		super().__init__()
@@ -124,7 +123,6 @@ class LVL(dict, ContextInstanceMixin):
 			await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
 	async def update_nick(self, *ids, nick = None):
-		if nick and nick[:1] in self.list_smile: '⛔' + nick[1:]
 		await self.con.execute("update lvl set nick = $1 where user_id = any($2) and peer_id = $3", nick, ids, self.peer_id)
 
 	async def update_text(self, text = None):
