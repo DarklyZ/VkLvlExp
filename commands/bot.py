@@ -1,5 +1,5 @@
 dict_help = {
-	'' : [
+	None : [
 		'/Help Top - топ',
 		'/Help LVL - уровни',
 		'/Help Nick - ники',
@@ -35,8 +35,8 @@ def load(bot):
 	lvl_class = LVL.get_current()
 	
 	@bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
-	async def help(message, extra = ''):
-		await message('Команды:\n' + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(dict_help[extra.lower()])))
+	async def help(message, extra = None):
+		await message('Команды:\n' + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(dict_help[extra])))
 
 	@bot.on.chat_message(text = 'mylvl', command = True)
 	async def mylvl(message):
