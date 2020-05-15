@@ -4,6 +4,15 @@ from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
 from vkbottle.api import Api
 from re import findall, I
+from os import rename
+import enchant
+
+if enchant.dict_exists('ru_RU'):
+	d = enchant.Dict('ru_RU')
+else:
+	rename('lang\\ru_RU.aff', f'{enchant.__path__[0]}\\data\\mingw64\\share\\enchant\\hunspell\\ru_RU.aff')
+	rename('lang\\ru_RU.dic', f'{enchant.__path__[0]}\\data\\mingw64\\share\\enchant\\hunspell\\ru_RU.dic')
+	d = enchant.Dict('ru_RU')
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
 get = lambda dict, key: dict.get(key, '')
@@ -19,7 +28,7 @@ class timezone(tzinfo):
 tz = timezone()
 
 def atta(text = '', attachments = [], negative = False):
-	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b\w{3,}\b', text, I))
+	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'\b\w{3,}\b', text, I) if d.check(chars))
 	count = s if s < 50 else 50
 	for attachment in attachments:
 		if attachment.type == 'photo':
