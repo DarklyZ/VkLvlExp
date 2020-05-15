@@ -1,5 +1,5 @@
 https://github.com/timoniq/vkbottle/archive/master.zip
-pyenchant
+PyEnchant
 asyncpg
 loguru
 uvloop
