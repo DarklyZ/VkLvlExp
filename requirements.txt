@@ -1,4 +1,5 @@
 https://github.com/timoniq/vkbottle/archive/master.zip
+pyaspeller
 asyncpg
 loguru
 uvloop
