@@ -26,7 +26,7 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[^a-zа-яё]?([a-zа-яё]{3,})[^a-zа-яё]?', text, I) if chars not in dict_errors)
 		count = s if s < 50 else 50
 	else:
-		count = 0
+		count, dict_errors = 0, {}
 	for attachment in attachments:
 		if attachment.type == 'photo':
 			pixel = max(size.width * size.height for size in attachment.photo.sizes)
@@ -38,7 +38,8 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 		elif attachment.type == 'video': count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
 		elif attachment.type == 'sticker': count += 10
 		elif attachment.type == 'audio': count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
-	return (-count if negative else count, dict_errors) if return_errors else (-count if negative else count)
+	count *= -1 if negative else 1
+	return (count, dict_errors) if return_errors else count
 
 class LVL(dict, ContextInstanceMixin):
 	def __init__(self, database_url, run):

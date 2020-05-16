@@ -108,4 +108,6 @@ def load(bot):
 	
 	@bot.on.chat_message(text = 'info', command = True, with_reply_message = True)
 	async def info(message):
-		await message(f"Стоимость сообщения {atta(message.reply_message.text, message.reply_message.attachments):+}Ⓔ")
+		exp, errors = atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
+		extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
+		await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
