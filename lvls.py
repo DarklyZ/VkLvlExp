@@ -20,10 +20,10 @@ class timezone(tzinfo):
 
 tz = timezone()
 
-def atta(text = '', attachments = [], negative = False):
+def atta(text = '', attachments = [], negative = False, return_errors = False):
 	if text:
-		tuple_error = tuple(change['word'] for change in speller.spell(text))
-		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[^a-zа-яё]?([a-zа-яё]{3,})[^a-zа-яё]?', text, I) if chars not in tuple_error)
+		dict_errors = {change['word'] : change['s'] for change in speller.spell(text)}
+		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[^a-zа-яё]?([a-zа-яё]{3,})[^a-zа-яё]?', text, I) if chars not in dict_errors)
 		count = s if s < 50 else 50
 	else:
 		count = 0
@@ -38,7 +38,7 @@ def atta(text = '', attachments = [], negative = False):
 		elif attachment.type == 'video': count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
 		elif attachment.type == 'sticker': count += 10
 		elif attachment.type == 'audio': count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
-	return -count if negative else count
+	return (-count if negative else count, dict_errors) if return_errors else (-count if negative else count)
 
 class LVL(dict, ContextInstanceMixin):
 	def __init__(self, database_url, run):
