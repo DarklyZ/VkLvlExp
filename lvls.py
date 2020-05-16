@@ -3,7 +3,7 @@ from itertools import groupby
 from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
 from vkbottle.api import Api
-from pyaspeller import Word
+from pyaspeller import YandexSpeller
 from re import findall, I
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
@@ -11,6 +11,7 @@ get = lambda dict, key: dict.get(key, '')
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
+speller = YandexSpeller()
 
 class timezone(tzinfo):
 	utcoffset = lambda self, dt : timedelta(hours = 5)
@@ -20,8 +21,12 @@ class timezone(tzinfo):
 tz = timezone()
 
 def atta(text = '', attachments = [], negative = False):
-	s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[^a-zа-яё]?([a-zа-яё]{3,})[^a-zа-яё]?', text, I) if Word(chars).correct)
-	count = s if s < 50 else 50
+	if text:
+		tuple_error = tuple(change['word'] for change in speller.spell(text))
+		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[^a-zа-яё]?([a-zа-яё]{3,})[^a-zа-яё]?', text, I) if chars not in tuple_error)
+		count = s if s < 50 else 50
+	else:
+		count = 0
 	for attachment in attachments:
 		if attachment.type == 'photo':
 			pixel = max(size.width * size.height for size in attachment.photo.sizes)
