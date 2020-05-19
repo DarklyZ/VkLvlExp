@@ -30,8 +30,8 @@ commands.top.load(bot, task.add_task)
 @bot.middleware.middleware_handler()
 class Register(Middleware):
 	async def middleware(self, message):
-		lvl_class(message.peer_id)
 		if message.peer_id == message.from_id or message.from_id < 0: return
+		lvl_class(message.peer_id)
 		await lvl_class.check_add_user(message.from_id)
 		if not message.payload and (exp := atta(message.text, message.attachments)):
 			await lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
