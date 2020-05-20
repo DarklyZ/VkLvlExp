@@ -3,7 +3,7 @@ from vkbottle import Bot
 from vkbottle.ext import Middleware
 from vkbottle.utils import TaskManager
 from lvls import LVL, atta
-from re import I, S
+from re import I
 from os import getenv
 
 class Validators(PatchedValidators):
@@ -12,7 +12,7 @@ class Validators(PatchedValidators):
 	max = lambda self, value, extra: value if len(value) <= int(extra) else None
 	inc = lambda self, value, *extra: value.lower() if value.lower() in extra else None
 
-Patcher(validators = Validators, flags = I + S)
+Patcher(validators = Validators, flags = I)
 bot = Bot(getenv('TOKEN'), debug = False)
 
 task = TaskManager(bot.loop)
