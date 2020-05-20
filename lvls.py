@@ -4,7 +4,7 @@ from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
 from vkbottle.api import Api
 from pyaspeller import YandexSpeller
-from re import findall, I
+from re import split, I
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
 get = lambda dict, key: dict.get(key, '')
@@ -23,7 +23,7 @@ tz = timezone()
 def atta(text = '', attachments = [], negative = False, return_errors = False):
 	if text:
 		dict_errors = {change['word'] : change['s'] for change in speller.spell(text)}
-		s = sum(3 if len(chars) >= 6 else 1 for chars in findall(r'[^a-zа-яё]?([a-zа-яё]{3,})[^a-zа-яё]?', text, I) if chars not in dict_errors)
+		s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, I) if chars not in dict_errors)
 		count = s if s < 50 else 50
 	else:
 		count, dict_errors = 0, {}
