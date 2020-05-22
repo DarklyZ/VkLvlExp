@@ -21,9 +21,10 @@ class timezone(tzinfo):
 tz = timezone()
 
 def atta(text = '', attachments = [], negative = False, return_errors = False):
+	text = text and sub(r'https?:\/\/\S+', '', text)
 	if text:
 		dict_errors = {change['word'] : change['s'] for change in speller.spell(text)}
-		s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, I) if len(chars) >= 3 and chars not in dict_errors)
+		s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, flags = I) if len(chars) >= 3 and chars not in dict_errors)
 		count = s if s < 50 else 50
 	else:
 		count, dict_errors = 0, {}
