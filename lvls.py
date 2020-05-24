@@ -11,7 +11,18 @@ get = lambda dict, key: dict.get(key, '')
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
-speller = YandexSpeller()
+
+class YaSpeller(YandexSpeller):
+	def spell(self, text):
+		text = self._prepare_text(text)
+
+		if text:
+			for item in self._spell_text(text):
+				yield item
+		else:
+			raise NotImplementedError()
+
+speller = YaSpeller()
 
 class timezone(tzinfo):
 	utcoffset = lambda self, dt : timedelta(hours = 5)
@@ -21,7 +32,6 @@ class timezone(tzinfo):
 tz = timezone()
 
 def atta(text = '', attachments = [], negative = False, return_errors = False):
-	text = text and sub(r'https?://\S+', '', text)
 	if text:
 		dict_errors = {change['word'] : change['s'] for change in speller.spell(text)}
 		s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, flags = I) if len(chars) >= 3 and chars not in dict_errors)
