@@ -4,7 +4,7 @@ from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
 from vkbottle.api import Api
 from pyaspeller import YandexSpeller
-from re import split, sub, I
+from re import split, I
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
 get = lambda dict, key: dict.get(key, '')
@@ -15,7 +15,7 @@ dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
 class YaSpeller(YandexSpeller):
 	def spell(self, text):
 		text = self._prepare_text(text)
-
+		
 		if text:
 			for item in self._spell_text(text):
 				yield item
@@ -38,6 +38,7 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 		count = s if s < 50 else 50
 	else:
 		count, dict_errors = 0, {}
+		
 	for attachment in attachments:
 		if attachment.type == 'photo':
 			pixel = max(size.width * size.height for size in attachment.photo.sizes)
