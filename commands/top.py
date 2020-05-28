@@ -4,8 +4,7 @@ def load(bot, run):
 	from datetime import timedelta
 	lvl_class = LVL.get_current()
 
-	def temp_new():
-		return lvl_class.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+	temp_new = lambda: lvl_class.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
 	@run
 	async def async_top_loop():

@@ -25,9 +25,9 @@ class YaSpeller(YandexSpeller):
 speller = YaSpeller()
 
 class timezone(tzinfo):
-	utcoffset = lambda self, dt : timedelta(hours = 5)
-	dst = lambda self, dt : timedelta()
-	tzname = lambda self, dt : '+05:00'
+	utcoffset = lambda self, dt: timedelta(hours = 5)
+	dst = lambda self, dt: timedelta()
+	tzname = lambda self, dt: '+05:00'
 
 tz = timezone()
 
