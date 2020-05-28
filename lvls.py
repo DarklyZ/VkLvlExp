@@ -103,7 +103,7 @@ class LVL(dict, ContextInstanceMixin):
 			else: await self.con.execute("delete from lvl where user_id = $1 and peer_id = $2", row['user_id'], self.peer_id)
 
 	async def remove_exp(self, id, exp = 0):
-		if allow := (await self.con.fetchrow("select count(*) > 0 as bool from lvl where user_id = $1 and exp >= $2 and peer_id = $3", id, exp, self.peer_id))['bool']:
+		if allow := (await self.con.fetchrow("select count(user_id) > 0 as bool from lvl where user_id = $1 and exp >= $2 and peer_id = $3", id, exp, self.peer_id))['bool']:
 			await self.update_lvl(id, exp = -exp)
 		return allow
 
@@ -137,7 +137,7 @@ class LVL(dict, ContextInstanceMixin):
 		return f"TOPTEMP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['temp_exp']}ⓉⒺ"for row in rows)
 
 	async def check_add_user(self, id):
-		if (await self.con.fetchrow("select count(*) = 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['bool']:
+		if (await self.con.fetchrow("select count(user_id) = 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['bool']:
 			await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
 	async def update_nick(self, *ids, nick = None):
