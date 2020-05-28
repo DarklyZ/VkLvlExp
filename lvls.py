@@ -57,8 +57,8 @@ class LVL(dict, ContextInstanceMixin):
 	def __init__(self, database_url, run):
 		super().__init__()
 		self.api = Api.get_current()
-		run(self.connect_db(database_url))
 		self.set_current(self)
+		run(self.connect_db(database_url))
 
 	def __call__(self, peer_id):
 		self.clear()
