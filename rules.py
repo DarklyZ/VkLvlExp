@@ -4,7 +4,7 @@ from lvls import LVL
 from re import compile, I, S
 
 class add_rule:
-	from vkbottle.framework.framework.handler.handler import COL_RULES
+	from vkbottle.framework.framework.handler.message import COL_RULES
 
 	def __init__(self, name):
 		self.name = name

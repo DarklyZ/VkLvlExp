@@ -18,7 +18,7 @@ bot = Bot(getenv('TOKEN'), debug = False)
 task = TaskManager(bot.loop)
 task.add_task(bot.run(True))
 
-bot.on.change_prefix_for_all([r'\.', '/', '!', ':'])
+bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 lvl_class = LVL(getenv('DATABASE_URL'), task.add_task)
 
 import rules, commands
@@ -29,7 +29,7 @@ commands.top.load(bot, task.add_task)
 
 @bot.middleware.middleware_handler()
 class Register(Middleware):
-	async def middleware(self, message):
+	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		lvl_class(message.peer_id)
 		await lvl_class.check_add_user(message.from_id)
