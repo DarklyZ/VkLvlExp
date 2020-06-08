@@ -48,5 +48,5 @@ def load(bot):
 	async def add_user_link(message, text):
 		await lvl_class.user(id1 := message.from_id)
 		title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
-		bot_name = (await bot.api.groups.getById(group_id = bot.group_id))[0]['name']
+		bot_name = (await bot.api.groups.get_by_id(group_id = bot.group_id))[0]['name']
 		await message(text.format(title = title, user = lvl_class[id1], name = bot_name), attachment = f'photo-{bot.group_id}_457241337')
