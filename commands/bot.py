@@ -31,9 +31,26 @@ def replace_smile(str):
 
 def load(bot):
 	from vkbottle import keyboard_gen
+	from requests import post, get
+	from time import time
+	from os import remove
 	from lvls import LVL, atta
 	lvl_class = LVL.get_current()
-	
+
+#-------------Зона тестирования-------------
+	@bot.on.chat_message(text='test <text>', command=True)
+	async def test(message, text):
+		temp = time()
+		with open(f'audio_{temp}.mp3', 'wb') as out_stream:
+			req = get(f'http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&text={"Сенпай, " + text}&speed=1', stream = True)
+			for chunk in req.iter_content(1024):
+				out_stream.write(chunk)
+		file = post((await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)).upload_url, files = {'file': open(f'audio_{temp}.mp3', 'rb')}).json()['file']
+		remove(f"audio_{temp}.mp3")
+		save = await bot.api.docs.save(file = file)
+		await message(attachment=f'doc{save.audio_message.owner_id}_{save.audio_message.id}')
+# -------------Зона тестирования-------------
+
 	@bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
 	async def help(message, extra = None):
 		await message('Команды:\n' + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(dict_help[extra])))
