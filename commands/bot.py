@@ -38,7 +38,7 @@ def load(bot):
 #-------------Зона тестирования-------------
 	@bot.on.chat_message(text = 'test <text>', command = True)
 	async def test(message, text):
-		content = await bot.request.get(f'http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&speed=1&text={text}', read_content = True)
+		content = await bot.request.get(f'http://tts.voicetech.yandex.net/tts?voice=alena&format=mp3&quality=hi&lang=ru_RU&speed=1.2&text={text}', read_content = True)
 		server = await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)
 		with BytesIO(content) as f:
 			file = (await bot.request.post(server.upload_url, data = {'file': f}))['file']
