@@ -32,7 +32,6 @@ def replace_smile(str):
 def load(bot):
 	from vkbottle import keyboard_gen
 	from lvls import LVL, atta
-	from requests import post
 	from io import BytesIO
 	lvl_class = LVL.get_current()
 
