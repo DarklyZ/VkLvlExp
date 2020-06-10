@@ -31,21 +31,18 @@ def replace_smile(str):
 
 def load(bot):
 	from vkbottle import keyboard_gen
-	from requests import post, get
-	from time import time
-	from os import remove
 	from lvls import LVL, atta
+	from requests import post
+	from io import BytesIO
 	lvl_class = LVL.get_current()
 
 #-------------Зона тестирования-------------
 	@bot.on.chat_message(text='test <text>', command=True)
 	async def test(message, text):
-		temp = time()
-		with open(f'cache/audio_{temp}.mp3', 'wb') as f:
-			req = get(f'http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&speed=1&text={"Сенпай, " + text}', stream = True)
-			f.write(req.content)
-		file = post((await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)).upload_url, files = {'file': open(f'cache/audio_{temp}.mp3', 'rb')}).json()['file']
-		remove(f"cache/audio_{temp}.mp3")
+		content = await bot.request.get(f'http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&speed=1&text={text}', read_content = True)
+		server = await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)
+		with BytesIO(content) as f:
+			file = (await bot.request.post(server.upload_url, data = {'file': f}))['file']
 		save = await bot.api.docs.save(file = file)
 		await message(attachment=f'doc{save.audio_message.owner_id}_{save.audio_message.id}')
 # -------------Зона тестирования-------------
