@@ -41,12 +41,11 @@ def load(bot):
 	@bot.on.chat_message(text='test <text>', command=True)
 	async def test(message, text):
 		temp = time()
-		with open(f'audio_{temp}.mp3', 'wb') as out_stream:
-			req = get(f'http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&text={"Сенпай, " + text}&speed=1', stream = True)
-			for chunk in req.iter_content(1024):
-				out_stream.write(chunk)
-		file = post((await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)).upload_url, files = {'file': open(f'audio_{temp}.mp3', 'rb')}).json()['file']
-		remove(f"audio_{temp}.mp3")
+		with open(f'cache/audio_{temp}.mp3', 'wb') as f:
+			req = get(f'http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&speed=1&text={"Сенпай, " + text}', stream = True)
+			f.write(req.content)
+		file = post((await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)).upload_url, files = {'file': open(f'cache/audio_{temp}.mp3', 'rb')}).json()['file']
+		remove(f"cache/audio_{temp}.mp3")
 		save = await bot.api.docs.save(file = file)
 		await message(attachment=f'doc{save.audio_message.owner_id}_{save.audio_message.id}')
 # -------------Зона тестирования-------------
