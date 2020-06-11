@@ -11,7 +11,8 @@ class AMessage(HTTP, ContextInstanceMixin):
 		voice = 'alyss'
 		format = 'mp3'
 		quality = 'hi'
-		speed = 1.15
+		emotion = 'evil'
+		speed = 1.5
 		text: str
 
 	def __init__(self):
