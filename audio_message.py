@@ -9,8 +9,6 @@ class AMessage(HTTP, ContextInstanceMixin):
 
 	class params(BaseModel):
 		voice = 'alyss'
-		format = 'mp3'
-		quality = 'hi'
 		emotion = 'evil'
 		speed = 1.5
 		text: str
