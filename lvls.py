@@ -2,7 +2,7 @@ from asyncpg import connect
 from itertools import groupby
 from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
-from vkbottle.api import Api
+from vkbottle.api import get_api
 from pyaspeller import YandexSpeller
 from re import split, I
 
@@ -56,7 +56,7 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 class LVL(dict, ContextInstanceMixin):
 	def __init__(self, database_url, run):
 		super().__init__()
-		self.api = Api.get_current()
+		self.api = get_api()
 		self.set_current(self)
 		run(self.connect_db(database_url))
 
