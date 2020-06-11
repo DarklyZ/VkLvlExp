@@ -1,6 +1,6 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule
-from vkbottle.api import Api
-from lvls import LVL
+from vkbottle.api import get_api
+from lvls import get_lvl
 from re import compile, I, S
 
 class add_rule:
@@ -17,7 +17,7 @@ class add_rule:
 class IsAdmin(AbstractMessageRule):
 	def __init__(self, adm):
 		self.adm = adm
-		self.api = Api.get_current()
+		self.api = get_api()
 
 	async def check(self, message):
 		if items := (await self.api.messages.get_conversations_by_id(peer_ids = message.peer_id)).items:
@@ -30,7 +30,7 @@ class IsAdmin(AbstractMessageRule):
 class WithText(AbstractMessageRule):
 	def __init__(self, wt):
 		self.wt = wt
-		self.lvl_class = LVL.get_current()
+		self.lvl_class = get_lvl()
 
 	async def check(self, message):
 		if text := await self.lvl_class.hello_text(): self.context.kwargs['text'] = text

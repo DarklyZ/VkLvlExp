@@ -155,3 +155,6 @@ class LVL(dict, ContextInstanceMixin):
 
 	async def hello_text(self):
 		return (row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)) and row['text']
+
+def get_lvl():
+	return LVL.get_current()

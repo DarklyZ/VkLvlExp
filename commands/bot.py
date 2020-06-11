@@ -31,19 +31,15 @@ def replace_smile(str):
 
 def load(bot):
 	from vkbottle import keyboard_gen
-	from lvls import LVL, atta
+	from lvls import get_lvl, atta
+	from audio_message import get_audio_message
 	from io import BytesIO
-	lvl_class = LVL.get_current()
+	lvl_class, amessage = get_lvl(), get_audio_message()
 
 #-------------Зона тестирования-------------
 	@bot.on.chat_message(text = 'test <text>', command = True)
 	async def test(message, text):
-		content = await bot.request.get(f'http://tts.voicetech.yandex.net/tts?voice=alena&format=mp3&quality=hi&lang=ru_RU&speed=1.2&text={text}', read_content = True)
-		server = await bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = message.peer_id)
-		with BytesIO(content) as f:
-			file = (await bot.request.post(server.upload_url, data = {'file': f}))['file']
-		save = await bot.api.docs.save(file = file)
-		await message(attachment = f'doc{save.audio_message.owner_id}_{save.audio_message.id}')
+		await message(attachment = await amessage.get_doc(text))
 # -------------Зона тестирования-------------
 
 	@bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)

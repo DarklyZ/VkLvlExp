@@ -1,8 +1,8 @@
 def load(bot, run):
 	from asyncio import sleep
-	from lvls import LVL
+	from lvls import get_lvl
 	from datetime import timedelta
-	lvl_class = LVL.get_current()
+	lvl_class = get_lvl()
 
 	temp_new = lambda: lvl_class.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
