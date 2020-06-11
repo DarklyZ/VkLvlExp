@@ -8,7 +8,7 @@ class params(BaseModel):
 	voice = 'alena'
 	format = 'mp3'
 	quality = 'hi'
-	speed = 1.2
+	speed = 1.15
 	text: str
 
 class AMessage(HTTP, ContextInstanceMixin):
