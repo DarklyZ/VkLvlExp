@@ -8,7 +8,7 @@ class AMessage(HTTP, ContextInstanceMixin):
 	url = 'http://tts.voicetech.yandex.net/tts'
 
 	class params(BaseModel):
-		voice = 'alena'
+		voice = 'alyss'
 		format = 'mp3'
 		quality = 'hi'
 		speed = 1.15
