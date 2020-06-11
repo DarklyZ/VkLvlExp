@@ -28,6 +28,7 @@ commands.bot.load(bot)
 commands.chat_action.load(bot)
 commands.regex.load(bot)
 commands.top.load(bot, task.add_task)
+commands.audio.load(bot)
 
 @bot.middleware.middleware_handler()
 class Register(Middleware):

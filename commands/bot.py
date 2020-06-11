@@ -33,14 +33,7 @@ def load(bot):
 	from vkbottle import keyboard_gen
 	from lvls import get_lvl, atta
 	from audio_message import get_audio_message
-	from io import BytesIO
 	lvl_class, amessage = get_lvl(), get_audio_message()
-
-#-------------Зона тестирования-------------
-	@bot.on.chat_message(text = 'test <text>', command = True)
-	async def test(message, text):
-		await message(attachment = await amessage.get_doc(text))
-# -------------Зона тестирования-------------
 
 	@bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
 	async def help(message, extra = None):
