@@ -8,7 +8,6 @@ class params(BaseModel):
 	voice = 'alena'
 	format = 'mp3'
 	quality = 'hi'
-	lang = 'ru_RU'
 	speed = 1.2
 	text: str
 
