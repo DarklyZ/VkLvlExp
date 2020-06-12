@@ -28,5 +28,8 @@ class AMessage(HTTP, ContextInstanceMixin):
 		save = await self.api.docs.save(file = file)
 		return f'doc{save.audio_message.owner_id}_{save.audio_message.id}'
 
+	async def get_text(self, audio_message):
+		pass
+
 def get_audio_message():
 	return AMessage.get_current()

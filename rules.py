@@ -1,7 +1,11 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule
 from vkbottle.api import get_api
+from vbml import Patcher, Pattern
+from audio_message import get_audio_message
 from lvls import get_lvl
 from re import compile, I, S
+
+from typing import Iterable
 
 class add_rule:
 	from vkbottle.framework.framework.handler.message import COL_RULES
@@ -12,6 +16,26 @@ class add_rule:
 	def __call__(self, cls):
 		self.COL_RULES[self.name] = cls
 		return cls
+
+@add_rule('audio_message')
+class AudioMessage(AbstractMessageRule):
+	def __init__(self, pattern):
+		self.amessage = get_audio_message()
+		self.patcher = Patcher.get_cerrent()
+		self.patterns = [i for i in self.pattern_gen(pattern)]
+
+	def pattern_gen(self, patterns):
+		for pattern in patterns if isinstance(patterns, Iterable) else [patterns]:
+			if isinstance(pattern, str): yield self.patcher.pattern(pattern)
+			elif isinstance(pattern, Pattern): yield pattern
+
+	async def check(self, message):
+		audio_message = message.attachments and message.attachments[0].audio_message
+		if audio_message and (text := self.amessage.get_text(audio_message)):
+			for pattern in self.patterns:
+				if self.patcher.check(text, pattern) is not None:
+					self.context.kwargs = pattern.dict()
+					return True
 
 @add_rule('is_admin')
 class IsAdmin(AbstractMessageRule):
@@ -24,7 +48,6 @@ class IsAdmin(AbstractMessageRule):
 			chat_settings = items[0].chat_settings
 			is_admin = message.from_id == chat_settings.owner_id or message.from_id in chat_settings.admin_ids
 			return self.adm and is_admin or not self.adm and not is_admin
-		else: return False
 
 @add_rule('with_text')
 class WithText(AbstractMessageRule):
@@ -33,7 +56,7 @@ class WithText(AbstractMessageRule):
 		self.lvl_class = get_lvl()
 
 	async def check(self, message):
-		if text := await self.lvl_class.hello_text(): self.context.kwargs['text'] = text
+		if text := await self.lvl_class.hello_text(): self.context.kwargs = {'text': text}
 		return self.wt and text or not self.wt and not text
 
 @add_rule('with_reply_message')
