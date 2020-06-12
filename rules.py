@@ -1,4 +1,5 @@
-from vkbottle.rule import AbstractMessageRule, ChatActionRule
+from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
+from vkbottle.types.base import BaseModel
 from vkbottle.api import get_api
 from vbml import Patcher, Pattern
 from audio_message import get_audio_message
@@ -18,24 +19,14 @@ class add_rule:
 		return cls
 
 @add_rule('audio_message')
-class AudioMessage(AbstractMessageRule):
-	def __init__(self, pattern):
-		self.amessage = get_audio_message()
-		self.patcher = Patcher.get_cerrent()
-		self.patterns = [i for i in self.pattern_gen(pattern)]
-
-	def pattern_gen(self, patterns):
-		for pattern in patterns if isinstance(patterns, Iterable) else [patterns]:
-			if isinstance(pattern, str): yield self.patcher.pattern(pattern)
-			elif isinstance(pattern, Pattern): yield pattern
+class AudioMessage(VBMLRule):
+	class audio_message(BaseModel):
+		text: str = None
 
 	async def check(self, message):
 		audio_message = message.attachments and message.attachments[0].audio_message
-		if audio_message and (text := self.amessage.get_text(audio_message)):
-			for pattern in self.patterns:
-				if self.patcher.check(text, pattern) is not None:
-					self.context.kwargs = pattern.dict()
-					return True
+		audio_message = self.audio_message(text = self.amessage.get_text(audio_message))
+		if audio_message.text: await super().check(audio_message)
 
 @add_rule('is_admin')
 class IsAdmin(AbstractMessageRule):
