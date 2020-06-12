@@ -1,7 +1,7 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
 from vkbottle.types.base import BaseModel
 from vbml import Patcher, Pattern
-from init import InitCommands
+from init import InitParams
 from re import compile, I, S
 
 from typing import Iterable
@@ -17,7 +17,7 @@ class add_rule:
 		return cls
 
 @add_rule('audio_message')
-class AudioMessage(VBMLRule, InitCommands, amessage = True):
+class AudioMessage(VBMLRule, InitParams, amessage = True):
 	class audio_message(BaseModel):
 		text: str = None
 
@@ -27,7 +27,7 @@ class AudioMessage(VBMLRule, InitCommands, amessage = True):
 		if audio_message.text: await super().check(audio_message)
 
 @add_rule('is_admin')
-class IsAdmin(AbstractMessageRule, InitCommands):
+class IsAdmin(AbstractMessageRule, InitParams):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -38,7 +38,7 @@ class IsAdmin(AbstractMessageRule, InitCommands):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @add_rule('with_text')
-class WithText(AbstractMessageRule, InitCommands, lvl_class = True):
+class WithText(AbstractMessageRule, InitParams, lvl_class = True):
 	def __init__(self, wt):
 		self.wt = wt
 

@@ -1,4 +1,4 @@
-from init import InitCommands
+from init import InitParams
 from vkbottle import keyboard_gen
 
 dict_help = {
@@ -32,7 +32,7 @@ def replace_smile(str):
 		str = str.replace(smile, '❌')
 	return str
 
-class BotCommands(InitCommands):
+class BotCommands(InitParams):
 	def load(self):
 		@self.bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
 		async def help(message, extra = None):

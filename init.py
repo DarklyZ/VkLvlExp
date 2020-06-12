@@ -1,4 +1,4 @@
-class InitCommands:
+class InitParams:
 	def __init__(self, bot):
 		self.bot = bot
 

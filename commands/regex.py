@@ -1,7 +1,7 @@
-from init import InitCommands
+from init import InitParams
 from random import choice
 
-class RegexCommands(InitCommands):
+class RegexCommands(InitParams):
 	def load(self):
 		@self.bot.on.chat_message(regex = r'^f+$')
 		async def f_f(message):

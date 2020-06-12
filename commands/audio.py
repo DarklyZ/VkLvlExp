@@ -1,6 +1,6 @@
-from init import InitCommands
+from init import InitParams
 
-class AudioCommands(InitCommands):
+class AudioCommands(InitParams):
 	def load(self):
 		#-------------Зона тестирования-------------
 		@self.bot.on.chat_message(text = 'test <text>', command = True)

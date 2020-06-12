@@ -1,8 +1,8 @@
-from init import InitCommands
+from init import InitParams
 from asyncio import sleep
 from datetime import timedelta
 
-class TopCommands(InitCommands):
+class TopCommands(InitParams):
 	def load(self, run):
 		temp_new = lambda: self.lvl_class.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 

@@ -2,7 +2,7 @@ from asyncpg import connect
 from itertools import groupby
 from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
-from init import InitCommands
+from init import InitParams
 from pyaspeller import YandexSpeller
 from re import split, I
 
@@ -53,7 +53,7 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 	count *= -1 if negative else 1
 	return (count, dict_errors) if return_errors else count
 
-class LVL(dict, ContextInstanceMixin, InitCommands):
+class LVL(dict, ContextInstanceMixin, InitParams):
 	def __init__(self, database_url, run):
 		super().__init__()
 		self.set_current(self)

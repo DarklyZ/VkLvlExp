@@ -1,6 +1,6 @@
-from init import InitCommands
+from init import InitParams
 
-class ChatActionCommands(InitCommands):
+class ChatActionCommands(InitParams):
 	def load(self):
 		@self.bot.on.chat_message(text = 'hello', command = True, is_admin = True)
 		async def hello_help(message):
