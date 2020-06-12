@@ -14,7 +14,7 @@ class Validators(PatchedValidators):
 	inc = lambda self, value, *extra: value.lower() if value.lower() in extra else None
 
 Patcher(validators = Validators, flags = I + S)
-bot = Bot(getenv('TOKEN'), debug = False)
+bot = Bot(getenv('TOKEN'), debug = "DEBUG")
 
 task = TaskManager(bot.loop)
 task.add_task(bot.run(True))
@@ -24,11 +24,11 @@ lvl_class = LVL(getenv('DATABASE_URL'), task.add_task)
 amessage = AMessage()
 
 import rules, commands
-commands.bot.load(bot)
-commands.chat_action.load(bot)
-commands.regex.load(bot)
-commands.top.load(bot, task.add_task)
-commands.audio.load(bot)
+commands.BotCommands(bot).load()
+commands.ChatActionCommands(bot).load()
+commands.RegexCommands(bot).load()
+commands.TopCommands(bot).load(task.add_task)
+commands.AudioCommands(bot).load()
 
 @bot.middleware.middleware_handler()
 class Register(Middleware):

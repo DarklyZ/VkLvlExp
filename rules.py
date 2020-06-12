@@ -1,9 +1,7 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
 from vkbottle.types.base import BaseModel
-from vkbottle.api import get_api
 from vbml import Patcher, Pattern
-from audio_message import get_audio_message
-from lvls import get_lvl
+from init import InitCommands
 from re import compile, I, S
 
 from typing import Iterable
@@ -19,7 +17,7 @@ class add_rule:
 		return cls
 
 @add_rule('audio_message')
-class AudioMessage(VBMLRule):
+class AudioMessage(VBMLRule, InitCommands, amessage = True):
 	class audio_message(BaseModel):
 		text: str = None
 
@@ -29,10 +27,9 @@ class AudioMessage(VBMLRule):
 		if audio_message.text: await super().check(audio_message)
 
 @add_rule('is_admin')
-class IsAdmin(AbstractMessageRule):
+class IsAdmin(AbstractMessageRule, InitCommands):
 	def __init__(self, adm):
 		self.adm = adm
-		self.api = get_api()
 
 	async def check(self, message):
 		if items := (await self.api.messages.get_conversations_by_id(peer_ids = message.peer_id)).items:
@@ -41,10 +38,9 @@ class IsAdmin(AbstractMessageRule):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @add_rule('with_text')
-class WithText(AbstractMessageRule):
+class WithText(AbstractMessageRule, InitCommands, lvl_class = True):
 	def __init__(self, wt):
 		self.wt = wt
-		self.lvl_class = get_lvl()
 
 	async def check(self, message):
 		if text := await self.lvl_class.hello_text(): self.context.kwargs = {'text': text}

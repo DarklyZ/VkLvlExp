@@ -1,10 +1,10 @@
 from vkbottle.utils import ContextInstanceMixin
 from vkbottle.types.base import BaseModel
 from vkbottle.http.request import HTTP
-from vkbottle.api import get_api
+from init import InitCommands
 from io import BytesIO
 
-class AMessage(HTTP, ContextInstanceMixin):
+class AMessage(HTTP, ContextInstanceMixin, InitCommands):
 	url = 'http://tts.voicetech.yandex.net/tts'
 
 	class params(BaseModel):
@@ -14,7 +14,6 @@ class AMessage(HTTP, ContextInstanceMixin):
 		text: str
 
 	def __init__(self):
-		self.api = get_api()
 		self.set_current(self)
 
 	def __call__(self, peer_id):
