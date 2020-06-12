@@ -10,7 +10,7 @@ class AMessage(HTTP, ContextInstanceMixin):
 	class params(BaseModel):
 		voice = 'alyss'
 		emotion = 'evil'
-		speed = 1.5
+		speed = 1.35
 		text: str
 
 	def __init__(self):
