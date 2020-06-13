@@ -1,4 +1,4 @@
-from init import InitParams
+from utils.init import InitParams
 from random import choice
 
 class RegexCommands(InitParams):

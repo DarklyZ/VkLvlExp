@@ -1,6 +1,6 @@
-from init import InitParams
+from utils.init import InitParams
 from vkbottle import keyboard_gen
-from lvls import atta
+from utils.lvls import atta
 
 dict_help = {
 	None : [

@@ -14,7 +14,7 @@ class InitParams:
 	def lvl_class(self):
 		lvl_class = getattr(self, '_lvl_class', False)
 		if not lvl_class:
-			from lvls import get_lvl
+			from utils.lvls import get_lvl
 			lvl_class = self._lvl_class = get_lvl()
 		return lvl_class
 
@@ -22,6 +22,6 @@ class InitParams:
 	def amessage(self):
 		amessage = getattr(self, '_amessage', False)
 		if not amessage:
-			from audio_message import get_audio_message
+			from utils.audio_message import get_audio_message
 			amessage = self._amessage = get_audio_message()
 		return amessage

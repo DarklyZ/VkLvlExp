@@ -1,10 +1,8 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
 from vkbottle.types.base import BaseModel
-from vbml import Patcher, Pattern
-from init import InitParams
+from utils.init import InitParams
 from re import compile, I, S
 
-from typing import Iterable
 
 class add_rule:
 	from vkbottle.framework.framework.handler.message import COL_RULES

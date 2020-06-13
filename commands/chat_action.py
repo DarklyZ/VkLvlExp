@@ -1,4 +1,4 @@
-from init import InitParams
+from utils.init import InitParams
 
 class ChatActionCommands(InitParams):
 	def load(self):

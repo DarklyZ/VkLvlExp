@@ -1,4 +1,4 @@
-from init import InitParams
+from utils.init import InitParams
 from asyncio import sleep
 from datetime import timedelta
 

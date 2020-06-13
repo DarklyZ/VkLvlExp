@@ -2,8 +2,8 @@ from vbml import Patcher, PatchedValidators
 from vkbottle import Bot
 from vkbottle.ext import Middleware
 from vkbottle.utils import TaskManager
-from lvls import LVL, atta
-from audio_message import AMessage
+from utils.lvls import LVL, atta
+from utils.audio_message import AMessage
 from re import I, S
 from os import getenv
 
@@ -23,7 +23,8 @@ bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 lvl_class = LVL(getenv('DATABASE_URL'), task.add_task)
 amessage = AMessage()
 
-import rules, commands
+import commands
+
 commands.BotCommands(bot).load()
 commands.ChatActionCommands(bot).load()
 commands.RegexCommands(bot).load()
