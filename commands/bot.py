@@ -113,6 +113,6 @@ class BotCommands(InitParams):
 			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
 
-		@self.bot.on.chat_message(text = ['link', 'link <reset:inc[reset]>'])
+		@self.bot.on.chat_message(text = ['link', 'link <reset:inc[reset]>'], command = True)
 		async def link(message, reset = None):
-			message('Ваша ссылка: ' + (await bot.api.messages.get_invite_link(peer_id = message.peer_id, reset = reset is not None)).link)
+			message('Ваша ссылка: ' + (await self.bot.api.messages.get_invite_link(peer_id = message.peer_id, reset = reset is not None)).link)
