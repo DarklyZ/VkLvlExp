@@ -112,3 +112,7 @@ class BotCommands(InitParams):
 			exp, errors = atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
 			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
+
+		@self.bot.on.chat_message(text = ['link', 'link <reset:inc[reset]>'])
+		async def link(message, reset = None):
+			message('Ваша ссылка: ' + (await bot.api.messages.get_invite_link(peer_id = message.peer_id, reset = reset is not None)).link)
