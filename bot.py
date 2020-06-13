@@ -14,7 +14,7 @@ class Validators(PatchedValidators):
 	inc = lambda self, value, *extra: value.lower() if value.lower() in extra else None
 
 Patcher(validators = Validators, flags = I + S)
-bot = Bot(getenv('TOKEN'), debug = False)
+bot = Bot(getenv('TOKEN'), debug = "DEBUG")
 
 task = TaskManager(bot.loop)
 task.add_task(bot.run(True))
