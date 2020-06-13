@@ -18,13 +18,14 @@ class add_rule:
 
 @add_rule('audio_message')
 class AudioMessage(VBMLRule, InitParams):
-	class audio_message(BaseModel):
+	class AM(BaseModel):
 		text: str = None
 
 	async def check(self, message):
-		audio_message = message.attachments and message.attachments[0].audio_message
-		audio_message = self.audio_message(text = self.amessage.get_text(audio_message))
-		if audio_message.text: await super().check(audio_message)
+		if (
+			( audio_message := message.attachments and message.attachments[0].audio_message ) and
+			( text := self.amessage.get_text(audio_message) )
+		): await super().check(self.AM(text = text))
 
 @add_rule('is_admin')
 class IsAdmin(AbstractMessageRule, InitParams):
