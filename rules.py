@@ -17,7 +17,7 @@ class add_rule:
 		return cls
 
 @add_rule('audio_message')
-class AudioMessage(VBMLRule, InitParams, amessage = True):
+class AudioMessage(VBMLRule, InitParams):
 	class audio_message(BaseModel):
 		text: str = None
 
