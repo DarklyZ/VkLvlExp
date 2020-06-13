@@ -23,7 +23,7 @@ bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 lvl_class = LVL(getenv('DATABASE_URL'), task.add_task)
 amessage = AMessage()
 
-import commands
+import commands, utils.rules
 
 commands.BotCommands(bot).load()
 commands.ChatActionCommands(bot).load()
