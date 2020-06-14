@@ -22,6 +22,6 @@ class InitParams:
 	def amessage(self):
 		amessage = getattr(self, '_amessage', False)
 		if not amessage:
-			from utils.audio_message import get_audio_message
-			amessage = self._amessage = get_audio_message()
+			from utils.audio_message import get_amessage
+			amessage = self._amessage = get_amessage()
 		return amessage

@@ -27,5 +27,5 @@ class AMessage(ContextInstanceMixin, InitParams):
 	async def get_text(self, audio_message):
 		pass
 
-def get_audio_message():
+def get_amessage():
 	return AMessage.get_current()
