@@ -18,10 +18,8 @@ class AudioMessage(VBMLRule, InitParams):
 		__getattr__ = dict.get
 
 	async def check(self, message):
-		if (
-			( audio_message := message.attachments and message.attachments[0].audio_message ) and
-			( text := self.amessage.get_text(audio_message) )
-		): await super().check(self.AM(text = text))
+		if (audio_message := message.attachments and message.attachments[0].audio_message) \
+			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
 @AddRule('is_admin')
 class IsAdmin(AbstractMessageRule, InitParams):
