@@ -73,10 +73,6 @@ class LVL(dict, ContextInstanceMixin, InitParams):
 	async def close_db(self):
 		await self.con.close()
 
-	async def getconst(self, const):
-		row = await self.con.fetchrow("select * from myconstants")
-		return row[const]
-		
 	async def temp_reset(self):
 		await self.con.execute("update lvl set temp_exp = 0")
 

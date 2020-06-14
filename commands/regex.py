@@ -1,5 +1,6 @@
 from utils import InitParams
 from random import choice
+from os import getenv
 
 class RegexCommands(InitParams):
 	def load(self):
@@ -22,9 +23,9 @@ class RegexCommands(InitParams):
 
 		@self.bot.on.chat_message(regex = r'смерт|суицид|умереть|гибну|окно')
 		async def olga(message):
-			await message(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{await self.lvl_class.getconst('olga_id')}|#бля_Оля_живи!!!!!]")
+			await message(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{getenv('olga_id', message.from_id)}|#бля_Оля_живи!!!!!]")
 
 		@self.bot.on.chat_message(regex = r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b')
 		async def archi(message):
 			await message(sticker_id = 9805)
-			await message(f"[id{await self.lvl_class.getconst('archi_id')}|💬][id{message.from_id}|🃏]Ожидайте бана…")
+			await message(f"[id{getenv('archi_id', message.from_id)}|💬][id{message.from_id}|🃏]Ожидайте бана…")
