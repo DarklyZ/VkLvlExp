@@ -33,7 +33,7 @@ class IsAdmin(AbstractMessageRule, InitParams):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @AddRule('with_text')
-class WithText(AbstractMessageRule, InitParams, lvl_class = True):
+class WithText(AbstractMessageRule, InitParams):
 	def __init__(self, wt):
 		self.wt = wt
 
