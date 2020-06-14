@@ -6,7 +6,7 @@ from io import BytesIO
 class AMessage(ContextInstanceMixin, InitParams):
 	url = 'http://tts.voicetech.yandex.net/tts'
 
-	class params(dict):
+	class Params(dict):
 		val = {'voice': 'alyss', 'emotion': 'evil', 'speed': '1.2'}
 		__init__ = lambda self, **var: super().__init__(**self.val, **var)
 
@@ -18,7 +18,7 @@ class AMessage(ContextInstanceMixin, InitParams):
 
 	async def get_doc(self, text):
 		server = await self.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = self.peer_id)
-		async with request('GET', self.url, params = self.params(text = text)) as response:
+		async with request('GET', self.url, params = self.Params(text = text)) as response:
 			with BytesIO(await response.content.read()) as bfile:
 				async with request('POST', server.upload_url, data = {'file': bfile}) as response:
 					save = await self.api.docs.save(file = (await response.json())['file'])
