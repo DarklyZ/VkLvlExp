@@ -1,4 +1,4 @@
-from utils.init import InitParams
+from utils import InitParams
 
 class AudioCommands(InitParams):
 	def load(self):

@@ -1,6 +1,6 @@
 from vkbottle.utils import ContextInstanceMixin
 from aiohttp import request
-from utils.init import InitParams
+from utils import InitParams
 from io import BytesIO
 
 class AMessage(ContextInstanceMixin, InitParams):

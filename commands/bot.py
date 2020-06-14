@@ -1,4 +1,4 @@
-from utils.init import InitParams
+from utils import InitParams
 from vkbottle import keyboard_gen
 from utils.lvls import atta
 

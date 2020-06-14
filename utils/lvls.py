@@ -2,7 +2,7 @@ from asyncpg import connect
 from itertools import groupby
 from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
-from utils.init import InitParams
+from utils import InitParams
 from pyaspeller import YandexSpeller
 from re import split, I
 
