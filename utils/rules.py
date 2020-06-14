@@ -2,7 +2,6 @@ from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
 from utils.init import InitParams
 from re import compile, I, S
 
-
 class AddRule:
 	from vkbottle.framework.framework.handler.message import COL_RULES
 
