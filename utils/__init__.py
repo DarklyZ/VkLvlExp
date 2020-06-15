@@ -1,5 +1,5 @@
 class InitParams:
-	def __init__(self, bot):
+	def __init__(self, *, bot = None):
 		self.bot = bot
 
 	@property

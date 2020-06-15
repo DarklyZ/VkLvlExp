@@ -25,11 +25,11 @@ amessage = AMessage()
 
 import commands, utils.rules
 
-commands.BotCommands(bot).load()
-commands.ChatActionCommands(bot).load()
-commands.RegexCommands(bot).load()
-commands.TopCommands(bot).load(task.add_task)
-commands.AudioCommands(bot).load()
+commands.BotCommands(bot = bot).load()
+commands.ChatActionCommands(bot = bot).load()
+commands.RegexCommands(bot = bot).load()
+commands.TopCommands(bot = bot).load(task.add_task)
+commands.AudioCommands(bot = bot).load()
 
 @bot.middleware.middleware_handler()
 class Register(Middleware):
