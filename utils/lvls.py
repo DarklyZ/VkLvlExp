@@ -54,10 +54,11 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 	return (count, dict_errors) if return_errors else count
 
 class LVL(dict, ContextInstanceMixin, InitParams):
-	def __init__(self, database_url, run):
+	def __init__(self, database_url, add_task = None):
 		super().__init__()
 		self.set_current(self)
-		run(self.connect_db(database_url))
+		self.database_url = database_url
+		if add_task: add_task(self.__aenter__())
 
 	def __call__(self, peer_id):
 		self.clear()
@@ -67,10 +68,11 @@ class LVL(dict, ContextInstanceMixin, InitParams):
 	def now(self):
 		return datetime.now(tz)
 
-	async def connect_db(self, database_url):
-		self.con = await connect(database_url, ssl = 'require')
+	async def __aenter__(self):
+		self.con = await connect(self.database_url, ssl = 'require')
+		return self
 
-	async def close_db(self):
+	async def __aexit__(self, exc_type, exc_val, exc_tb):
 		await self.con.close()
 
 	async def temp_reset(self):
