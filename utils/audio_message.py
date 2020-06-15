@@ -7,7 +7,7 @@ class AMessage(ContextInstanceMixin, InitParams):
 	url = 'http://tts.voicetech.yandex.net/tts'
 
 	class Params(dict):
-		val = {'voice': 'alyss', 'emotion': 'evil', 'speed': '1.2'}
+		val = {'voice': 'alyss', 'emotion': 'evil', 'speed': '1.1'}
 		__init__ = lambda self, **var: super().__init__(**self.val, **var)
 
 	def __init__(self):
