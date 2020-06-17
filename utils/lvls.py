@@ -1,6 +1,5 @@
 from asyncpg import connect
 from itertools import groupby
-from datetime import datetime, tzinfo, timedelta
 from vkbottle.utils import ContextInstanceMixin
 from utils import InitParams
 from pyaspeller import YandexSpeller
@@ -23,13 +22,6 @@ class YaSpeller(YandexSpeller):
 			raise NotImplementedError()
 
 speller = YaSpeller()
-
-class timezone(tzinfo):
-	utcoffset = lambda self, dt: timedelta(hours = 5)
-	dst = lambda self, dt: timedelta()
-	tzname = lambda self, dt: '+05:00'
-
-tz = timezone()
 
 def atta(text = '', attachments = [], negative = False, return_errors = False):
 	if text:
@@ -63,10 +55,6 @@ class LVL(dict, ContextInstanceMixin, InitParams):
 	def __call__(self, peer_id):
 		self.clear()
 		self.peer_id = peer_id
-
-	@property
-	def now(self):
-		return datetime.now(tz)
 
 	async def __aenter__(self):
 		self.con = await connect(self.database_url, ssl = 'require')

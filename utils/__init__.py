@@ -3,6 +3,20 @@ class InitParams:
 		self.bot = bot
 
 	@property
+	def now(self):
+		now = getattr(self, '_now', False)
+		if not now:
+			from datetime import datetime, tzinfo, timedelta
+
+			class timezone(tzinfo):
+				utcoffset = lambda self, dt: timedelta(hours=5)
+				dst = lambda self, dt: timedelta()
+				tzname = lambda self, dt: '+05:00'
+
+			now = self._now = lambda: datetime.now(timezone())
+		return now()
+
+	@property
 	def api(self):
 		api = getattr(self, '_api', False)
 		if not api:

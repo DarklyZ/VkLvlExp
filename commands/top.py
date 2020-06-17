@@ -4,7 +4,7 @@ from datetime import timedelta
 
 class TopCommands(InitParams):
 	def load(self, run):
-		temp_new = lambda: self.lvl_class.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
 		@run
 		async def async_top_loop():
