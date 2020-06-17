@@ -1,6 +1,7 @@
 from utils import InitParams
 from vkbottle import keyboard_gen
 from utils.lvls import atta
+from random import randint, choice
 
 dict_help = {
 	None : [
@@ -24,7 +25,8 @@ dict_help = {
 	],
 	'extra' : [
 		'/BAN[ <причина>] & <rep_mes> - типо бан',
-		'/Ord <chr>+ - код в юникоде символов'
+		'/Ord <chr>+ - код в юникоде символов',
+		'/TWDNE - покажет рандомную вайфу с сайта ThisWaifuDoesNotExist'
 	]
 }
 
@@ -112,3 +114,8 @@ class BotCommands(InitParams):
 			exp, errors = atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
 			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
+
+		@self.bot.on.chat_message(text = 'twdne', command = True)
+		async def twdne(message):
+			compliment = choice(('симпатичная', 'привлекательная', 'виртуозная', 'превосходная', 'милая', 'бесценная'))
+			await message(message = f'Эта вайфу такая {compliment}', attachment = await self.twdne.get_doc(randint(1, 99999)))

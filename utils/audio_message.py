@@ -19,7 +19,7 @@ class AMessage(ContextInstanceMixin, InitParams):
 	async def get_doc(self, text):
 		server = await self.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = self.peer_id)
 		async with request('GET', self.url, params = self.Params(text = text)) as response:
-			with BytesIO(await response.content.read()) as bfile:
+			with BytesIO(await response.read()) as bfile:
 				async with request('POST', server.upload_url, data = {'file': bfile}) as response:
 					save = await self.api.docs.save(file = (await response.json())['file'])
 		return f'doc{save.audio_message.owner_id}_{save.audio_message.id}'

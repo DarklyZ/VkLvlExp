@@ -14,7 +14,7 @@ class InitParams:
 	def lvl_class(self):
 		lvl_class = getattr(self, '_lvl_class', False)
 		if not lvl_class:
-			from .lvls import get_lvl
+			from utils.lvls import get_lvl
 			lvl_class = self._lvl_class = get_lvl()
 		return lvl_class
 
@@ -22,6 +22,14 @@ class InitParams:
 	def amessage(self):
 		amessage = getattr(self, '_amessage', False)
 		if not amessage:
-			from .audio_message import get_amessage
+			from utils.audio_message import get_amessage
 			amessage = self._amessage = get_amessage()
 		return amessage
+
+	@property
+	def twdne(self):
+		twdne = getattr(self, '_twdne', False)
+		if not twdne:
+			from utils.thiswaifudoesnotexist import get_twdne
+			twdne = self._twdne= get_twdne()
+		return twdne
