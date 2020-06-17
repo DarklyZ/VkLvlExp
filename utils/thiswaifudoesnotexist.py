@@ -1,7 +1,6 @@
 from vkbottle.utils import ContextInstanceMixin
 from utils import InitParams
 from aiohttp import request
-from json import loads
 from io import BytesIO
 
 class ThisWaifuDoesNotExist(ContextInstanceMixin, InitParams):
