@@ -1,6 +1,5 @@
 https://github.com/timoniq/vkbottle/archive/master.zip
 pyaspeller
-requests
 asyncpg
 loguru
 uvloop
