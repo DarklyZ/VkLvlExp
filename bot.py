@@ -28,10 +28,10 @@ twdne = ThisWaifuDoesNotExist()
 import commands, utils.rules
 
 commands.BotCommands(bot = bot).load()
-commands.ChatActionCommands(bot = bot).load()
-commands.RegexCommands(bot = bot).load()
 commands.TopCommands(bot = bot).load(task.add_task)
+commands.ChatActionCommands(bot = bot).load()
 commands.AudioCommands(bot = bot).load()
+commands.RegexCommands(bot = bot).load()
 
 @bot.middleware.middleware_handler()
 class Register(Middleware):
