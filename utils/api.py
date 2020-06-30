@@ -6,8 +6,8 @@ class ShikiApi(InitParams):
 	def __call__(self, peer_id):
 		self.peer_id = peer_id
 
-	async def search(self, text):
-		async with request('GET', 'http://shikimori.one/api/animes/search', params = {'q': text}) as response:
+	async def search(self, type, text):
+		async with request('GET', f'http://shikimori.one/api/{type}/search', params = {'q': text}) as response:
 			return await response.json()
 
 	async def get_doc(self, urls, page):
