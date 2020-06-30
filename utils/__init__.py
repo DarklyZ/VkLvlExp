@@ -1,57 +1,32 @@
 class InitParams:
-	def __init__(self, *, bot = None):
+	def __init__(self, *, bot = None, **kwargs):
 		self.bot = bot
+		if kwargs: self.set_params(**kwargs)
 
-	@property
-	def now(self):
-		now = getattr(self, '_now', False)
-		if not now:
-			from datetime import datetime, tzinfo, timedelta
+	@classmethod
+	def set_params(cls, database_url, add_task):
+		from vkbottle.api import get_api
+		cls.api = get_api()
+		from utils.lvls import LVL
+		cls.lvl_class = LVL(database_url, add_task)
+		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage
+		cls.amessage = AMessage()
+		cls.twdne = ThisWaifuDoesNotExist()
+		cls.shiki = ShikiApi()
 
-			class timezone(tzinfo):
-				utcoffset = lambda self, dt: timedelta(hours=5)
-				dst = lambda self, dt: timedelta()
-				tzname = lambda self, dt: '+05:00'
+		from datetime import datetime, tzinfo, timedelta
 
-			now = self._now = lambda: datetime.now(timezone())
-		return now()
+		class timezone(tzinfo):
+			utcoffset = lambda self, dt: timedelta(hours=5)
+			dst = lambda self, dt: timedelta()
+			tzname = lambda self, dt: '+05:00'
 
-	@property
-	def api(self):
-		api = getattr(self, '_api', False)
-		if not api:
-			from vkbottle.api import get_api
-			api = self._api = get_api()
-		return api
+		cls.now = property(lambda self: datetime.now(timezone()))
 
-	@property
-	def lvl_class(self):
-		lvl_class = getattr(self, '_lvl_class', False)
-		if not lvl_class:
-			from utils.lvls import get_lvl
-			lvl_class = self._lvl_class = get_lvl()
-		return lvl_class
+	@classmethod
+	def set_peer_id(cls, peer_id):
+		cls.lvl_class(peer_id)
+		cls.amessage(peer_id)
+		cls.twdne(peer_id)
+		cls.shiki(peer_id)
 
-	@property
-	def amessage(self):
-		amessage = getattr(self, '_amessage', False)
-		if not amessage:
-			from utils.audio_message import get_amessage
-			amessage = self._amessage = get_amessage()
-		return amessage
-
-	@property
-	def twdne(self):
-		twdne = getattr(self, '_twdne', False)
-		if not twdne:
-			from utils.thiswaifudoesnotexist import get_twdne
-			twdne = self._twdne= get_twdne()
-		return twdne
-
-	@property
-	def shiki(self):
-		shiki = getattr(self, '_shiki', False)
-		if not shiki:
-			from utils.shikimori import get_shiki
-			shiki = self._shiki= get_shiki()
-		return shiki
