@@ -24,7 +24,7 @@ class ShikiApi(ContextInstanceMixin, InitParams):
 					bfile.name = '.jpg'
 					async with request('POST', server.upload_url, data = {'photo': bfile}) as response:
 						res = await response.json(content_type = 'text/html')
-					saves.append(await self.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash']))
+						saves.append(await self.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash']))
 		return [f'photo{save[0].owner_id}_{save[0].id}' for save in saves]
 
 def get_shiki():
