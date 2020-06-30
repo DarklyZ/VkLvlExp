@@ -2,6 +2,7 @@ from vkbottle.utils import ContextInstanceMixin
 from utils import InitParams
 from io import BytesIO
 from aiohttp import request
+from vkbottle import vkscript
 
 class ShikiApi(ContextInstanceMixin, InitParams):
 	def __init__(self):
