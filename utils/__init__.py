@@ -46,7 +46,7 @@ class InitParams:
 		if not twdne:
 			from utils.thiswaifudoesnotexist import get_twdne
 			twdne = self._twdne= get_twdne()
-		return twdne	@property
+		return twdne
 
 	@property
 	def shiki(self):
