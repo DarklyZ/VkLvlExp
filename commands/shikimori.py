@@ -7,5 +7,5 @@ class ShikimoriCommands(InitParams):
 		async def shiki_search(message, type, text, page = 1):
 			response = await self.shiki.search(type, text)
 			docs = await self.shiki.get_doc([item['image']['original'] for item in response], page)
-			russian = '\n'.join(item['russian'] for item in response[(page - 1) * 10 : (page - 1) * 10 + 10])
+			russian = '\n'.join(item['russian'] or item['name'] for item in response[(page - 1) * 10 : (page - 1) * 10 + 10])
 			await message(russian or 'Не найдено', attachment = ','.join(docs))
