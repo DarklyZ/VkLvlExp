@@ -2,7 +2,6 @@ from utils import InitParams
 
 class ShikimoriCommands(InitParams):
 	def load(self):
-
 		@self.bot.on.chat_message(text = ['ss <page:pos> <text>', 'ss <text>'], command = True)
 		async def _(message, text, page = 1):
 			response = await self.shiki.search(text)
