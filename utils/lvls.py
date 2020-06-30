@@ -1,6 +1,5 @@
 from asyncpg import connect
 from itertools import groupby
-from vkbottle.utils import ContextInstanceMixin
 from utils import InitParams
 from pyaspeller import YandexSpeller
 from re import split, I
@@ -45,10 +44,9 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 	count *= -1 if negative else 1
 	return (count, dict_errors) if return_errors else count
 
-class LVL(dict, ContextInstanceMixin, InitParams):
+class LVL(dict, InitParams):
 	def __init__(self, database_url, add_task = None):
 		super().__init__()
-		self.set_current(self)
 		self.database_url = database_url
 		if add_task: add_task(self.__aenter__())
 
