@@ -10,10 +10,10 @@ class ShikiApi(InitParams):
 		async with request('GET', f'http://shikimori.one/api/{type}/search', params = {'q': text}) as response:
 			return await response.json()
 
-	async def get_doc(self, urls, page):
+	async def get_doc(self, urls):
 		server = await self.api.photos.get_messages_upload_server(peer_id = self.peer_id)
 		saves = []
-		for url in urls[(page - 1) * 10 : (page - 1) * 10 + 10]:
+		for url in urls:
 			async with request('GET', 'http://shikimori.one' + url) as response:
 				with BytesIO(await response.read()) as bfile:
 					bfile.name = '.jpg'
