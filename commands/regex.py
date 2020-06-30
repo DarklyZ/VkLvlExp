@@ -25,7 +25,7 @@ class RegexCommands(InitParams):
 		async def olga(message):
 			await message(f"Вы написали:\n\"{message.text}\".\nЯ расценила это за попытку суицида.\n[id{getenv('olga_id', message.from_id)}|#бля_Оля_живи!!!!!]")
 
-		@self.bot.on.chat_message(regex = r'\b(?:мирарукурин|мира|рару|руку|кури|рин)\b')
+		@self.bot.on.chat_message(regex = r'\b(?:мирарукурин|мира|рару|руку|кури|рин|черемша)\b')
 		async def archi(message):
 			await message(sticker_id = 9805)
 			await message(f"[id{getenv('archi_id', message.from_id)}|💬][id{message.from_id}|🃏]Ожидайте бана…")

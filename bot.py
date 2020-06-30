@@ -40,7 +40,7 @@ commands.ShikimoriCommands(bot = bot).load()
 class Register(Middleware):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
-		lvl_class(message.peer_id); amessage(message.peer_id); twdne(message.peer_id)
+		lvl_class(message.peer_id); amessage(message.peer_id); twdne(message.peer_id); shiki(message.peer_id)
 		await lvl_class.check_add_user(message.from_id)
 		if not message.payload and (exp := atta(message.text, message.attachments)):
 			await lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
