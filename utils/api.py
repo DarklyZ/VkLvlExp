@@ -8,10 +8,13 @@ class ShikiApi(InitParams):
 	def __call__(self, peer_id):
 		self.peer_id = peer_id
 
-	async def search(self, type, text):
+	async def search(self, type, text, page):
+		params = {'search': text}
 		if type == 'characters': type += '/search'
-		async with request('GET', self.url.format(method = type), params = {'search': text}) as response:
-			return await response.json()
+		else: params.update({'censored': 'false', 'page': page, 'limit': '10'})
+		async with request('GET', self.url.format(method = type), params = params) as response:
+			res = await response.json()
+			return res[(page - 1) * 10 : (page - 1) * 10 + 10] if type == 'characters' else res
 
 	async def get_doc(self, urls):
 		server = await self.api.photos.get_messages_upload_server(peer_id = self.peer_id)
