@@ -3,11 +3,14 @@ from io import BytesIO
 from aiohttp import request
 
 class ShikiApi(InitParams):
+	url = 'http://shikimori.one/api/{method}'
+
 	def __call__(self, peer_id):
 		self.peer_id = peer_id
 
 	async def search(self, type, text):
-		async with request('GET', f'http://shikimori.one/api/{type}/search', params = {'q': text}) as response:
+		if type == 'characters': type += '/search'
+		async with request('GET', self.url.format(method = type), params = {'search': text}) as response:
 			return await response.json()
 
 	async def get_doc(self, urls):
