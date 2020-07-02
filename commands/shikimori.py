@@ -9,7 +9,7 @@ class ShikimoriCommands(InitParams):
 			if response:
 				docs = await self.shiki.get_doc(item['image']['original'] for item in response)
 				russian = '\n'.join([f"""{num + 1}) {item['russian'] or item['name']} {
-						(await self.api.utils.get_short_link('http://shikimori.one' + item['url'])).short_url
+						(await self.bot.api.utils.get_short_link('http://shikimori.one' + item['url'])).short_url
 				}""" for num, item in enumerate(response)])
 				await message(russian, attachment = ','.join(docs))
 			else: await message('Не найдено')
