@@ -2,6 +2,7 @@ from utils import InitParams
 from vkbottle import keyboard_gen
 from utils.lvls import atta
 from random import randint, choice
+from re import search
 
 dict_help = {
 	None : [
@@ -119,3 +120,9 @@ class BotCommands(InitParams):
 		async def twdne(message):
 			compliment = choice(('симпатичная', 'привлекательная', 'виртуозная', 'превосходная', 'милая', 'бесценная'))
 			await message(message = f'Эта вайфу такая {compliment}', attachment = await self.twdne.get_doc(randint(1, 99999)))
+
+		@self.bot.on.chat_message(text = 'date', command = True, with_reply_message = True)
+		async def date_created(message):
+			date = search(r'<ya:created dc:date="(?P<Y>\d{4})-(?P<M>\d{2})-(?P<D>\d{2}).+?"/>', await self.foaf(id := message.reply_message.from_id))
+			await self.lvl_class.user(id)
+			await message(message = f"Я проследила за пользователем: {self.lvl_class[id]},\nон создал страницу: {date['D']}-{date['M']}-{date['Y']}")

@@ -9,10 +9,11 @@ class InitParams:
 		cls.api = get_api()
 		from utils.lvls import LVL
 		cls.lvl_class = LVL(database_url, add_task)
-		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage
+		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, Foaf
 		cls.amessage = AMessage()
 		cls.twdne = ThisWaifuDoesNotExist()
 		cls.shiki = ShikiApi()
+		cls.foaf = Foaf()
 
 		from datetime import datetime, tzinfo, timedelta
 

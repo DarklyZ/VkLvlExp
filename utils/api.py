@@ -63,3 +63,10 @@ class ThisWaifuDoesNotExist(InitParams):
 					res = await response.json(content_type = 'text/html')
 					save = await self.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash'])
 		return f'photo{save[0].owner_id}_{save[0].id}'
+
+class Foaf(InitParams):
+	url = 'https://vk.com/foaf.php'
+
+	async def __call__(self, id):
+		async with request('GET', self.url, params = {'id': str(id)}) as response:
+			return await response.text('WINDOWS-1251')
