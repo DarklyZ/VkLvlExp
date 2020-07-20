@@ -23,7 +23,8 @@ class InitParams:
 
 		cls.now = property(lambda self: datetime.now(timezone()))
 
-	def load_commands(self):
+	@staticmethod
+	def load_commands():
 		import commands, utils.rules
 
 		commands.BotCommands()
@@ -33,6 +34,7 @@ class InitParams:
 		commands.RegexCommands()
 		commands.ShikimoriCommands()
 
+	@classmethod
 	def set_peer_id(cls, peer_id):
 		cls.lvl_class(peer_id)
 		cls.amessage(peer_id)
