@@ -37,7 +37,7 @@ def replace_smile(str):
 	return str
 
 class BotCommands(InitParams):
-	def load(self):
+	def __init__(self):
 		@self.bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
 		async def help(message, extra = None):
 			await message('Команды:\n' + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(dict_help[extra])))

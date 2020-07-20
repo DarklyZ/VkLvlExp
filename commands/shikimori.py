@@ -1,7 +1,7 @@
 from utils import InitParams
 
 class ShikimoriCommands(InitParams):
-	def load(self):
+	def __init__(self):
 		@self.bot.on.chat_message(text = ['ss <type:inc[animes,mangas,ranobe,characters,people]> <page:pos> <text>',
 				'ss <type:inc[animes,mangas,ranobe,characters,people]> <text>'], command = True)
 		async def shiki_search(message, type, text, page = 1):

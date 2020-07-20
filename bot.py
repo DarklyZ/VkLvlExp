@@ -20,16 +20,9 @@ task = TaskManager(bot.loop)
 task.add_task(bot.run(True))
 
 bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
-InitParams(database_url = getenv('DATABASE_URL'), add_task = task.add_task)
 
-import commands, utils.rules
-
-commands.BotCommands(bot = bot).load()
-commands.ChatActionCommands(bot = bot).load()
-commands.TopCommands(bot = bot).load(task.add_task)
-commands.AudioCommands(bot = bot).load()
-commands.RegexCommands(bot = bot).load()
-commands.ShikimoriCommands(bot = bot).load()
+init_params = InitParams(bot = bot, database_url = getenv('DATABASE_URL'), add_task = task.add_task)
+init_params.load_commands()
 
 @bot.middleware.middleware_handler()
 class Register(Middleware, InitParams):

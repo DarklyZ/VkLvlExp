@@ -45,10 +45,11 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 	return (count, dict_errors) if return_errors else count
 
 class LVL(dict, InitParams):
-	def __init__(self, database_url, add_task = None):
+	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url
-		if add_task: add_task(self.__aenter__())
+		if add_task := getattr(self, 'add_task'):
+			add_task(self.__aenter__())
 
 	def __call__(self, peer_id):
 		self.clear()
@@ -99,7 +100,7 @@ class LVL(dict, InitParams):
 				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 				if row['row_number'] % 2 != 0}
 		self.update({user.id : f"{get(top, user.id)}{get(topboost, user.id)}{bdate(user, self.now)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
-		        for user in await self.api.users.get(user_ids = ids, fields = 'bdate')})
+		        for user in await self.bot.api.users.get(user_ids = ids, fields = 'bdate')})
 
 	async def send(self, *ids):
 		lvl = {row['user_id'] : f"{row['lvl']}Ⓛ|{row['exp']}/{row['lvl'] * 2000}Ⓔ"

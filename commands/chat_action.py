@@ -1,7 +1,7 @@
 from utils import InitParams
 
 class ChatActionCommands(InitParams):
-	def load(self):
+	def __init__(self):
 		@self.bot.on.chat_message(text = 'hello', command = True, is_admin = True)
 		async def hello_help(message):
 			await message('Ключевые слова:\n{title} - заголовок\n{user} - пользователь\n{name} - имя бота')

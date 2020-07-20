@@ -1,14 +1,13 @@
 class InitParams:
-	def __init__(self, *, bot = None, **kwargs):
-		self.bot = bot
+	def __init__(self, **kwargs):
 		if kwargs: self.set_params(**kwargs)
 
 	@classmethod
-	def set_params(cls, database_url, add_task):
-		from vkbottle.api import get_api
-		cls.api = get_api()
+	def set_params(cls, bot, database_url, add_task):
+		cls.bot = bot
+		cls.add_task = add_task
 		from utils.lvls import LVL
-		cls.lvl_class = LVL(database_url, add_task)
+		cls.lvl_class = LVL(database_url)
 		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, Foaf
 		cls.amessage = AMessage()
 		cls.twdne = ThisWaifuDoesNotExist()
@@ -18,13 +17,22 @@ class InitParams:
 		from datetime import datetime, tzinfo, timedelta
 
 		class timezone(tzinfo):
-			utcoffset = lambda self, dt: timedelta(hours=5)
+			utcoffset = lambda self, dt: timedelta(hours = 5)
 			dst = lambda self, dt: timedelta()
 			tzname = lambda self, dt: '+05:00'
 
 		cls.now = property(lambda self: datetime.now(timezone()))
 
-	@classmethod
+	def load_commands(self):
+		import commands, utils.rules
+
+		commands.BotCommands()
+		commands.ChatActionCommands()
+		commands.TopCommands()
+		commands.AudioCommands()
+		commands.RegexCommands()
+		commands.ShikimoriCommands()
+
 	def set_peer_id(cls, peer_id):
 		cls.lvl_class(peer_id)
 		cls.amessage(peer_id)

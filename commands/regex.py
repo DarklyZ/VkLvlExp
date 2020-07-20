@@ -3,7 +3,7 @@ from random import choice
 from os import getenv
 
 class RegexCommands(InitParams):
-	def load(self):
+	def __init__(self):
 		@self.bot.on.chat_message(regex = r'^f+$')
 		async def f_f(message):
 			rand = choice((457241326,457241327,457241328,457241331,457241332,457241333,457241334,457241338,457241339))

@@ -3,10 +3,10 @@ from asyncio import sleep
 from datetime import timedelta
 
 class TopCommands(InitParams):
-	def load(self, run):
+	def __init__(self):
 		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
-		@run
+		@self.add_task
 		async def async_top_loop():
 			temp = temp_new()
 			while not await sleep(5 * 60):
