@@ -7,9 +7,15 @@ class ShikimoriCommands(InitParams):
 		async def shiki_search(message, type, text, page = 1):
 			response = await self.shiki.search(type, text, page)
 			if response:
+				objs = [
+					[
+						f"{num + 1}) {item['russian'] or item['name']}",
+						'Шики: ' + await self.shiki.get_shiki_short_link(item['url']),
+						'Неко: ' + await self.shiki.get_neko_short_link(item['id']) if type == 'animes' else ''
+					]
+					for num, item in enumerate(response)
+				]
+				text = '\n'.join('\n'.join(i for i in item if i) for item in objs)
 				docs = await self.shiki.get_doc(item['image']['original'] for item in response)
-				russian = '\n'.join([f"""{num + 1}) {item['russian'] or item['name']} {
-						(await self.bot.api.utils.get_short_link('http://shikimori.one' + item['url'])).short_url[8:]
-				}""" for num, item in enumerate(response)])
-				await message(russian, attachment = ','.join(docs))
+				await message(text, attachment = ','.join(docs))
 			else: await message('Не найдено')

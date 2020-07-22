@@ -3,7 +3,9 @@ from io import BytesIO
 from aiohttp import request
 
 class ShikiApi(InitParams):
-	url = 'http://shikimori.one/api/{method}'
+	url_shiki = 'http://shikimori.one{url}'
+	url_shiki_api = url_shiki.format(url = '/api/{method}')
+	url_neko_anime = 'https://nekomori.ch/anime/-{id}/general'
 
 	def __call__(self, peer_id):
 		self.peer_id = peer_id
@@ -11,9 +13,15 @@ class ShikiApi(InitParams):
 	async def search(self, type, text, page, limit = 5):
 		params, types = {'search': text}, ['chatacters', 'people']
 		if type not in types: params.update({'censored': 'false', 'page': page, 'limit': str(limit)})
-		async with request('GET', self.url.format(method = type + ('/search' if type in types else '')), params = params) as response:
+		async with request('GET', self.url_shiki_api.format(method = type + ('/search' if type in types else '')), params = params) as response:
 			res = await response.json()
 			return res[(page - 1) * limit : (page - 1) * limit + limit] if type in types else res
+
+	async def get_shiki_short_link(self, url):
+		return (await self.bot.api.utils.get_short_link(self.url_shiki.format(url = url))).short_url[8:]
+
+	async def get_neko_short_link(self, id):
+		return (await self.bot.api.utils.get_short_link(self.url_neko_anime.format(id = id))).short_url[8:]
 
 	async def get_doc(self, urls):
 		server = await self.bot.api.photos.get_messages_upload_server(peer_id = self.peer_id)
