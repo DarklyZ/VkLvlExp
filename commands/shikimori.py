@@ -11,7 +11,7 @@ class ShikimoriCommands(InitParams):
 					[
 						f"{num + 1}) {item['russian'] or item['name']}",
 						'Шики: ' + await self.shiki.get_shiki_short_link(item['url']),
-						'Неко: ' + await self.shiki.get_neko_short_link(item['id']) if type == 'animes' else ''
+						'Неко: ' + await self.shiki.get_neko_short_link(item['id']) if type == 'animes' else None
 					]
 					for num, item in enumerate(response)
 				]
