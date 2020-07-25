@@ -28,12 +28,6 @@ class ExtraCommands(InitParams):
 		async def ordo(message):
 			await message(f'Не знаю зачем тебе, но получай: {[ord(text) for text in message.reply_message.text]}')
 
-		@self.bot.on.chat_message(text = 'info', command = True, with_reply_message = True)
-		async def info(message):
-			exp, errors = atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
-			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
-			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
-
 		@self.bot.on.chat_message(text = 'twdne', command = True)
 		async def twdne(message):
 			compliment = choice(('симпатичная', 'привлекательная', 'виртуозная', 'превосходная', 'милая', 'бесценная'))
