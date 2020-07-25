@@ -1,6 +1,10 @@
 from utils import InitParams
 
 class ShikimoriCommands(InitParams):
+	help = [
+		'/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>'
+	]
+
 	def __init__(self):
 		@self.bot.on.chat_message(text = ['ss <type:inc[animes,mangas,ranobe,characters,people]> <page:pos> <text>',
 				'ss <type:inc[animes,mangas,ranobe,characters,people]> <text>'], command = True)

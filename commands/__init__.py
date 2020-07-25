@@ -1,29 +1,28 @@
 from utils import InitParams
 
-from .lvl import LVLCommands
-from .top import TopCommands
-from .nick import NickCommands
-from .extra import ExtraCommands
-from .shikimori import ShikimoriCommands
-from .chat_action import ChatActionCommands
-from .regex import RegexCommands
+from commands.lvl import LVLCommands
+from commands.nick import NickCommands
+from commands.extra import ExtraCommands
+from commands.shikimori import ShikimoriCommands
+from commands.chat_action import ChatActionCommands
+from commands.regex import RegexCommands
 
 class HelpCommand(InitParams):
 	help = [
-		'/Help Top - топ',
 		'/Help LVL - уровни',
 		'/Help Nick - ники',
-		'/Help Extra - доп. команды'
+		'/Help Extra - доп. команды',
+		'/Help Shiki - шикимори'
 	]
 
 	dict_help = {
-		'top': TopCommands,
 		'lvl': LVLCommands,
 		'nick': NickCommands,
-		'extra': ExtraCommands
+		'extra': ExtraCommands,
+		'shiki': ShikimoriCommands
 	}
 
 	def __init__(self):
-		@self.bot.on.chat_message(text = ['help', 'help <extra:inc[top,lvl,nick,extra]>'], command = True)
+		@self.bot.on.chat_message(text = ['help', 'help <extra:inc[lvl,nick,extra,shiki]>'], command = True)
 		async def help(message, extra = None):
-			await message('Команды:\n' + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(self.dict_help.get(extra, self).help)))
+			await message(f"Команды{f' {extra.title()}' if extra else ''}:\n" + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(self.dict_help.get(extra, self).help)))

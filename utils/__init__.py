@@ -29,7 +29,6 @@ class InitParams:
 
 		commands.HelpCommand()
 		commands.LVLCommands()
-		commands.TopCommands()
 		commands.NickCommands()
 		commands.ExtraCommands()
 		commands.ShikimoriCommands()
