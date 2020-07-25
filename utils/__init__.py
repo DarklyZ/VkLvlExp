@@ -22,23 +22,9 @@ class InitParams:
 
 		cls.now = property(lambda self: datetime.now(timezone()))
 
-	@staticmethod
-	def upload_commands():
-		import commands, utils.rules
-
-		commands.HelpCommand()
-		commands.LVLCommands()
-		commands.NickCommands()
-		commands.ExtraCommands()
-		commands.ShikimoriCommands()
-		commands.ChatActionCommands()
-		commands.RegexCommands()
-
-	@property
 	async def run_db(self):
 		await self.lvl_class.__aenter__()
 
-	@property
 	async def run_top(self):
 		from asyncio import sleep
 		from datetime import timedelta
@@ -56,3 +42,15 @@ class InitParams:
 		self.amessage(peer_id)
 		self.twdne(peer_id)
 		self.shiki(peer_id)
+
+	@staticmethod
+	def upload_commands():
+		import commands, utils.rules
+
+		commands.HelpCommand()
+		commands.LVLCommands()
+		commands.NickCommands()
+		commands.ExtraCommands()
+		commands.ShikimoriCommands()
+		commands.ChatActionCommands()
+		commands.RegexCommands()
