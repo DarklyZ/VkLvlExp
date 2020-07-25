@@ -1,4 +1,5 @@
 from utils import InitParams
+from utils.lvl import atta
 from vkbottle import keyboard_gen
 from random import randint, choice
 from re import search
