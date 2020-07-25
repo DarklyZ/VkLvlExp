@@ -58,10 +58,10 @@ class LVLCommands(InitParams):
 			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
 
-		@self.bot.on.chat_message(text=['toplvl <one:pos> <two:pos>', 'toplvl'], command=True)
-		async def toplvl_send(message, one=1, two=10):
-			await message(await self.lvl_class.toplvl_size(one, two), disable_mentions=True)
+		@self.bot.on.chat_message(text = ['toplvl <one:pos> <two:pos>', 'toplvl'], command = True)
+		async def toplvl_send(message, one = 1, two = 10):
+			await message(await self.lvl_class.toplvl_size(one, two), disable_mentions = True)
 
-		@self.bot.on.chat_message(text=['toptemp <one:pos> <two:pos>', 'toptemp'], command=True)
-		async def toptemp_send(message, one=1, two=10):
-			await message(await self.lvl_class.toptemp_size(one, two), disable_mentions=True)
+		@self.bot.on.chat_message(text = ['toptemp <one:pos> <two:pos>', 'toptemp'], command = True)
+		async def toptemp_send(message, one = 1, two = 10):
+			await message(await self.lvl_class.toptemp_size(one, two), disable_mentions = True)
