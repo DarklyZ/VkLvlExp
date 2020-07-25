@@ -1,8 +1,9 @@
 class InitParams:
-	@classmethod
-	def __init__(cls, bot, database_url):
-		cls.__init__ = object.__init__
+	def __init__(self, **kwargs):
+		if kwargs: self.init(**kwargs)
 
+	@classmethod
+	def init(cls, bot, database_url):
 		cls.bot = bot
 		from utils.lvls import LVL
 		cls.lvl_class = LVL(database_url)
@@ -21,6 +22,18 @@ class InitParams:
 
 		cls.now = property(lambda self: datetime.now(timezone()))
 
+	@staticmethod
+	def upload_commands():
+		import commands, utils.rules
+
+		commands.HelpCommand()
+		commands.LVLCommands()
+		commands.NickCommands()
+		commands.ExtraCommands()
+		commands.ShikimoriCommands()
+		commands.ChatActionCommands()
+		commands.RegexCommands()
+
 	@property
 	async def run_db(self):
 		await self.lvl_class.__aenter__()
@@ -30,7 +43,7 @@ class InitParams:
 		from asyncio import sleep
 		from datetime import timedelta
 
-		temp_new = lambda: self.now.replace(hour=0, minute=0, second=0) + timedelta(days=1)
+		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
 		temp = temp_new()
 		while not await sleep(5 * 60):
@@ -43,15 +56,3 @@ class InitParams:
 		self.amessage(peer_id)
 		self.twdne(peer_id)
 		self.shiki(peer_id)
-
-	@staticmethod
-	def load_commands():
-		import commands, utils.rules
-
-		commands.HelpCommand()
-		commands.LVLCommands()
-		commands.NickCommands()
-		commands.ExtraCommands()
-		commands.ShikimoriCommands()
-		commands.ChatActionCommands()
-		commands.RegexCommands()

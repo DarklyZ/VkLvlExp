@@ -26,7 +26,7 @@ init_params = InitParams(bot = bot, database_url = getenv('DATABASE_URL'))
 task.add_task(init_params.run_db)
 task.add_task(init_params.run_top)
 
-init_params.load_commands()
+init_params.upload_commands()
 
 @bot.middleware.middleware_handler()
 class Register(Middleware, InitParams):
