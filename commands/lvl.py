@@ -52,6 +52,12 @@ class LVLCommands(InitParams):
 			await self.lvl_class.send(id)
 			await message((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + self.lvl_class[id])
 
+		@self.bot.on.chat_message(text = 'info', command = True, with_reply_message = True)
+		async def info(message):
+			exp, errors = atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
+			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
+			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
+
 		@self.bot.on.chat_message(text=['toplvl <one:pos> <two:pos>', 'toplvl'], command=True)
 		async def toplvl_send(message, one=1, two=10):
 			await message(await self.lvl_class.toplvl_size(one, two), disable_mentions=True)
