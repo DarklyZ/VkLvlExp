@@ -27,12 +27,14 @@ class InitParams:
 	def load_commands():
 		import commands, utils.rules
 
-		commands.BotCommands()
-		commands.ChatActionCommands()
+		commands.HelpCommand()
+		commands.LVLCommands()
 		commands.TopCommands()
-		commands.AudioCommands()
-		commands.RegexCommands()
+		commands.NickCommands()
+		commands.ExtraCommands()
 		commands.ShikimoriCommands()
+		commands.ChatActionCommands()
+		commands.RegexCommands()
 
 	@classmethod
 	def set_peer_id(cls, peer_id):

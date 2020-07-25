@@ -3,6 +3,11 @@ from asyncio import sleep
 from datetime import timedelta
 
 class TopCommands(InitParams):
+	help = [
+		'/TopLVL[ <от> <до>] - топ 10 участников',
+		'/TopTemp[ <от> <до>] - временный топ 10 участников'
+	]
+
 	def __init__(self):
 		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
