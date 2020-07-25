@@ -1,11 +1,9 @@
 class InitParams:
-	def __init__(self, **kwargs):
-		if kwargs: self.set_params(**kwargs)
-
 	@classmethod
-	def set_params(cls, bot, database_url, add_task):
+	def __init__(cls, bot, database_url):
+		cls.__init__ = object.__init__
+
 		cls.bot = bot
-		cls.add_task = add_task
 		from utils.lvls import LVL
 		cls.lvl_class = LVL(database_url)
 		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, Foaf
@@ -23,6 +21,29 @@ class InitParams:
 
 		cls.now = property(lambda self: datetime.now(timezone()))
 
+	@property
+	async def run_db(self):
+		await self.lvl_class.__aenter__()
+
+	@property
+	async def run_top(self):
+		from asyncio import sleep
+		from datetime import timedelta
+
+		temp_new = lambda: self.now.replace(hour=0, minute=0, second=0) + timedelta(days=1)
+
+		temp = temp_new()
+		while not await sleep(5 * 60):
+			if self.lvl_class.now < temp: continue
+			await self.lvl_class.temp_reset()
+			temp = temp_new()
+
+	def set_peer_id(self, peer_id):
+		self.lvl_class(peer_id)
+		self.amessage(peer_id)
+		self.twdne(peer_id)
+		self.shiki(peer_id)
+
 	@staticmethod
 	def load_commands():
 		import commands, utils.rules
@@ -34,11 +55,3 @@ class InitParams:
 		commands.ShikimoriCommands()
 		commands.ChatActionCommands()
 		commands.RegexCommands()
-
-	@classmethod
-	def set_peer_id(cls, peer_id):
-		cls.lvl_class(peer_id)
-		cls.amessage(peer_id)
-		cls.twdne(peer_id)
-		cls.shiki(peer_id)
-

@@ -21,7 +21,11 @@ task.add_task(bot.run(True))
 
 bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 
-init_params = InitParams(bot = bot, database_url = getenv('DATABASE_URL'), add_task = task.add_task)
+init_params = InitParams(bot = bot, database_url = getenv('DATABASE_URL'))
+
+task.add_task(init_params.run_db)
+task.add_task(init_params.run_top)
+
 init_params.load_commands()
 
 @bot.middleware.middleware_handler()

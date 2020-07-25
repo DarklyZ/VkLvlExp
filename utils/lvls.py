@@ -48,8 +48,6 @@ class LVL(dict, InitParams):
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url
-		if add_task := getattr(self, 'add_task'):
-			add_task(self.__aenter__())
 
 	def __call__(self, peer_id):
 		self.clear()

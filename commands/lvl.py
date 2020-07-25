@@ -1,7 +1,5 @@
 from utils import InitParams
 from utils.lvls import atta
-from asyncio import sleep
-from datetime import timedelta
 
 class LVLCommands(InitParams):
 	help = [
@@ -13,16 +11,6 @@ class LVLCommands(InitParams):
 	]
 
 	def __init__(self):
-		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
-
-		@self.add_task
-		async def async_top_loop():
-			temp = temp_new()
-			while not await sleep(5 * 60):
-				if self.lvl_class.now < temp: continue
-				await self.lvl_class.temp_reset()
-				temp = temp_new()
-
 		@self.bot.on.chat_message(text = 'mylvl', command = True)
 		async def mylvl(message):
 			await self.lvl_class.send(id := message.from_id)
