@@ -44,7 +44,7 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 	count *= -1 if negative else 1
 	return (count, dict_errors) if return_errors else count
 
-class LVL(dict, InitParams):
+class LVL(dict, InitParams.Params):
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url

@@ -29,7 +29,7 @@ task.add_task(init_params.run_top)
 init_params.upload_commands()
 
 @bot.middleware.middleware_handler()
-class Register(Middleware, InitParams):
+class Register(Middleware, InitParams.Params):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		self.set_peer_id(message.peer_id)

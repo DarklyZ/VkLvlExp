@@ -5,7 +5,7 @@ def replace_smile(str):
 		str = str.replace(smile, '❌')
 	return str
 
-class NickCommands(InitParams):
+class NickCommands(InitParams.Params):
 	help = [
 		'/Set Nick <Ник> - заменить имя на ник',
 		'/Del Nick - вернуть имя'

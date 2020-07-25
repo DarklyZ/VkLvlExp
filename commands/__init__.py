@@ -7,7 +7,7 @@ from commands.shikimori import ShikimoriCommands
 from commands.chat_action import ChatActionCommands
 from commands.regex import RegexCommands
 
-class HelpCommand(InitParams):
+class HelpCommand(InitParams.Params):
 	help = [
 		'/Help LVL - уровни',
 		'/Help Nick - ники',

@@ -2,7 +2,7 @@ from utils import InitParams
 from random import choice
 from os import getenv
 
-class RegexCommands(InitParams):
+class RegexCommands(InitParams.Params):
 	def __init__(self):
 		@self.bot.on.chat_message(regex = r'^f+$')
 		async def f_f(message):

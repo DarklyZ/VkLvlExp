@@ -2,7 +2,7 @@ from utils import InitParams
 from io import BytesIO
 from aiohttp import request
 
-class ShikiApi(InitParams):
+class ShikiApi(InitParams.Params):
 	url_shiki = 'http://shikimori.one{url}'
 	url_shiki_api = url_shiki.format(url = '/api/{method}')
 	url_neko_anime = 'https://nekomori.ch/anime/-{id}/general'
@@ -35,7 +35,7 @@ class ShikiApi(InitParams):
 						saves.append(await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash']))
 		return [f'photo{save[0].owner_id}_{save[0].id}' for save in saves]
 
-class AMessage(InitParams):
+class AMessage(InitParams.Params):
 	url = 'http://tts.voicetech.yandex.net/tts'
 
 	class Params(dict):
@@ -56,7 +56,7 @@ class AMessage(InitParams):
 	async def get_text(self, audio_message):
 		pass
 
-class ThisWaifuDoesNotExist(InitParams):
+class ThisWaifuDoesNotExist(InitParams.Params):
 	url = 'https://www.thiswaifudoesnotexist.net/example-{id}.jpg'
 
 	def __call__(self, peer_id):
@@ -72,7 +72,7 @@ class ThisWaifuDoesNotExist(InitParams):
 					save = await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash'])
 		return f'photo{save[0].owner_id}_{save[0].id}'
 
-class Foaf(InitParams):
+class Foaf(InitParams.Params):
 	url = 'https://vk.com/foaf.php'
 
 	async def __call__(self, id):

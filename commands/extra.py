@@ -3,7 +3,7 @@ from vkbottle import keyboard_gen
 from random import randint, choice
 from re import search
 
-class ExtraCommands(InitParams):
+class ExtraCommands(InitParams.Params):
 	help = [
 		'/BAN[ <причина>] & <rep_mes> - типо бан',
 		'/Ord <chr>+ - код в юникоде символов',

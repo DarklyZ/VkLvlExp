@@ -13,7 +13,7 @@ class AddRule:
 		return cls
 
 @AddRule('audio_message')
-class AudioMessage(VBMLRule, InitParams):
+class AudioMessage(VBMLRule, InitParams.Params):
 	class AM(dict):
 		__getattr__ = dict.get
 
@@ -22,7 +22,7 @@ class AudioMessage(VBMLRule, InitParams):
 			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
 @AddRule('is_admin')
-class IsAdmin(AbstractMessageRule, InitParams):
+class IsAdmin(AbstractMessageRule, InitParams.Params):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -33,7 +33,7 @@ class IsAdmin(AbstractMessageRule, InitParams):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @AddRule('with_text')
-class WithText(AbstractMessageRule, InitParams):
+class WithText(AbstractMessageRule, InitParams.Params):
 	def __init__(self, wt):
 		self.wt = wt
 
