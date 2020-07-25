@@ -9,7 +9,7 @@ from os import getenv
 
 class Validators(PatchedValidators):
 	int = lambda self, value: int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
-	pos = lambda self, value: int(value) if value.isdigit() or value[:1] in '+' and value[1:].isdigit() else None
+	pos = lambda self, value: int(value) if value.isdigit() or value[:1] == '+' and value[1:].isdigit() else None
 	max = lambda self, value, extra: value if len(value) <= int(extra) else None
 	inc = lambda self, value, *extra: value.lower() if value.lower() in extra else None
 
