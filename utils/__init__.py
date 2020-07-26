@@ -10,16 +10,15 @@ class InitParams:
 
 	params = Params()
 
-	@classmethod
-	def __init__(cls, bot, database_url):
-		cls.params.bot = bot
+	def __init__(self, bot, database_url):
+		self.params.bot = bot
 		from utils.lvls import LVL
-		cls.params.lvl_class = LVL(database_url)
+		self.params.lvl_class = LVL(database_url)
 		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, Foaf
-		cls.params.amessage = AMessage()
-		cls.params.twdne = ThisWaifuDoesNotExist()
-		cls.params.shiki = ShikiApi()
-		cls.params.foaf = Foaf()
+		self.params.amessage = AMessage()
+		self.params.twdne = ThisWaifuDoesNotExist()
+		self.params.shiki = ShikiApi()
+		self.params.foaf = Foaf()
 
 		from datetime import datetime, tzinfo, timedelta
 
@@ -28,7 +27,7 @@ class InitParams:
 			dst = lambda self, dt: timedelta()
 			tzname = lambda self, dt: '+05:00'
 
-		cls.params.now = property(lambda self: datetime.now(timezone()))
+		self.params.now = property(lambda self: datetime.now(timezone()))
 
 	async def run_db(self):
 		await self.params.lvl_class.__aenter__()
