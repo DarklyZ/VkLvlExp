@@ -11,7 +11,7 @@ class ShikiApi(InitParams.Params):
 		self.peer_id = peer_id
 
 	async def search(self, type, text, page, limit = 5):
-		params, types = {'search': text}, ['chatacters', 'people']
+		params, types = {'search': text}, ['characters', 'people']
 		if type not in types: params.update({'censored': 'false', 'page': page, 'limit': str(limit)})
 		else: type += '/search'
 		async with request('GET', self.url_shiki_api.format(method = type), params = params) as response:
