@@ -1,6 +1,8 @@
+from datetime import datetime, tzinfo, timedelta
+from asyncio import sleep
 from asyncpg import connect
 from itertools import groupby
-from utils import InitParams
+from utils import InitData
 from pyaspeller import YandexSpeller
 from re import split, I
 
@@ -9,6 +11,13 @@ get = lambda dict, key: dict.get(key, '')
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
+
+class timezone(tzinfo):
+	utcoffset = lambda self, dt: timedelta(hours=5)
+	dst = lambda self, dt: timedelta()
+	tzname = lambda self, dt: '+05:00'
+
+tz = timezone()
 
 class YaSpeller(YandexSpeller):
 	def spell(self, text):
@@ -44,7 +53,7 @@ def atta(text = '', attachments = [], negative = False, return_errors = False):
 	count *= -1 if negative else 1
 	return (count, dict_errors) if return_errors else count
 
-class LVL(dict, InitParams.Params):
+class LVL(dict, InitData.Data):
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url
@@ -60,8 +69,21 @@ class LVL(dict, InitParams.Params):
 	async def __aexit__(self, exc_type, exc_val, exc_tb):
 		await self.con.close()
 
-	async def temp_reset(self):
-		await self.con.execute("update lvl set temp_exp = 0")
+	@property
+	def now(self):
+		return datetime.now(tz)
+
+	async def run_db(self):
+		await self.__aenter__()
+
+	async def run_top(self):
+		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+
+		temp = temp_new()
+		while not await sleep(5 * 60):
+			if self.now < temp: continue
+			await self.con.execute("update lvl set temp_exp = 0")
+			temp = temp_new()
 
 	async def update_lvl(self, *ids, lvl = 0, exp = 0, boost = False, temp = False):
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)

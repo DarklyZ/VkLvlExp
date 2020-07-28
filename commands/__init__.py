@@ -1,4 +1,4 @@
-from utils import InitParams
+from utils import InitData
 
 from commands.lvl import LVLCommands
 from commands.nick import NickCommands
@@ -7,7 +7,7 @@ from commands.shikimori import ShikimoriCommands
 from commands.chat_action import ChatActionCommands
 from commands.regex import RegexCommands
 
-class HelpCommand(InitParams.Params):
+class HelpCommand(InitData.Data):
 	help = [
 		'/Help LVL - уровни',
 		'/Help Nick - ники',

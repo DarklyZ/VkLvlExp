@@ -1,8 +1,7 @@
 from vbml import Patcher, PatchedValidators
-from vkbottle import Bot
 from vkbottle.ext import Middleware
 from vkbottle.utils import TaskManager
-from utils import InitParams
+from utils import InitData
 from utils.lvls import atta
 from re import I, S
 from os import getenv
@@ -14,27 +13,40 @@ class Validators(PatchedValidators):
 	inc = lambda self, value, *extra: value.lower() if value.lower() in extra else None
 
 Patcher(validators = Validators, flags = I + S)
-bot = Bot(getenv('TOKEN'), debug = False)
 
-task = TaskManager(bot.loop)
-task.add_task(bot.run(True))
+data = InitData(token = getenv('TOKEN'), database_url = getenv('DATABASE_URL'))
 
-bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
+task = TaskManager(data.bot.loop)
+task.add_task(data.bot.run(True))
 
-init_params = InitParams(bot = bot, database_url = getenv('DATABASE_URL'))
+data.bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 
-task.add_task(init_params.run_db)
-task.add_task(init_params.run_top)
+task.add_task(data.lvl_class.run_db)
+task.add_task(data.lvl_class.run_top)
 
-init_params.upload_commands()
+import commands, utils.rules
 
-@bot.middleware.middleware_handler()
-class Register(Middleware, InitParams.Params):
+commands.HelpCommand()
+commands.LVLCommands()
+commands.NickCommands()
+commands.ExtraCommands()
+commands.ShikimoriCommands()
+commands.ChatActionCommands()
+commands.RegexCommands()
+
+@data.bot.middleware.middleware_handler()
+class Register(Middleware, InitData.Data):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		self.set_peer_id(message.peer_id)
 		await self.lvl_class.check_add_user(message.from_id)
 		if not message.payload and (exp := atta(message.text, message.attachments)):
 			await self.lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
+
+	def set_peer_id(self, peer_id):
+		self.lvl_class(peer_id)
+		self.amessage(peer_id)
+		self.twdne(peer_id)
+		self.shiki(peer_id)
 
 task.run()

@@ -1,6 +1,6 @@
-from utils import InitParams
+from utils import InitData
 
-class ShikimoriCommands(InitParams.Params):
+class ShikimoriCommands(InitData.Data):
 	help = [
 		'/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>'
 	]

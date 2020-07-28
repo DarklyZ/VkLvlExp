@@ -1,9 +1,9 @@
-from utils import InitParams
+from utils import InitData
 from vkbottle import keyboard_gen
 from random import randint, choice
 from re import search
 
-class ExtraCommands(InitParams.Params):
+class ExtraCommands(InitData.Data):
 	help = [
 		'/BAN[ <причина>] & <rep_mes> - типо бан',
 		'/Ord <chr>+ - код в юникоде символов',

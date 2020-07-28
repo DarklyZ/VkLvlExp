@@ -1,7 +1,7 @@
-from utils import InitParams
+from utils import InitData
 from utils.lvls import atta
 
-class LVLCommands(InitParams.Params):
+class LVLCommands(InitData.Data):
 	help = [
 		'/MyLVL - мой уровень',
 		'/LVL & <rep_mes> - посмотреть уровень участника',

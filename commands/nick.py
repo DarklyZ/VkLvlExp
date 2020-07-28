@@ -1,11 +1,11 @@
-from utils import InitParams
+from utils import InitData
 
 def replace_smile(str):
 	for smile in ('🥇', '🥈', '🥉', '❸', '❷', '\n'):
 		str = str.replace(smile, '❌')
 	return str
 
-class NickCommands(InitParams.Params):
+class NickCommands(InitData.Data):
 	help = [
 		'/Set Nick <Ник> - заменить имя на ник',
 		'/Del Nick - вернуть имя'

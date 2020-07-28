@@ -1,5 +1,5 @@
 from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
-from utils import InitParams
+from utils import InitData
 from re import compile, I, S
 
 class AddRule:
@@ -13,7 +13,7 @@ class AddRule:
 		return cls
 
 @AddRule('audio_message')
-class AudioMessage(VBMLRule, InitParams.Params):
+class AudioMessage(VBMLRule, InitData.Data):
 	class AM(dict):
 		__getattr__ = dict.get
 
@@ -22,7 +22,7 @@ class AudioMessage(VBMLRule, InitParams.Params):
 			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
 @AddRule('is_admin')
-class IsAdmin(AbstractMessageRule, InitParams.Params):
+class IsAdmin(AbstractMessageRule, InitData.Data):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -33,7 +33,7 @@ class IsAdmin(AbstractMessageRule, InitParams.Params):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @AddRule('with_text')
-class WithText(AbstractMessageRule, InitParams.Params):
+class WithText(AbstractMessageRule, InitData.Data):
 	def __init__(self, wt):
 		self.wt = wt
 
