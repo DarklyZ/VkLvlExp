@@ -14,5 +14,6 @@ class InitData:
 		self.shiki = ShikiApi()
 		self.foaf = Foaf()
 
-	__getattr__ = lambda self, key: getattr(self.Data, key)
+	__getattr__ = lambda self, item: getattr(self.Data, item)
 	__setattr__ = lambda self, key, value: setattr(self.Data, key, value)
+	__delattr__ = lambda self, item: delattr(self.Data, item)
