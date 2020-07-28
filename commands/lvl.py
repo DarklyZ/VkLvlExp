@@ -7,7 +7,8 @@ class LVLCommands(InitParams.Params):
 		'/LVL & <rep_mes> - посмотреть уровень участника',
 		'/Tele <count> & <rep_mes> - передать свою exp другому',
 		'/TopLVL[ <от> <до>] - топ 10 участников',
-		'/TopTemp[ <от> <до>] - временный топ 10 участников'
+		'/TopTemp[ <от> <до>] - временный топ 10 участников',
+		'/Info & <rep_mes> - узнать вес сообщения'
 	]
 
 	def __init__(self):
