@@ -39,6 +39,6 @@ class ExtraCommands(InitData.Data):
 			await self.lvl_class.user(id)
 			await message(message = f"Я проследила за пользователем: {self.lvl_class[id]},\nон создал страницу: {date['D']}-{date['M']}-{date['Y']}")
 
-		@self.bot.on.chat_message(text = 'test <text>', command = True)
-		async def test(message, text):
+		@self.bot.on.chat_message(text = 'tts <text>', command = True)
+		async def tts(message, text):
 			await message(attachment = await self.amessage.get_doc(text))
