@@ -43,7 +43,7 @@ class ShikiApi(InitData.Data):
 
 	async def search(self, type, text, page, limit = 5):
 		data, types = {'search': text}, ['characters', 'people']
-		if type not in types: data.update({'censored': 'false', 'page': page, 'limit': str(limit)})
+		if type not in types: data.update({'censored': 'false', 'page': page, 'limit': limit})
 		else: type += '/search'
 		async with request('GET', self.url_shiki_api.format(method = type), data = data) as response:
 			res = await response.json()
