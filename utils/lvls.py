@@ -3,7 +3,6 @@ from asyncio import sleep
 from asyncpg import connect
 from itertools import groupby
 from utils import InitData
-from pyaspeller import YandexSpeller
 from re import split, I
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
