@@ -44,7 +44,7 @@ class LVL(dict, InitData.Data):
 		self.con = await connect(self.database_url, ssl = 'require')
 
 	async def run_top(self):
-		temp_new = lambda: self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+		temp_new = lambda: datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
 		temp = temp_new()
 		while not await sleep(5 * 60):
