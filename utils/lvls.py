@@ -142,9 +142,9 @@ class LVL(dict, InitData.Data):
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
 			elif attachment.type == 'wall':
-				count += atta(attachment.wall.text, attachment.wall.attachments)
+				count += LVL.atta(attachment.wall.text, attachment.wall.attachments)
 			elif attachment.type == 'wall_reply':
-				count += atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
+				count += LVL.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
 			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
 				count += 20
 			elif attachment.type == 'audio_message':
