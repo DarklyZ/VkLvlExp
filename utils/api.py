@@ -5,10 +5,10 @@ from aiohttp import request
 class YaSpeller:
 	api = 'http://speller.yandex.net/services/spellservice.json/checkText'
 
-	def __init__(self, lang=None, ignore_urls=False, ignore_capitalization=False,
-			ignore_digits=False, ignore_latin=False, ignore_roman_numerals=False,
-			ignore_uppercase=False, find_repeat_words=False, flag_latin=False,
-			by_words=False):
+	def __init__(self, lang = None, ignore_urls = False, ignore_capitalization = False,
+			ignore_digits = False, ignore_latin = False, ignore_roman_numerals = False,
+			ignore_uppercase = False, find_repeat_words = False, flag_latin = False,
+			by_words = False):
 
 		self.lang = lang or ['en', 'ru']
 
