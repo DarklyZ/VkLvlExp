@@ -31,7 +31,6 @@ class YaSpeller(YandexSpeller):
 
 speller = YaSpeller()
 
-
 class LVL(dict, InitData.Data):
 	def __init__(self, database_url):
 		super().__init__()
