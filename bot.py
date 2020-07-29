@@ -21,7 +21,7 @@ task.add_task(data.bot.run(True))
 
 data.bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 
-task.add_task(data.lvl_class.run_db)
+task.add_task(data.lvl_class.run_connect)
 task.add_task(data.lvl_class.run_top)
 
 import commands, utils.rules
@@ -30,7 +30,6 @@ commands.HelpCommand()
 commands.LVLCommands()
 commands.NickCommands()
 commands.ExtraCommands()
-commands.ShikimoriCommands()
 commands.ChatActionCommands()
 commands.RegexCommands()
 

@@ -70,7 +70,7 @@ class ThisWaifuDoesNotExist(InitData.Data):
 					save = await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash'])
 		return f'photo{save[0].owner_id}_{save[0].id}'
 
-class Foaf(InitData.Data):
+class FoafPHP(InitData.Data):
 	url = 'https://vk.com/foaf.php'
 
 	async def __call__(self, id):

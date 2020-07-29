@@ -3,7 +3,6 @@ from utils import InitData
 from commands.lvl import LVLCommands
 from commands.nick import NickCommands
 from commands.extra import ExtraCommands
-from commands.shikimori import ShikimoriCommands
 from commands.chat_action import ChatActionCommands
 from commands.regex import RegexCommands
 

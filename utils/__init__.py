@@ -12,7 +12,7 @@ class InitData:
 		self.amessage = AMessage()
 		self.twdne = ThisWaifuDoesNotExist()
 		self.shiki = ShikiApi()
-		self.foaf = Foaf()
+		self.foaf = FoafPHP()
 
 	__getattr__ = lambda self, item: getattr(self.Data, item)
 	__setattr__ = lambda self, key, value: setattr(self.Data, key, value)
