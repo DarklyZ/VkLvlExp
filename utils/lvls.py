@@ -3,6 +3,8 @@ from asyncio import sleep
 from asyncpg import connect
 from itertools import groupby
 from utils import InitData
+from pyaspeller import YandexSpeller
+from re import split, I
 
 bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
 get = lambda dict, key: dict.get(key, '')
@@ -17,7 +19,51 @@ class timezone(tzinfo):
 
 tz = timezone()
 
+class YaSpeller(YandexSpeller):
+	def spell(self, text):
+		text = self._prepare_text(text)
+
+		if text:
+			for item in self._spell_text(text):
+				yield item
+		else:
+			raise NotImplementedError()
+
+speller = YaSpeller()
+
+
 class LVL(dict, InitData.Data):
+	@staticmethod
+	def atta(text = '', attachments = [], negative = False, return_errors = False):
+		if text:
+			dict_errors = {change['word']: change['s'] for change in speller.spell(text)}
+			s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, flags=I) if
+			        len(chars) >= 3 and chars not in dict_errors)
+			count = s if s < 50 else 50
+		else:
+			count, dict_errors = 0, {}
+
+		for attachment in attachments:
+			if attachment.type == 'photo':
+				pixel = max(size.width * size.height for size in attachment.photo.sizes)
+				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
+			elif attachment.type == 'wall':
+				count += atta(attachment.wall.text, attachment.wall.attachments)
+			elif attachment.type == 'wall_reply':
+				count += atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
+			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
+				count += 20
+			elif attachment.type == 'audio_message':
+				count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
+			elif attachment.type == 'video':
+				count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
+			elif attachment.type == 'sticker':
+				count += 10
+			elif attachment.type == 'audio':
+				count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
+		count *= -1 if negative else 1
+		return (count, dict_errors) if return_errors else count
+
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url
