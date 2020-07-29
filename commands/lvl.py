@@ -23,7 +23,7 @@ class LVLCommands(InitData.Data):
 
 		@self.bot.on.chat_message(text = ['tele <exp:pos>', 'tele <exp:inc[up]>'], command = True, with_reply_message = True, from_id_pos = True)
 		async def tele(message, exp):
-			if exp == 'up': exp = self.lvl_class.atta(message.reply_message.text, message.reply_message.attachments)
+			if exp == 'up': exp = await self.lvl_class.atta(message.reply_message.text, message.reply_message.attachments)
 			if await self.lvl_class.remove_exp(id1 := message.from_id, exp = exp):
 				await self.lvl_class.update_lvl(id2 := message.reply_message.from_id, exp = exp)
 				await self.lvl_class.send(id1, id2)
@@ -35,14 +35,14 @@ class LVLCommands(InitData.Data):
 
 		@self.bot.on.chat_message(text = ['exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'], command = True, is_admin = True, with_reply_message = True)
 		async def exp(message, exp, lvl = 0):
-			if exp in ('up', 'down'): exp = self.lvl_class.atta(message.reply_message.text, message.reply_message.attachments, exp == 'down')
+			if exp in ('up', 'down'): exp = await self.lvl_class.atta(message.reply_message.text, message.reply_message.attachments, exp == 'down')
 			await self.lvl_class.update_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
 			await self.lvl_class.send(id)
 			await message((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + self.lvl_class[id])
 
 		@self.bot.on.chat_message(text = 'info', command = True, with_reply_message = True)
 		async def info(message):
-			exp, errors = self.lvl_class.atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
+			exp, errors = await self.lvl_class.atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
 			extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 			await message(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
 

@@ -19,18 +19,6 @@ class timezone(tzinfo):
 
 tz = timezone()
 
-class YaSpeller(YandexSpeller):
-	def spell(self, text):
-		text = self._prepare_text(text)
-
-		if text:
-			for item in self._spell_text(text):
-				yield item
-		else:
-			raise NotImplementedError()
-
-speller = YaSpeller()
-
 class LVL(dict, InitData.Data):
 	def __init__(self, database_url):
 		super().__init__()
@@ -127,10 +115,10 @@ class LVL(dict, InitData.Data):
 	async def hello_text(self):
 		return (row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)) and row['text']
 
-	@staticmethod
-	def atta(text = '', attachments = [], negative = False, return_errors = False):
+	@classmethod
+	async def atta(cls, text = '', attachments = [], negative = False, return_errors = False):
 		if text:
-			dict_errors = {change['word']: change['s'] for change in speller.spell(text)}
+			dict_errors = {change['word']: change['s'] for change in await cls.speller.spell(text)}
 			s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, flags=I) if
 			        len(chars) >= 3 and chars not in dict_errors)
 			count = s if s < 50 else 50
@@ -142,9 +130,9 @@ class LVL(dict, InitData.Data):
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
 			elif attachment.type == 'wall':
-				count += LVL.atta(attachment.wall.text, attachment.wall.attachments)
+				count += await cls.atta(attachment.wall.text, attachment.wall.attachments)
 			elif attachment.type == 'wall_reply':
-				count += LVL.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
+				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
 			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
 				count += 20
 			elif attachment.type == 'audio_message':

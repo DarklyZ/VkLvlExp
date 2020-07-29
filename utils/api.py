@@ -2,6 +2,37 @@ from utils import InitData
 from io import BytesIO
 from aiohttp import request
 
+class YaSpeller:
+	api = 'http://speller.yandex.net/services/spellservice.json/checkText'
+
+	def __init__(self, lang=None, ignore_urls=False, ignore_capitalization=False,
+			ignore_digits=False, ignore_latin=False, ignore_roman_numerals=False,
+			ignore_uppercase=False, find_repeat_words=False, flag_latin=False,
+			by_words=False):
+
+		self.lang = lang or ['en', 'ru']
+
+		self.options = 0
+		if ignore_uppercase: self.options |= 1
+		if ignore_digits: self.options |= 2
+		if ignore_urls: self.options |= 4
+		if find_repeat_words: self.options |= 8
+		if ignore_latin: self.options |= 16
+		if flag_latin: self.options |= 128
+		if by_words: self.options |= 256
+		if ignore_capitalization: self.options |= 512
+		if ignore_roman_numerals: self.options |= 2048
+
+	async def spell(self, text):
+		lang = ','.join(self.lang)
+		data = {
+			'text': text,
+			'options': self.options,
+			'lang': lang,
+		}
+		async with request('POST', self.api, data = data) as response:
+			return await response.json()
+
 class ShikiApi(InitData.Data):
 	url_shiki = 'http://shikimori.one{url}'
 	url_shiki_api = url_shiki.format(url = '/api/{method}')
@@ -11,12 +42,12 @@ class ShikiApi(InitData.Data):
 		self.peer_id = peer_id
 
 	async def search(self, type, text, page, limit = 5):
-		params, types = {'search': text}, ['characters', 'people']
-		if type not in types: params.update({'censored': 'false', 'page': page, 'limit': str(limit)})
+		data, types = {'search': text}, ['characters', 'people']
+		if type not in types: data.update({'censored': 'false', 'page': page, 'limit': str(limit)})
 		else: type += '/search'
-		async with request('GET', self.url_shiki_api.format(method = type), params = params) as response:
+		async with request('GET', self.url_shiki_api.format(method = type), data = data) as response:
 			res = await response.json()
-			return res[(page - 1) * limit : (page - 1) * limit + limit] if len(params) == 1 else res
+			return res[(page - 1) * limit : (page - 1) * limit + limit] if len(data) == 1 else res
 
 	async def get_shiki_short_link(self, url):
 		return (await self.bot.api.utils.get_short_link(self.url_shiki.format(url = url))).short_url[8:]
@@ -38,14 +69,14 @@ class ShikiApi(InitData.Data):
 
 class AMessage(InitData.Data):
 	url = 'http://tts.voicetech.yandex.net/tts'
-	params = {'voice': 'alyss', 'emotion': 'evil', 'speed': '1.1'}
+	data = {'voice': 'alyss', 'emotion': 'evil', 'speed': 1.1}
 
 	def __call__(self, peer_id):
 		self.peer_id = peer_id
 
 	async def get_doc(self, text):
 		server = await self.bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = self.peer_id)
-		async with request('GET', self.url, params = {'text': text, **self.params}) as response:
+		async with request('GET', self.url, data = {'text': text, **self.data}) as response:
 			with BytesIO(await response.read()) as bfile:
 				async with request('POST', server.upload_url, data = {'file': bfile}) as response:
 					save = await self.bot.api.docs.save(file = (await response.json())['file'])

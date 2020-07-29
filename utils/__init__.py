@@ -5,13 +5,14 @@ class InitData:
 	def __init__(self, token, database_url, debug = False):
 		from utils.lvls import LVL
 		from vkbottle import Bot
-		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP
+		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
 		self.bot = Bot(token, debug = debug)
 		self.lvl_class = LVL(database_url)
 		self.amessage = AMessage()
 		self.twdne = ThisWaifuDoesNotExist()
 		self.shiki = ShikiApi()
+		self.speller = YaSpeller()
 		self.foaf = FoafPHP()
 
 	__getattr__ = lambda self, item: getattr(self.Data, item)
