@@ -1,4 +1,4 @@
-https://github.com/DarlyZ/vkbottle/archive/patch.zip
+https://github.com/timoniq/vkbottle/archive/master.zip
 asyncpg
 loguru
 uvloop
