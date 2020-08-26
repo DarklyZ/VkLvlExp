@@ -13,15 +13,14 @@ class Validators(PatchedValidators):
 
 Patcher(validators = Validators, flags = I + S)
 
-data = InitData(token = getenv('TOKEN'), database_url = getenv('DATABASE_URL'))
+with InitData(token = getenv('TOKEN'), database_url = getenv('DATABASE_URL')) as data:
+	task = TaskManager(data.bot.loop)
+	task.add_task(data.bot.run(True))
 
-task = TaskManager(data.bot.loop)
-task.add_task(data.bot.run(True))
+	data.bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
 
-data.bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
-
-task.add_task(data.lvl_class.run_connect)
-task.add_task(data.lvl_class.run_top)
+	task.add_task(data.lvl_class.run_connect)
+	task.add_task(data.lvl_class.run_top)
 
 import commands, utils.rules
 
