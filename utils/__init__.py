@@ -14,10 +14,9 @@ class InitData:
 		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
 		with self as data:
-			data.bot = Bot(token, debug = debug)
-			data.lvl_class = LVL(database_url)
-			data.amessage = AMessage()
-			data.twdne = ThisWaifuDoesNotExist()
-			data.shiki = ShikiApi()
-			data.speller = YaSpeller()
-			data.foaf = FoafPHP()
+			data.bot = Bot(token, debug = debug); data.bot.loop_update()
+			data.bot.on.chat_message.prefix = [r'\.', '/', '!', ':']
+
+			data.lvl_class, data.amessage = LVL(database_url), AMessage()
+			data.twdne, data.shiki = ThisWaifuDoesNotExist(), ShikiApi()
+			data.speller, data.foaf = YaSpeller(), FoafPHP()
