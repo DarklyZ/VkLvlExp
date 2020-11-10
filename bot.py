@@ -1,8 +1,11 @@
 from vkbottle import BaseMiddleware, Bot
+from loguru._defaults import LOGURU_ERROR_NO
+from vkbottle.modules import logger
 from utils import InitData
 from vbml import Patcher
 from os import getenv
 
+logger._core.min_level = LOGURU_ERROR_NO
 patcher = Patcher()
 
 @patcher.validator(key = 'int')
