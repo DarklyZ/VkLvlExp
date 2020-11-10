@@ -38,9 +38,9 @@ class Register(BaseMiddleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
+	data.bot.polling.wait = 25
 	data.bot.labeler.message_view.register_middleware(Register())
 
 	import utils.rules
