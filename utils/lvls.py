@@ -74,7 +74,7 @@ class LVL(dict, InitData.Data):
 				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 				if row['row_number'] % 2 != 0}
 		self.update({user.id : f"{get(top, user.id)}{get(topboost, user.id)}{bdate(user, datetime.now(tz))}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
-		        for user in await self.bot.api.users.get(user_ids = ids, fields = 'bdate')})
+		        for user in await self.bot.api.users.get(user_ids = str(ids)[1:-1], fields = 'bdate')})
 
 	async def send(self, *ids):
 		lvl = {row['user_id'] : f"{row['lvl']}Ⓛ|{row['exp']}/{row['lvl'] * 2000}Ⓔ"
@@ -87,7 +87,7 @@ class LVL(dict, InitData.Data):
 		except: return f'Я не могу отобразить {x} - {y}'
 		if rows:
 			await self.user(*(row['user_id'] for row in rows))
-			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ"for row in rows)
+			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 		else: return "TOPLVL пустой"
 
 	async def toptemp_size(self, x, y):
@@ -95,7 +95,7 @@ class LVL(dict, InitData.Data):
 		except: return f'Я не могу отобразить {x} - {y}'
 		if rows:
 			await self.user(*(row['user_id'] for row in rows))
-			return f"TOPTEMP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['temp_exp']}ⓉⒺ"for row in rows)
+			return f"TOPTEMP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['temp_exp']}ⓉⒺ" for row in rows)
 		else: return "TOPTEMP пустой"
 
 	async def check_add_user(self, id):

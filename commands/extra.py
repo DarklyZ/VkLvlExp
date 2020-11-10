@@ -1,63 +1,66 @@
 from utils import InitData
-from vkbottle import keyboard_gen
+from vkbottle.tools import Keyboard, Text, KeyboardButtonColor
+from vkbottle.bot import BotLabeler
 from random import randint, choice
 from re import search
 
-class ExtraCommands(InitData.Data):
-	help = [
-		'/BAN[ <причина>] & <rep_mes> - типо бан',
-		'/Ord <chr>+ - код в юникоде символов',
-		'/TWDNE - покажет рандомную вайфу с сайта ThisWaifuDoesNotExist',
-		'/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>'
-	]
+help = [
+	'/BAN[ <причина>] & <rep_mes> - типо бан',
+	'/Ord <chr>+ - код в юникоде символов',
+	'/TWDNE - покажет рандомную вайфу с сайта ThisWaifuDoesNotExist',
+	'/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>',
+	'/TTS <text> - Озвучит <text>'
+]
 
-	def __init__(self):
-		@self.bot.on.chat_message(text = ['ban <text>', 'ban'], command = True, with_reply_message = True)
-		async def ban(message, text = 'не указана'):
-			await self.lvl_class.user(id := message.reply_message.from_id)
-			await message(f"Бан пользователя:\n{self.lvl_class[id]}\nПричина: {text}", keyboard = keyboard_gen([
-				[{'text': 'Ясно-понятно', 'color': 'positive', 'payload': {'command': 'ban'}}]
-			], inline = True))
+with InitData.With as data:
+	bl = BotLabeler()
 
-		@self.bot.on.chat_message(text = ['echo <text>', 'echo'], command = True, is_admin = True)
-		async def echo(message, text = 'Сообщение не указано'):
-			await message(f'{text}\n' + ''.join(f"[id{item['member_id']}|💬]"
-					for item in (await self.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
-					if item['member_id'] > 0 and item['member_id'] != message.from_id))
+	@bl.chat_message(command = ['ban <text>', 'ban'], with_reply_message = True)
+	async def ban(message, command = 'не указана'):
+		await data.lvl_class.user(id := message.reply_message.from_id)
+		await message.answer(f"Бан пользователя:\n{data.lvl_class[id]}\nПричина: {text}", keyboard = Keyboard(inline = True)
+		              .add(Text(label = 'Ясно-понятно', payload = {'command': 'ban'}), color = KeyboardButtonColor.POSITIVE)
+		              .get_json())
 
-		@self.bot.on.chat_message(text = 'ord', command = True, with_reply_message = True)
-		async def ordo(message):
-			await message(f'Не знаю зачем тебе, но получай: {[ord(text) for text in message.reply_message.text]}')
+	@bl.chat_message(command = ['echo <text>', 'echo'], is_admin = True)
+	async def echo(message, command = 'Сообщение не указано'):
+		await message.answer(f'{text}\n' + ''.join(f"[id{item['member_id']}|💬]"
+				for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
+				if item['member_id'] > 0 and item['member_id'] != message.from_id))
 
-		@self.bot.on.chat_message(text = 'twdne', command = True)
-		async def twdne(message):
-			compliment = choice(('симпатичная', 'привлекательная', 'виртуозная', 'превосходная', 'милая', 'бесценная'))
-			await message(message = f'Эта вайфу такая {compliment}', attachment = await self.twdne.get_doc(randint(1, 99999)))
+	@bl.chat_message(command = 'ord', with_reply_message = True)
+	async def ordo(message):
+		await message.answer(f'Не знаю зачем тебе, но получай: {[ord(text) for text in message.reply_message.text]}')
 
-		@self.bot.on.chat_message(text = 'date', command = True, with_reply_message = True)
-		async def date_created(message):
-			date = search(r'<ya:created dc:date="(?P<Y>\d{4})-(?P<M>\d{2})-(?P<D>\d{2}).+?"/>', await self.foaf(id := message.reply_message.from_id))
-			await self.lvl_class.user(id)
-			await message(message = f"Я проследила за пользователем: {self.lvl_class[id]},\nон создал страницу: {date['D']}-{date['M']}-{date['Y']}")
+	@bl.chat_message(command = 'twdne')
+	async def twdne(message):
+		compliment = choice(('симпатичная', 'привлекательная', 'виртуозная', 'превосходная', 'милая', 'бесценная'))
+		await message.answer(message = f'Эта вайфу такая {compliment}', attachment = await data.twdne.get_doc(randint(1, 99999)))
 
-		@self.bot.on.chat_message(text = 'tts <text>', command = True)
-		async def tts(message, text):
-			await message(attachment = await self.amessage.get_doc(text))
+	@bl.chat_message(command = 'date', with_reply_message = True)
+	async def date_created(message):
+		date = search(r'<ya:created dc:date="(?P<Y>\d{4})-(?P<M>\d{2})-(?P<D>\d{2}).+?"/>', await data.foaf(id := message.reply_message.from_id))
+		await data.lvl_class.user(id)
+		await message.answer(message = f"Я проследила за пользователем: {data.lvl_class[id]},\nон создал страницу: {date['D']}-{date['M']}-{date['Y']}")
 
-		@self.bot.on.chat_message(text = ['ss <type:inc[animes,mangas,ranobe,characters,people]> <page:pos> <text>',
-				'ss <type:inc[animes,mangas,ranobe,characters,people]> <text>'], command = True)
-		async def shiki_search(message, type, text, page = 1):
-			response = await self.shiki.search(type, text, page)
-			if response:
-				objs = [
-					[
-						f"{num + 1}) {item['russian'] or item['name']}",
-						'Шики: ' + await self.shiki.get_shiki_short_link(item['url']),
-						'Неко: ' + await self.shiki.get_neko_short_link(item['id']) if type == 'animes' else None
-					]
-					for num, item in enumerate(response)
+	@bl.chat_message(command = 'tts <text>')
+	async def tts(message, text):
+		await message.answer(attachment = await data.amessage.get_doc(text))
+
+	@bl.chat_message(command = ['ss <type:inc[animes,mangas,ranobe,characters,people]> <page:pos> <text>',
+			'ss <type:inc[animes,mangas,ranobe,characters,people]> <text>'])
+	async def shiki_search(message, type, text, page = 1):
+		response = await data.shiki.search(type, text, page)
+		if response:
+			objs = [
+				[
+					f"{num + 1}) {item['russian'] or item['name']}",
+					'Шики: ' + await data.shiki.get_shiki_short_link(item['url']),
+					'Неко: ' + await data.shiki.get_neko_short_link(item['id']) if type == 'animes' else None
 				]
-				text = '\n'.join('\n'.join(i for i in item if i) for item in objs)
-				docs = await self.shiki.get_doc(item['image']['original'] for item in response)
-				await message(text, attachment = ','.join(docs))
-			else: await message('Не найдено')
+				for num, item in enumerate(response)
+			]
+			command = '\n'.join('\n'.join(i for i in item if i) for item in objs)
+			docs = await data.shiki.get_doc(item['image']['original'] for item in response)
+			await message.answer(text, attachment = ','.join(docs))
+		else: await message.answer('Не найдено')

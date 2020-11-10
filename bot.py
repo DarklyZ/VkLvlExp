@@ -1,41 +1,33 @@
-from vbml import Patcher, PatchedValidators
-from vkbottle.ext import Middleware
-from vkbottle.utils import TaskManager
+from vkbottle import BaseMiddleware, Bot
 from utils import InitData
-from re import I, S
+from vbml import Patcher
 from os import getenv
 
-class Validators(PatchedValidators):
-	int = lambda self, value: int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
-	pos = lambda self, value: int(value) if value.isdigit() or value[:1] == '+' and value[1:].isdigit() else None
-	max = lambda self, value, extra: value if len(value) <= int(extra) else None
-	inc = lambda self, value, *extra: value.lower() if value.lower() in extra else None
+patcher = Patcher()
 
-Patcher(validators = Validators, flags = I + S)
+@patcher.validator(key = 'int')
+def int_validator(value):
+	return int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
 
-with InitData(token = getenv('TOKEN'), database_url = getenv('DATABASE_URL')) as data:
-	task = TaskManager(data.bot.loop, auto_reload = True)
-	task.add_task(data.bot.run(True))
-	task.add_task(data.lvl_class.run_connect)
-	task.add_task(data.lvl_class.run_top)
+@patcher.validator(key = 'pos')
+def pos_validator(value):
+	return int(value) if value.isdigit() or value[:1] == '+' and value[1:].isdigit() else None
 
-import commands, utils.rules
+@patcher.validator(key = 'max')
+def max_validator(value, extra):
+	return value if len(value) <= int(extra) else None
 
-commands.HelpCommand()
-commands.LVLCommands()
-commands.NickCommands()
-commands.ExtraCommands()
-commands.ChatActionCommands()
-commands.RegexCommands()
+@patcher.validator(key = 'inc')
+def inc_validator(value, *extra):
+	return value.lower() if value.lower() in extra else None
 
-@data.bot.middleware.middleware_handler()
-class Register(Middleware, InitData.Data):
+class Register(BaseMiddleware, InitData.Data):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		self.set_peer_id(message.peer_id)
 		await self.lvl_class.check_add_user(message.from_id)
 		if not message.payload and (exp := await self.lvl_class.atta(message.text, message.attachments)):
-			await self.lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
+			await self.lvl_class.update_lvl(message.from_id, exp=exp, boost=True, temp=True)
 
 	def set_peer_id(self, peer_id):
 		self.lvl_class(peer_id)
@@ -43,4 +35,18 @@ class Register(Middleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-task.run()
+
+with InitData(getenv('DATABASE_URL')) as data:
+	data.bot = Bot(getenv('TOKEN'))
+	data.bot.labeler.message_view.register_middleware(Register())
+
+	import utils.rules
+	from commands import labelers
+
+	for custom_labeler in labelers:
+		data.bot.labeler.load(custom_labeler)
+
+	data.bot.loop_wrapper.add_task(data.lvl_class.run_connect)
+	data.bot.loop_wrapper.add_task(data.lvl_class.run_top)
+
+	data.bot.run_forever()

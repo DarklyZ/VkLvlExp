@@ -1,16 +1,33 @@
-from vkbottle.rule import AbstractMessageRule, ChatActionRule, VBMLRule
+from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
 from utils import InitData
 from re import compile, I, S
 
+from vbml import Pattern
+
 class AddRule:
-	from vkbottle.framework.framework.handler.message import COL_RULES
+	from vkbottle.framework.bot.labeler.default import DEFAULT_CUSTOM_RULES
 
 	def __init__(self, name):
 		self.name = name
 
 	def __call__(self, cls):
-		self.COL_RULES[self.name] = cls
+		self.DEFAULT_CUSTOM_RULES[self.name] = cls
 		return cls
+
+@AddRule('command')
+class CommandVBMLRule(VBMLRule):
+	def __init__(self, pattern):
+		regex = r'[\./!:]{}$'
+
+		if isinstance(pattern, str):
+			pattern = [Pattern(pattern, regex = regex, flags = I | S)]
+		elif isinstance(pattern, Pattern):
+			pattern = [pattern]
+		elif isinstance(pattern, list):
+			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = I | S) for p in pattern]
+
+		self.patterns = pattern
+		self.patcher = self.config["vbml_patcher"]
 
 @AddRule('audio_message')
 class AudioMessage(VBMLRule, InitData.Data):
@@ -22,7 +39,7 @@ class AudioMessage(VBMLRule, InitData.Data):
 			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
 @AddRule('is_admin')
-class IsAdmin(AbstractMessageRule, InitData.Data):
+class IsAdmin(ABCMessageRule, InitData.Data):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -33,7 +50,7 @@ class IsAdmin(AbstractMessageRule, InitData.Data):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @AddRule('with_text')
-class WithText(AbstractMessageRule, InitData.Data):
+class WithText(ABCMessageRule, InitData.Data):
 	def __init__(self, wt):
 		self.wt = wt
 
@@ -42,7 +59,7 @@ class WithText(AbstractMessageRule, InitData.Data):
 		return self.wt and text or not self.wt and not text
 
 @AddRule('with_reply_message')
-class WithReplyMessage(AbstractMessageRule):
+class WithReplyMessage(ABCMessageRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
 	
@@ -51,7 +68,7 @@ class WithReplyMessage(AbstractMessageRule):
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
 
 @AddRule('from_id_pos')
-class FromIdPos(AbstractMessageRule):
+class FromIdPos(ABCMessageRule):
 	def __init__(self, fip):
 		self.fip = fip
 	
@@ -60,9 +77,9 @@ class FromIdPos(AbstractMessageRule):
 		return self.fip and is_fip or not self.fip and not is_fip
 
 @AddRule('regex')
-class RegexRule(AbstractMessageRule):
+class RegexRule(ABCMessageRule):
 	def __init__(self, regex):
-		self.compile = compile(regex, flags = I + S)
+		self.compile = compile(regex, flags = I | S)
 
 	async def check(self, message):
 		return bool(self.compile.search(message.text))
