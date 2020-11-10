@@ -16,14 +16,14 @@ with InitData.With as data:
 	bl = BotLabeler()
 
 	@bl.chat_message(command = ['ban <text>', 'ban'], with_reply_message = True)
-	async def ban(message, command = 'не указана'):
+	async def ban(message, text = 'не указана'):
 		await data.lvl_class.user(id := message.reply_message.from_id)
 		await message.answer(f"Бан пользователя:\n{data.lvl_class[id]}\nПричина: {text}", keyboard = Keyboard(inline = True)
 		              .add(Text(label = 'Ясно-понятно', payload = {'command': 'ban'}), color = KeyboardButtonColor.POSITIVE)
 		              .get_json())
 
 	@bl.chat_message(command = ['echo <text>', 'echo'], is_admin = True)
-	async def echo(message, command = 'Сообщение не указано'):
+	async def echo(message, text = 'Сообщение не указано'):
 		await message.answer(f'{text}\n' + ''.join(f"[id{item['member_id']}|💬]"
 				for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
 				if item['member_id'] > 0 and item['member_id'] != message.from_id))
