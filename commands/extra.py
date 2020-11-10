@@ -9,7 +9,7 @@ help = [
 	'/Ord <chr>+ - код в юникоде символов',
 	'/TWDNE - покажет рандомную вайфу с сайта ThisWaifuDoesNotExist',
 	'/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>',
-	'/TTS <text> - Озвучит <text>'
+	'/TTS <text> - озвучит <text>'
 ]
 
 with InitData.With as data:
