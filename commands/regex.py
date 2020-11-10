@@ -9,15 +9,15 @@ with InitData.With as data:
 	@bl.chat_message(regex = r'^f+$')
 	async def f_f(message):
 		rand = choice((457241326,457241327,457241328,457241331,457241332,457241333,457241334,457241338,457241339))
-		await message.answer('Пал боец\nСмертью храбрых', attachment = f'photo-{data.bot.group_id}_{rand}')
+		await message.answer('Пал боец\nСмертью храбрых', attachment = f'photo-{data.bot.polling.group_id}_{rand}')
 
 	@bl.chat_message(regex = r'^[^\?]*\?{3}$')
 	async def hm_(message):
-		await message.answer(attachment = f'photo-{bl.group_id}_457241329')
+		await message.answer(attachment = f'photo-{data.bot.polling.group_id}_457241329')
 
 	@bl.chat_message(regex = r'^[^\?]*\?{2}$')
 	async def h_(message):
-		await message.answer(attachment = f'photo-{bl.group_id}_457241330')
+		await message.answer(attachment = f'photo-{data.bot.polling.group_id}_457241330')
 
 	@bl.chat_message(regex = r'\bня\b')
 	async def nya(message):
