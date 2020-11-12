@@ -40,7 +40,7 @@ class Register(BaseMiddleware, InitData.Data):
 
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
-	data.bot.polling.wait = 25
+	data.bot.polling.wait = 40
 	data.bot.labeler.message_view.register_middleware(Register())
 
 	import utils.rules
