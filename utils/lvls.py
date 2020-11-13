@@ -1,3 +1,4 @@
+from vkbottle_types.objects import MessagesMessageAttachmentType as MType
 from datetime import datetime, tzinfo, timedelta
 from asyncio import sleep
 from asyncpg import connect
@@ -124,22 +125,22 @@ class LVL(dict, InitData.Data):
 			count, dict_errors = 0, {}
 
 		for attachment in attachments:
-			if attachment.type == 'photo':
+			if attachment.type == MType.PHOTO:
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
-			elif attachment.type == 'wall':
+			elif attachment.type == MType.WALL:
 				count += await cls.atta(attachment.wall.text, attachment.wall.attachments)
-			elif attachment.type == 'wall_reply':
+			elif attachment.type == MType.WALL_REPLY:
 				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
-			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
+			elif attachment.type == MType.DOC and attachment.doc.ext == 'gif':
 				count += 20
-			elif attachment.type == 'audio_message':
+			elif attachment.type == MType.AUDIO_MESSAGE:
 				count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
-			elif attachment.type == 'video':
+			elif attachment.type == MType.VIDEO:
 				count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
-			elif attachment.type == 'sticker':
+			elif attachment.type == MType.STICKER:
 				count += 10
-			elif attachment.type == 'audio':
+			elif attachment.type == MType.AUDIO:
 				count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
 		count *= -1 if negative else 1
 		return (count, dict_errors) if return_errors else count
