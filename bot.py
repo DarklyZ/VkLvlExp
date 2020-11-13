@@ -30,7 +30,7 @@ class Register(BaseMiddleware, InitData.Data):
 		self.set_peer_id(message.peer_id)
 		await self.lvl_class.check_add_user(message.from_id)
 		if not message.payload and (exp := await self.lvl_class.atta(message.text, message.attachments)):
-			await self.lvl_class.update_lvl(message.from_id, exp=exp, boost=True, temp=True)
+			await self.lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
 
 	def set_peer_id(self, peer_id):
 		self.lvl_class(peer_id)
