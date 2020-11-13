@@ -52,9 +52,9 @@ with InitData(getenv('DATABASE_URL')) as data:
 	for custom_labeler in labelers:
 		data.bot.labeler.load(custom_labeler)
 
-	lp = LoopWrapper()
-	lp.add_task(run_bot(data.bot))
-	lp.add_task(data.lvl_class.run_connect)
-	lp.add_task(data.lvl_class.run_top)
+	lw = LoopWrapper()
+	lw.add_task(run_bot(data.bot))
+	lw.add_task(data.lvl_class.run_connect)
+	lw.add_task(data.lvl_class.run_top)
 
-	lp.run_forever()
+	lw.run_forever()
