@@ -5,7 +5,7 @@ from utils import InitData
 from vbml import Patcher
 from os import getenv
 
-logger._core.min_level = LOGURU_ERROR_NO
+#logger._core.min_level = LOGURU_ERROR_NO
 patcher = Patcher()
 
 @patcher.validator(key = 'int')
@@ -40,7 +40,6 @@ class Register(BaseMiddleware, InitData.Data):
 
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
-	data.bot.polling.wait = 25
 	data.bot.labeler.message_view.register_middleware(Register())
 
 	import utils.rules
