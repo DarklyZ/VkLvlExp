@@ -1,4 +1,4 @@
-from vkbottle import BaseMiddleware, Bot
+from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from loguru._defaults import LOGURU_ERROR_NO
 from vkbottle.modules import logger
 from utils import InitData
@@ -38,6 +38,10 @@ class Register(BaseMiddleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
+async def run_bot(bot):
+	try: await bot.run_polling()
+	except: await run_bot(bot)
+
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
 	data.bot.labeler.message_view.register_middleware(Register())
@@ -48,7 +52,9 @@ with InitData(getenv('DATABASE_URL')) as data:
 	for custom_labeler in labelers:
 		data.bot.labeler.load(custom_labeler)
 
-	data.bot.loop_wrapper.add_task(data.lvl_class.run_connect)
-	data.bot.loop_wrapper.add_task(data.lvl_class.run_top)
+	lp = LoopWrapper()
+	lp.add_task(run_bot(data.bot))
+	lp.add_task(data.lvl_class.run_connect)
+	lp.add_task(data.lvl_class.run_top)
 
-	data.bot.run_forever()
+	lp.run_forever()
