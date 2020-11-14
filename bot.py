@@ -1,7 +1,7 @@
 from aiohttp.client_exceptions import ServerConnectionError
-from loguru._defaults import LOGURU_ERROR_NO
-from vkbottle import BaseMiddleware, Bot
+from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
+from loguru._defaults import LOGURU_ERROR_NO
 from utils import InitData
 from vbml import Patcher
 from os import getenv
@@ -39,12 +39,31 @@ class Register(BaseMiddleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-with InitData(getenv('DATABASE_URL')) as data:
-	data.bot = Bot(getenv('TOKEN'))
-	data.bot.labeler.message_view.register_middleware(Register())
+class RunBot:
+	def __init__(self, bot):
+		self.bot, self._stop = bot, False
 
-	@data.bot.error_handler.register_error_handler(ServerConnectionError)
-	async def SCE(e): return {"updates": ()}
+	@property
+	def stop(self):
+		if self.bot.polling.stop and not self._stop:
+			self.bot.polling.stop = self._stop
+		return self._stop
+
+	@stop.setter
+	def stop(self, value):
+		self._stop = self.bot.polling.stop = value
+
+	async def run_bot(self):
+		while not self.stop: await self.bot.run_polling()
+
+	async def SCE(self, e):
+		self.bot.polling.stop = True
+		return {"updates": []}
+
+with InitData(getenv('DATABASE_URL')) as data:
+	data.bot = Bot(getenv('TOKEN')); rb = RunBot(data.bot)
+	data.bot.error_handler.register_error_handler(ServerConnectionError, rb.SCE)
+	data.bot.labeler.message_view.register_middleware(Register())
 
 	import utils.rules
 	from commands import labelers
@@ -52,7 +71,9 @@ with InitData(getenv('DATABASE_URL')) as data:
 	for custom_labeler in labelers:
 		data.bot.labeler.load(custom_labeler)
 
-	data.bot.loop_wrapper.add_task(data.lvl_class.run_connect)
-	data.bot.loop_wrapper.add_task(data.lvl_class.run_top)
+	lw = LoopWrapper()
+	lw.add_task(rb.run_bot)
+	lw.add_task(data.lvl_class.run_connect)
+	lw.add_task(data.lvl_class.run_top)
 
-	data.bot.run_forever()
+	lw.run_forever()
