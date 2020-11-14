@@ -1,4 +1,5 @@
-from vkbottle import BaseMiddleware, Bot, LoopWrapper
+from aiohttp.client_exceptions import ServerConnectionError
+from vkbottle import BaseMiddleware, Bot
 from loguru._defaults import LOGURU_ERROR_NO
 from vkbottle.modules import logger
 from utils import InitData
@@ -38,13 +39,12 @@ class Register(BaseMiddleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-async def run_bot(bot):
-	try: await bot.run_polling()
-	except: await run_bot(bot)
-
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
 	data.bot.labeler.message_view.register_middleware(Register())
+
+	@data.bot.error_handler.register_error_handler(ServerConnectionError)
+	async def SCE(e): return {"updates": ()}
 
 	import utils.rules
 	from commands import labelers
@@ -52,9 +52,7 @@ with InitData(getenv('DATABASE_URL')) as data:
 	for custom_labeler in labelers:
 		data.bot.labeler.load(custom_labeler)
 
-	lw = LoopWrapper()
-	lw.add_task(run_bot(data.bot))
-	lw.add_task(data.lvl_class.run_connect)
-	lw.add_task(data.lvl_class.run_top)
+	data.bot.loop_wrapper.add_task(data.lvl_class.run_connect)
+	data.bot.loop_wrapper.add_task(data.lvl_class.run_top)
 
-	lw.run_forever()
+	data.bot.run_forever()
