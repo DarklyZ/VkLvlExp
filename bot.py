@@ -42,6 +42,16 @@ class Register(BaseMiddleware, InitData.Data):
 class RunBot:
 	def __init__(self, bot):
 		self.bot, self._stop = bot, False
+		self.bot.error_handler.register_error_handler(
+			ServerConnectionError, self.SCE
+		)
+
+	async def run_bot(self):
+		while not self.stop: await self.bot.run_polling()
+
+	async def SCE(self, e):
+		self.bot.polling.stop = True
+		return {"updates": []}
 
 	@property
 	def stop(self):
@@ -53,16 +63,8 @@ class RunBot:
 	def stop(self, value):
 		self._stop = self.bot.polling.stop = value
 
-	async def run_bot(self):
-		while not self.stop: await self.bot.run_polling()
-
-	async def SCE(self, e):
-		self.bot.polling.stop = True
-		return {"updates": []}
-
 with InitData(getenv('DATABASE_URL')) as data:
-	data.bot = Bot(getenv('TOKEN')); rb = RunBot(data.bot)
-	data.bot.error_handler.register_error_handler(ServerConnectionError, rb.SCE)
+	data.bot = Bot(getenv('TOKEN'))
 	data.bot.labeler.message_view.register_middleware(Register())
 
 	import utils.rules
@@ -72,7 +74,7 @@ with InitData(getenv('DATABASE_URL')) as data:
 		data.bot.labeler.load(custom_labeler)
 
 	lw = LoopWrapper()
-	lw.add_task(rb.run_bot)
+	lw.add_task(RunBot(data.bot).run_bot)
 	lw.add_task(data.lvl_class.run_connect)
 	lw.add_task(data.lvl_class.run_top)
 
