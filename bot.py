@@ -1,6 +1,6 @@
 from aiohttp.client_exceptions import ServerConnectionError
-from vkbottle import BaseMiddleware, Bot
 from loguru._defaults import LOGURU_ERROR_NO
+from vkbottle import BaseMiddleware, Bot
 from vkbottle.modules import logger
 from utils import InitData
 from vbml import Patcher
