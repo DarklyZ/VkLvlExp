@@ -1,3 +1,5 @@
+import vk_types
+
 from aiohttp.client_exceptions import ServerConnectionError
 from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
