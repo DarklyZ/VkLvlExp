@@ -1,4 +1,4 @@
-import vk_types
+import override_vkbottle_types
 
 from aiohttp.client_exceptions import ServerConnectionError
 from vkbottle import BaseMiddleware, Bot, LoopWrapper
