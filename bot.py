@@ -8,7 +8,7 @@ from utils import InitData
 from vbml import Patcher
 from os import getenv
 
-#logger._core.min_level = LOGURU_ERROR_NO
+logger._core.min_level = LOGURU_ERROR_NO
 patcher = Patcher()
 
 @patcher.validator(key = 'int')

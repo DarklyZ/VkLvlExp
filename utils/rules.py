@@ -6,7 +6,7 @@ from sys import modules
 
 from vbml import Pattern
 
-class AddRule:
+class SetRule:
 	DEFAULT_CUSTOM_RULES = modules['vkbottle.framework.bot.labeler.default'].DEFAULT_CUSTOM_RULES
 
 	def __init__(self, name):
@@ -16,7 +16,7 @@ class AddRule:
 		self.DEFAULT_CUSTOM_RULES[self.name] = cls
 		return cls
 
-@AddRule('command')
+@SetRule('command')
 class CommandVBMLRule(VBMLRule):
 	def __init__(self, pattern):
 		self.config['vbml_flags'] = I | S
@@ -33,7 +33,7 @@ class CommandVBMLRule(VBMLRule):
 		self.patterns = pattern
 		self.patcher = self.config["vbml_patcher"]
 
-@AddRule('audio_message')
+@SetRule('audio_message')
 class AudioMessage(VBMLRule, InitData.Data):
 	class AM(dict):
 		__getattr__ = dict.get
@@ -42,7 +42,7 @@ class AudioMessage(VBMLRule, InitData.Data):
 		if (audio_message := message.attachments and message.attachments[0].audio_message) \
 			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
-@AddRule('is_admin')
+@SetRule('is_admin')
 class IsAdmin(ABCMessageRule, InitData.Data):
 	def __init__(self, adm):
 		self.adm = adm
@@ -53,7 +53,7 @@ class IsAdmin(ABCMessageRule, InitData.Data):
 			is_admin = message.from_id == chat_settings.owner_id or message.from_id in chat_settings.admin_ids
 			return self.adm and is_admin or not self.adm and not is_admin
 
-@AddRule('with_text')
+@SetRule('with_text')
 class WithText(ABCMessageRule, InitData.Data):
 	def __init__(self, wt):
 		self.wt = wt
@@ -62,7 +62,7 @@ class WithText(ABCMessageRule, InitData.Data):
 		if text := await self.lvl_class.hello_text(): text = {'text': text}
 		return self.wt and text or not self.wt and not text
 
-@AddRule('with_reply_message')
+@SetRule('with_reply_message')
 class WithReplyMessage(ABCMessageRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
@@ -71,7 +71,7 @@ class WithReplyMessage(ABCMessageRule):
 		is_wrm = message.reply_message and message.reply_message.from_id > 0
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
 
-@AddRule('from_id_pos')
+@SetRule('from_id_pos')
 class FromIdPos(ABCMessageRule):
 	def __init__(self, fip):
 		self.fip = fip
@@ -80,7 +80,7 @@ class FromIdPos(ABCMessageRule):
 		is_fip = message.from_id > 0
 		return self.fip and is_fip or not self.fip and not is_fip
 
-@AddRule('regex')
+@SetRule('regex')
 class RegexRule(ABCMessageRule):
 	def __init__(self, regex):
 		self.compile = compile(regex, flags = I | S)
@@ -88,7 +88,7 @@ class RegexRule(ABCMessageRule):
 	async def check(self, message):
 		return bool(self.compile.search(message.text))
 
-@AddRule('chat_action_rule')
+@SetRule('chat_action_rule')
 class ChatActionRule(ChatActionRule):
 	def __init__(self, arg):
 		super().__init__([arg] if isinstance(arg, MMAS) else arg)
