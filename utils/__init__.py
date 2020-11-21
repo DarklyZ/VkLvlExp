@@ -11,8 +11,8 @@ class InitData:
 		pass
 
 	def __init__(self, database_url):
-		from utils.lvls import LVL
-		from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
+		from .lvls import LVL
+		from .api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
 		with self as data:
 			data.lvl_class, data.amessage = LVL(database_url), AMessage()
