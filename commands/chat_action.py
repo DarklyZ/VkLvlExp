@@ -10,7 +10,7 @@ with InitData.With as data:
 		await message.answer('Ключевые слова:\n{title} - заголовок\n{user} - пользователь\n{name} - имя бота')
 
 	@bl.chat_message(command = ['set hello <text>', 'set hello'], is_admin = True)
-	async def hello_plus(message, command = '* Стандартное приветствие *'):
+	async def hello_plus(message, text = '* Стандартное приветствие *'):
 		try: hello = text.format(title = 'title', user = 'user', name = 'name')
 		except: return await message.answer('Неправильный формат')
 		await data.lvl_class.update_text(text)
