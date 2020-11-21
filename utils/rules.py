@@ -1,5 +1,5 @@
 from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
-from vkbottle_types.objects import MessagesMessageActionStatus as MMAS
+from vkbottle_types.objects import MessagesMessageActionStatus as MMAStatus
 from utils import InitData
 from re import compile, I, S
 from sys import modules
@@ -91,4 +91,4 @@ class RegexRule(ABCMessageRule):
 @SetRule('chat_action_rule')
 class ChatActionRule(ChatActionRule):
 	def __init__(self, arg):
-		super().__init__([arg] if isinstance(arg, MMAS) else arg)
+		super().__init__([arg] if isinstance(arg, MMAStatus) else arg)
