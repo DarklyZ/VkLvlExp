@@ -1,11 +1,13 @@
 from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
+from vkbottle_types.objects import MessagesMessageActionStatus as MMAS
 from utils import InitData
 from re import compile, I, S
+from sys import modules
 
 from vbml import Pattern
 
 class AddRule:
-	from vkbottle.framework.bot.labeler.default import DEFAULT_CUSTOM_RULES
+	DEFAULT_CUSTOM_RULES = modules['vkbottle.framework.bot.labeler.default'].DEFAULT_CUSTOM_RULES
 
 	def __init__(self, name):
 		self.name = name
@@ -17,14 +19,16 @@ class AddRule:
 @AddRule('command')
 class CommandVBMLRule(VBMLRule):
 	def __init__(self, pattern):
+		self.config['vbml_flags'] = I | S
+
 		regex = r'[\./!:]{}$'
 
 		if isinstance(pattern, str):
-			pattern = [Pattern(pattern, regex = regex, flags = I | S)]
+			pattern = [Pattern(pattern, regex = regex, flags = self.config['vbml_flags'])]
 		elif isinstance(pattern, Pattern):
 			pattern = [pattern]
 		elif isinstance(pattern, list):
-			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = I | S) for p in pattern]
+			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = self.config['vbml_flags']) for p in pattern]
 
 		self.patterns = pattern
 		self.patcher = self.config["vbml_patcher"]
@@ -55,7 +59,7 @@ class WithText(ABCMessageRule, InitData.Data):
 		self.wt = wt
 
 	async def check(self, message):
-		if text := await self.lvl_class.hello_text(): self.context.kwargs = {'text': text}
+		if text := await self.lvl_class.hello_text(): text = {'text': text}
 		return self.wt and text or not self.wt and not text
 
 @AddRule('with_reply_message')
@@ -84,5 +88,7 @@ class RegexRule(ABCMessageRule):
 	async def check(self, message):
 		return bool(self.compile.search(message.text))
 
-
-AddRule('chat_action_rule')(ChatActionRule)
+@AddRule('chat_action_rule')
+class ChatActionRule(ChatActionRule):
+	def __init__(self, arg):
+		super().__init__([arg] if isinstance(arg, MMAS) else arg)
