@@ -1,6 +1,6 @@
 import override_vkbottle_types
 
-from aiohttp.client_exceptions import ServerConnectionError
+from aiohttp.client_exceptions import ServerDisconnectedError
 from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
 from loguru._defaults import LOGURU_ERROR_NO
@@ -45,7 +45,7 @@ class RunBot:
 	def __init__(self, bot):
 		self.bot, self._stop = bot, False
 		self.bot.error_handler.register_error_handler(
-			ServerConnectionError, self.SCE
+			ServerDisconnectedError, self.SCE
 		)
 
 	async def run_bot(self):
