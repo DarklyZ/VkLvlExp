@@ -45,13 +45,13 @@ class RunBot:
 	def __init__(self, bot):
 		self.bot, self._stop = bot, False
 		self.bot.error_handler.register_error_handler(
-			ServerDisconnectedError, self.SCE
+			ServerDisconnectedError, self.SDE
 		)
 
 	async def run_bot(self):
 		while not self.stop: await self.bot.run_polling()
 
-	async def SCE(self, e):
+	async def SDE(self, e):
 		self.bot.polling.stop = True
 		return {"updates": []}
 
