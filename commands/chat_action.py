@@ -1,5 +1,5 @@
-from vkbottle_types.objects import MessagesMessageActionStatus as MMAStatus
 from utils import InitData
+from vkbottle_types.objects import MessagesMessageActionStatus as MMAStatus
 from vkbottle.bot import BotLabeler
 
 with InitData.With as data:
