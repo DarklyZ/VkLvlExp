@@ -7,6 +7,7 @@ class SetAttr:
 
     def __call__(self, type):
         self.set(self.cls, self.name, type)
+        return type
 
     @staticmethod
     def set(cls, name, type, class_validators = None, default = None, required = False):
