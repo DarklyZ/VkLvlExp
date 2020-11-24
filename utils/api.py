@@ -3,7 +3,7 @@ from io import BytesIO
 from aiohttp import request
 
 class YaSpeller:
-	api = 'http://speller.yandex.net/services/spellservice.json/checkText'
+	url = 'http://speller.yandex.net/services/spellservice.json/checkText'
 
 	def __init__(self, lang = None, ignore_urls = False, ignore_capitalization = False,
 			ignore_digits = False, ignore_latin = False, ignore_roman_numerals = False,
@@ -30,7 +30,7 @@ class YaSpeller:
 			'options': self.options,
 			'lang': lang,
 		}
-		async with request('POST', self.api, data = data) as response:
+		async with request('POST', self.url, data = data) as response:
 			return await response.json()
 
 class ShikiApi(InitData.Data):
