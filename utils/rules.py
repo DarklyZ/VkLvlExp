@@ -1,9 +1,9 @@
+from sys import modules
+
 from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
 from vkbottle_types.objects import MessagesMessageActionStatus as MMAStatus
 from utils import InitData
 from re import compile, I, S
-from sys import modules
-
 from vbml import Pattern
 
 class SetRule:
