@@ -24,3 +24,6 @@ class MessagesMessageAttachmentType(enum.Enum):
     ARTICLE = "article"
     GRAFFITI = "graffiti"
     AUDIO_MESSAGE = "audio_message"
+
+SetAttr(WallWallComment, 'attachments').set(List[WallCommentAttachment], default = [])
+SetAttr(WallWallpostFull, 'attachments').set(List[WallWallpostAttachment], default = [])
