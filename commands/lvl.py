@@ -40,7 +40,7 @@ with InitData.With as data:
 		if exp in ('up', 'down'): exp = await data.lvl_class.atta(message.reply_message.text, message.reply_message.attachments, exp == 'down')
 		await data.lvl_class.update_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
 		await data.lvl_class.send(id)
-		await message((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + data.lvl_class[id])
+		await message.answer((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + data.lvl_class[id])
 
 	@bl.chat_message(command = 'info', with_reply_message = True)
 	async def info(message):
