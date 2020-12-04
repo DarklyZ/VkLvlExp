@@ -1,4 +1,8 @@
-from vkbottle_types.objects import MessagesMessageAttachmentType as MType
+from vkbottle_types.objects import (
+	MessagesMessageAttachmentType as MType,
+	WallWallpostAttachmentType as WType,
+	WallCommentAttachmentType as CType
+)
 from datetime import datetime, tzinfo, timedelta
 from asyncio import sleep
 from asyncpg import connect
@@ -116,7 +120,7 @@ class LVL(dict, InitData.Data):
 		return (row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)) and row['text']
 
 	@classmethod
-	async def atta(cls, text = '', attachments = [], negative = False, return_errors = False):
+	async def atta(cls, text = '', attachments = [], negative = False, return_errors = False, types = MType):
 		if text:
 			dict_errors = {change['word']: change['s'] for change in await cls.speller.spell(text)}
 			s = sum(3 if len(chars) >= 6 else 1 for chars in split(r'[^a-zа-яё]+', text, flags = I) if len(chars) >= 3 and chars not in dict_errors)
@@ -125,22 +129,22 @@ class LVL(dict, InitData.Data):
 			count, dict_errors = 0, {}
 
 		for attachment in attachments:
-			if attachment.type == MType.PHOTO:
+			if attachment.type == types.PHOTO:
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
-			elif attachment.type == MType.WALL:
-				count += await cls.atta(attachment.wall.text, attachment.wall.attachments)
-			elif attachment.type == MType.WALL_REPLY:
-				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
-			elif attachment.type == MType.DOC and attachment.doc.ext == 'gif':
+			elif attachment.type == types.WALL:
+				count += await cls.atta(attachment.wall.text, attachment.wall.attachments, types = WType)
+			elif attachment.type == types.WALL_REPLY:
+				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments, types = CType)
+			elif attachment.type == types.DOC and attachment.doc.ext == 'gif':
 				count += 20
-			elif attachment.type == MType.AUDIO_MESSAGE:
+			elif attachment.type == types.AUDIO_MESSAGE:
 				count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
-			elif attachment.type == MType.VIDEO:
+			elif attachment.type == types.VIDEO:
 				count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
-			elif attachment.type == MType.STICKER:
+			elif attachment.type == types.STICKER:
 				count += 10
-			elif attachment.type == MType.AUDIO:
+			elif attachment.type == types.AUDIO:
 				count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
 		count *= -1 if negative else 1
 		return (count, dict_errors) if return_errors else count
