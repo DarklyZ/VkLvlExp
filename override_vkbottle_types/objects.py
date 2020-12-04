@@ -1,12 +1,12 @@
 from vkbottle_types.objects import *
-from .set_attr import SetAttr
+from .set_attr import SetAnnotations
 
-@SetAttr(MessagesConversation, 'chat_settings')
+@SetAnnotations(MessagesConversation, 'chat_settings')
 class ChatSettings(BaseObject):
     owner_id: int
     admin_ids: list
 
-@SetAttr(MessagesMessageAttachment, 'type')
+@SetAnnotations(MessagesMessageAttachment, 'type')
 class MessagesMessageAttachmentType(enum.Enum):
     PHOTO = "photo"
     AUDIO = "audio"
@@ -25,5 +25,7 @@ class MessagesMessageAttachmentType(enum.Enum):
     GRAFFITI = "graffiti"
     AUDIO_MESSAGE = "audio_message"
 
-SetAttr(WallWallComment, 'attachments').set(List[WallCommentAttachment], default = [])
-SetAttr(WallWallpostFull, 'attachments').set(List[WallWallpostAttachment], default = [])
+SetAnnotations(WallWallComment, 'attachments').value(List[WallCommentAttachment], default = [])
+SetAnnotations(WallWallpostFull, 'attachments').value(List[WallWallpostAttachment], default = [])
+
+SetAnnotations(PhotosPhotoSizes, 'type').value(str)
