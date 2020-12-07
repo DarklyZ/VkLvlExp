@@ -57,6 +57,7 @@ class RunBot:
 		while not self.stop: await self.bot.run_polling()
 
 	async def skip_error(self, e):
+		logger.error(f"{e.__class__.__name__} skipped")
 		self.bot.polling.stop = True
 		return {"updates": []}
 
