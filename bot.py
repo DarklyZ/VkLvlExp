@@ -1,6 +1,6 @@
 import override_vkbottle_types
 
-from aiohttp.client_exceptions import ServerDisconnectedError
+from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
 from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
 from loguru._defaults import LOGURU_ERROR_NO
@@ -42,16 +42,21 @@ class Register(BaseMiddleware, InitData.Data):
 		self.shiki(peer_id)
 
 class RunBot:
+	_stop = False
+
 	def __init__(self, bot):
-		self.bot, self._stop = bot, False
+		self.bot = bot
 		self.bot.error_handler.register_error_handler(
-			ServerDisconnectedError, self.SDE
+			ServerDisconnectedError, self.skip_error
+		)
+		self.bot.error_handler.register_error_handler(
+			ClientOSError, self.skip_error
 		)
 
 	async def run_bot(self):
 		while not self.stop: await self.bot.run_polling()
 
-	async def SDE(self, e):
+	async def skip_error(self, e):
 		self.bot.polling.stop = True
 		return {"updates": []}
 
