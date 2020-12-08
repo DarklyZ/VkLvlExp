@@ -1,5 +1,5 @@
 from vkbottle_types.objects import *
-from .set_attr import SetAnnotations
+from .set_anno import SetAnnotations
 
 @SetAnnotations(MessagesConversation, 'chat_settings')
 class ChatSettings(BaseObject):
