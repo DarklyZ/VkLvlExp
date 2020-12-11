@@ -1,12 +1,10 @@
 from vkbottle_types.objects import *
-from .set_anno import SetAnnotations
+from .set_anno import annotation
 
-@SetAnnotations(MessagesConversation, 'chat_settings')
 class ChatSettings(BaseObject):
     owner_id: int
     admin_ids: list
 
-@SetAnnotations(MessagesMessageAttachment, 'type')
 class MessagesMessageAttachmentType(enum.Enum):
     PHOTO = "photo"
     AUDIO = "audio"
@@ -25,7 +23,20 @@ class MessagesMessageAttachmentType(enum.Enum):
     GRAFFITI = "graffiti"
     AUDIO_MESSAGE = "audio_message"
 
-SetAnnotations(WallWallComment, 'attachments').value(List[WallCommentAttachment], default = [])
-SetAnnotations(WallWallpostFull, 'attachments').value(List[WallWallpostAttachment], default = [])
+class ClientInfoButtonActions(enum.Enum):
+    TEXT = "text"
+    VKPAY = "vkpay"
+    OPEN_APP = "open_app"
+    LOCATION = "location"
+    OPEN_LINK = "open_link"
+    OPEN_PHOTO = "open_photo"
+    CALLBACK = "callback"
+    INTENT_SUBSCRIBE = "intent_subscribe"
+    INTENT_UNSUBSCRIBE = "intent_unsubscribe"
 
-SetAnnotations(PhotosPhotoSizes, 'type').value(str)
+annotation(MessagesConversation, "chat_settings", ChatSettings)
+annotation(MessagesMessageAttachment, "type", MessagesMessageAttachmentType)
+annotation(MessagesClientInfo, "button_actions", List[ClientInfoButtonActions])
+annotation(WallWallComment, "attachments", List[WallCommentAttachment], default = [])
+annotation(WallWallpostFull, "attachments", List[WallWallpostAttachment], default = [])
+annotation(PhotosPhotoSizes, "type", str)
