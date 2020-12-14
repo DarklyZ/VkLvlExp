@@ -132,13 +132,13 @@ class LVL(dict, InitData.Data):
 			if attachment.type == types.PHOTO:
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
-			elif attachment.type == types.WALL:
+			elif types is MType and attachment.type == types.WALL:
 				count += await cls.atta(attachment.wall.text, attachment.wall.attachments, types = WType)
-			elif attachment.type == types.WALL_REPLY:
+			elif types is MType and attachment.type == types.WALL_REPLY:
 				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments, types = CType)
 			elif attachment.type == types.DOC and attachment.doc.ext == 'gif':
 				count += 20
-			elif attachment.type == types.AUDIO_MESSAGE:
+			elif types is MType and attachment.type == types.AUDIO_MESSAGE:
 				count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
 			elif attachment.type == types.VIDEO:
 				count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
