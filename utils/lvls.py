@@ -142,7 +142,7 @@ class LVL(dict, InitData.Data):
 				count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
 			elif attachment.type == types.VIDEO:
 				count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
-			elif attachment.type == types.STICKER:
+			elif types is not WType and attachment.type == types.STICKER:
 				count += 10
 			elif attachment.type == types.AUDIO:
 				count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
