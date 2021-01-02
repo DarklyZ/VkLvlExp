@@ -1,7 +1,7 @@
 import override_vkbottle_types
 
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
-from vkbottle import BaseMiddleware, Bot, LoopWrapper
+from vkbottle import BaseMiddleware, Bot
 from vkbottle.modules import logger
 from loguru._defaults import LOGURU_ERROR_NO
 from utils import InitData
@@ -41,35 +41,21 @@ class Register(BaseMiddleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-class RunBot:
-	_stop = False
+class Bot(Bot):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		for e in (ServerDisconnectedError, ClientOSError):
+			self.error_handler.register_error_handler(e, self.skip_error)
 
-	def __init__(self, bot):
-		self.bot = bot
-		self.bot.error_handler.register_error_handler(
-			ServerDisconnectedError, self.skip_error
-		)
-		self.bot.error_handler.register_error_handler(
-			ClientOSError, self.skip_error
-		)
-
-	async def run_bot(self):
-		while not self.stop: await self.bot.run_polling()
+	async def run_polling(self):
+		while True:
+			await super().run_polling()
+			self.polling.stop = False
 
 	async def skip_error(self, e):
-		logger.error(f"{e.__class__.__name__} skipped")
-		self.bot.polling.stop = True
-		return {"updates": []}
-
-	@property
-	def stop(self):
-		if self.bot.polling.stop and not self._stop:
-			self.bot.polling.stop = self._stop
-		return self._stop
-
-	@stop.setter
-	def stop(self, value):
-		self._stop = self.bot.polling.stop = value
+		logger.error(f"{e.__class__.__name__}: restarting...")
+		self.polling.stop = True
+		return {'update': []}
 
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
@@ -81,9 +67,7 @@ with InitData(getenv('DATABASE_URL')) as data:
 	for custom_labeler in labelers:
 		data.bot.labeler.load(custom_labeler)
 
-	lw = LoopWrapper()
-	lw.add_task(RunBot(data.bot).run_bot)
-	lw.add_task(data.lvl_class.run_connect)
-	lw.add_task(data.lvl_class.run_top)
+	data.bot.loop_wrapper.add_task(data.lvl_class.run_connect)
+	data.bot.loop_wrapper.add_task(data.lvl_class.run_top)
 
-	lw.run_forever()
+	data.bot.run_forever()
