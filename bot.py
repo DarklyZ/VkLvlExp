@@ -42,13 +42,15 @@ class Register(BaseMiddleware, InitData.Data):
 		self.shiki(peer_id)
 
 class Bot(Bot):
+	stop = False
+
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		for e in (ServerDisconnectedError, ClientOSError):
 			self.error_handler.register_error_handler(e, self.skip_error)
 
 	async def run_polling(self):
-		while True:
+		while not self.stop:
 			await super().run_polling()
 			self.polling.stop = False
 
