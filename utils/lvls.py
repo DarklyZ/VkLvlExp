@@ -18,8 +18,10 @@ class timezone(tzinfo):
 tz = timezone()
 
 def getcake(bdate):
-	bdate, date = datetime.strptime(bdate, "%d.%m" if bdate.count('.') == 1 else "%d.%m.%Y"), datetime.now(tz)
-	return '🎂' if bdate.day == date.day and bdate.month == date.month else ''
+	if isinstance(bdate, str):
+		bdate, date = datetime.strptime(bdate, "%d.%m" if bdate.count('.') == 1 else "%d.%m.%Y"), datetime.now(tz)
+		return '🎂' if bdate.day == date.day and bdate.month == date.month else ''
+	else: return ''
 
 get = lambda dict, key: dict.get(key, '')
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
