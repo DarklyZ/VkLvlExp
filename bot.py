@@ -1,7 +1,7 @@
 import override_vkbottle_types
 
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
-from vkbottle import BaseMiddleware, Bot
+from vkbottle import BaseMiddleware, Bot, BotPolling
 from vkbottle.modules import logger
 from loguru._defaults import LOGURU_ERROR_NO
 from utils import InitData
@@ -41,23 +41,28 @@ class Register(BaseMiddleware, InitData.Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-class Bot(Bot):
-	stop = False
+class BotPolling(BotPolling):
+	start = True
 
+	async def listen(self):
+		while self.start:
+			self.start = self.stop = False
+			async for event in super().listen():
+				yield event if event is not None else {'update': []}
+
+	def restart(self):
+		self.start = self.stop = True
+
+class Bot(Bot):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		self._polling = BotPolling(self.api)
 		for e in (ServerDisconnectedError, ClientOSError):
 			self.error_handler.register_error_handler(e, self.skip_error)
 
-	async def run_polling(self):
-		while not self.stop:
-			await super().run_polling()
-			self.polling.stop = False
-
 	async def skip_error(self, e):
 		logger.error(f"{e.__class__.__name__}: restarting...")
-		self.polling.stop = True
-		return {'update': []}
+		self.polling.restart()
 
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'))
