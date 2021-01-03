@@ -1,4 +1,4 @@
-import override_vkbottle_types
+import override_types
 
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
 from vkbottle import BaseMiddleware, Bot, BotPolling
@@ -42,30 +42,14 @@ class Register(BaseMiddleware, InitData.Data):
 		self.shiki(peer_id)
 
 class BotPolling(BotPolling):
-	start = True
-
 	async def listen(self):
-		while self.start:
-			self.start = self.stop = False
+		while not self.stop:
 			async for event in super().listen():
-				yield event if event is not None else {'update': []}
-
-	def restart(self):
-		self.start = self.stop = True
-
-class Bot(Bot):
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self._polling = BotPolling(self.api)
-		for e in (ServerDisconnectedError, ClientOSError):
-			self.error_handler.register_error_handler(e, self.skip_error)
-
-	async def skip_error(self, e):
-		logger.error(f"{e.__class__.__name__}: restarting...")
-		self.polling.restart()
+				if event is None: break
+				else: yield event
 
 with InitData(getenv('DATABASE_URL')) as data:
-	data.bot = Bot(getenv('TOKEN'))
+	data.bot = Bot(getenv('TOKEN'), polling = BotPolling())
 	data.bot.labeler.message_view.register_middleware(Register())
 
 	import utils.rules

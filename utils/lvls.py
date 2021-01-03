@@ -10,18 +10,21 @@ from itertools import groupby
 from utils import InitData
 from re import split, I
 
-bdate = lambda user, date: '🎂' if user.bdate and user.bdate.startswith(f"{date.day}.{date.month}") else ''
-get = lambda dict, key: dict.get(key, '')
-dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
-dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
-dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
-
 class timezone(tzinfo):
-	utcoffset = lambda self, dt: timedelta(hours=5)
+	utcoffset = lambda self, dt: timedelta(hours = 5)
 	dst = lambda self, dt: timedelta()
 	tzname = lambda self, dt: '+05:00'
 
 tz = timezone()
+
+def getcake(bdate):
+	bdate, date = datetime.strptime(bdate, "%d.%m" if bdate.count('.') == 1 else "%d.%m.%Y"), datetime.now(tz)
+	return '🎂' if bdate.day == date.day and bdate.month == date.month else ''
+
+get = lambda dict, key: dict.get(key, '')
+dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
+dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
+dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
 
 class LVL(dict, InitData.Data):
 	def __init__(self, database_url):
@@ -78,7 +81,7 @@ class LVL(dict, InitData.Data):
 		topboost = {row['user_id'] : dict_topboost[row['row_number']]
 				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 				if row['row_number'] % 2 != 0}
-		self.update({user.id : f"{get(top, user.id)}{get(topboost, user.id)}{bdate(user, datetime.now(tz))}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
+		self.update({user.id : f"{get(top, user.id)}{get(topboost, user.id)}{getcake(user.bdate)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
 		        for user in await self.bot.api.users.get(user_ids = str(ids)[1:-1], fields = 'bdate')})
 
 	async def send(self, *ids):
