@@ -52,8 +52,8 @@ with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'), polling = BotPolling())
 	data.bot.labeler.message_view.register_middleware(Register())
 
-	for e in (ServerDisconnectedError, ClientOSError):
-		@data.bot.error_handler.register_error_handler(e)
+	for error in (ServerDisconnectedError, ClientOSError):
+		@data.bot.error_handler.register_error_handler(error)
 		async def skip_error(e):
 			logger.error(f"{e.__class__.__name__}: restarting...")
 
