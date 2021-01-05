@@ -45,12 +45,17 @@ class BotPolling(BotPolling):
 	async def listen(self):
 		while not self.stop:
 			async for event in super().listen():
-				if event is None: break
-				else: yield event
+				if isinstance(event, dict): yield event
+				else: break
 
 with InitData(getenv('DATABASE_URL')) as data:
 	data.bot = Bot(getenv('TOKEN'), polling = BotPolling())
 	data.bot.labeler.message_view.register_middleware(Register())
+
+	for e in (ServerDisconnectedError, ClientOSError):
+		@data.bot.error_handler.register_error_handler(e)
+		async def skip_error(e):
+			logger.error(f"{e.__class__.__name__}: restarting...")
 
 	import utils.rules
 	from commands import labelers
