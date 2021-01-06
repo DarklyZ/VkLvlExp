@@ -2,12 +2,12 @@ from sys import modules
 
 from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
 from vkbottle_types.objects import MessagesMessageActionStatus as MMAStatus
-from utils import InitData
+from utils import Data
 from re import compile, I, S
 from vbml import Pattern
 
 class SetRule:
-	DEFAULT_CUSTOM_RULES = modules['vkbottle.framework.bot.labeler.default'].DEFAULT_CUSTOM_RULES
+	from vkbottle.framework.bot.labeler.default import DEFAULT_CUSTOM_RULES
 
 	def __init__(self, name):
 		self.name = name
@@ -34,7 +34,7 @@ class CommandVBMLRule(VBMLRule):
 		self.patcher = self.config["vbml_patcher"]
 
 @SetRule('audio_message')
-class AudioMessage(VBMLRule, InitData.Data):
+class AudioMessage(VBMLRule, Data):
 	class AM(dict):
 		__getattr__ = dict.get
 
@@ -43,7 +43,7 @@ class AudioMessage(VBMLRule, InitData.Data):
 			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
 @SetRule('is_admin')
-class IsAdmin(ABCMessageRule, InitData.Data):
+class IsAdmin(ABCMessageRule, Data):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -54,7 +54,7 @@ class IsAdmin(ABCMessageRule, InitData.Data):
 			return self.adm and is_admin or not self.adm and not is_admin
 
 @SetRule('with_text')
-class WithText(ABCMessageRule, InitData.Data):
+class WithText(ABCMessageRule, Data):
 	def __init__(self, wt):
 		self.wt = wt
 

@@ -1,10 +1,15 @@
 import override_types
 
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
+
 from vkbottle import BaseMiddleware, Bot, BotPolling
 from vkbottle.modules import logger
+
+from utils import Data
+from utils.lvls import LVL
+from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 from loguru._defaults import LOGURU_ERROR_NO
-from utils import InitData
+
 from vbml import Patcher
 from os import getenv
 
@@ -27,7 +32,7 @@ def max_validator(value, extra):
 def inc_validator(value, *extra):
 	return value.lower() if value.lower() in extra else None
 
-class Register(BaseMiddleware, InitData.Data):
+class Register(BaseMiddleware, Data):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		self.set_peer_id(message.peer_id)
@@ -48,22 +53,27 @@ class BotPolling(BotPolling):
 				if isinstance(event, dict): yield event
 				else: break
 
-with InitData(getenv('DATABASE_URL')) as data:
-	data.bot = Bot(getenv('TOKEN'), polling = BotPolling())
-	data.bot.labeler.message_view.register_middleware(Register())
+class InitData(Data, init = True):
+	bot = Bot(getenv('TOKEN'), polling = BotPolling())
+	lvl_class, amessage = LVL(getenv('DATABASE_URL')), AMessage()
+	twdne, shiki = ThisWaifuDoesNotExist(), ShikiApi()
+	speller, foaf = YaSpeller(), FoafPHP()
 
-	for error in (ServerDisconnectedError, ClientOSError):
-		@data.bot.error_handler.register_error_handler(error)
-		async def skip_error(e):
-			logger.error(f"{e.__class__.__name__}: restarting...")
+	def __init__(self):
+		self.bot.labeler.message_view.register_middleware(Register())
 
-	import utils.rules
-	from commands import labelers
+		for error in (ServerDisconnectedError, ClientOSError):
+			@self.bot.error_handler.register_error_handler(error)
+			async def skip_error(e):
+				logger.error(f"{e.__class__.__name__}: restarting...")
 
-	for custom_labeler in labelers:
-		data.bot.labeler.load(custom_labeler)
+		import utils.rules
+		from commands import labelers
 
-	data.bot.loop_wrapper.add_task(data.lvl_class.run_connect)
-	data.bot.loop_wrapper.add_task(data.lvl_class.run_top)
+		for custom_labeler in labelers:
+			self.bot.labeler.load(custom_labeler)
 
-	data.bot.run_forever()
+		self.bot.loop_wrapper.add_task(self.lvl_class.run_connect)
+		self.bot.loop_wrapper.add_task(self.lvl_class.run_top)
+
+		self.bot.run_forever()

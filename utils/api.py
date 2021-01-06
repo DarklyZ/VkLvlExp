@@ -1,4 +1,4 @@
-from utils import InitData
+from utils import Data
 from io import BytesIO
 from aiohttp import request
 
@@ -33,7 +33,7 @@ class YaSpeller:
 		async with request('POST', self.url, data = data) as response:
 			return await response.json()
 
-class ShikiApi(InitData.Data):
+class ShikiApi(Data):
 	url_shiki = 'http://shikimori.one{url}'
 	url_shiki_api = url_shiki.format(url = '/api/{method}')
 	url_neko_anime = 'https://nekomori.ch/anime/-{id}/general'
@@ -67,7 +67,7 @@ class ShikiApi(InitData.Data):
 						saves.append(await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash']))
 		return [f'photo{save[0].owner_id}_{save[0].id}' for save in saves]
 
-class AMessage(InitData.Data):
+class AMessage(Data):
 	url = 'http://tts.voicetech.yandex.net/tts'
 	data = {'voice': 'alyss', 'emotion': 'evil', 'speed': 1.1}
 
@@ -85,7 +85,7 @@ class AMessage(InitData.Data):
 	async def get_text(self, audio_message):
 		pass
 
-class ThisWaifuDoesNotExist(InitData.Data):
+class ThisWaifuDoesNotExist(Data):
 	url = 'https://www.thiswaifudoesnotexist.net/example-{id}.jpg'
 
 	def __call__(self, peer_id):
@@ -101,7 +101,7 @@ class ThisWaifuDoesNotExist(InitData.Data):
 					save = await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash'])
 		return f'photo{save[0].owner_id}_{save[0].id}'
 
-class FoafPHP(InitData.Data):
+class FoafPHP(Data):
 	url = 'https://vk.com/foaf.php'
 
 	async def __call__(self, id):
