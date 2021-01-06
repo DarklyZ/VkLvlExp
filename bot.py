@@ -8,8 +8,8 @@ from vkbottle.modules import logger
 from utils import Data
 from utils.lvls import LVL
 from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
-from loguru._defaults import LOGURU_ERROR_NO
 
+from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
 from os import getenv
 
