@@ -13,6 +13,8 @@ from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
 from os import getenv
 
+from web import run_app
+
 logger._core.min_level = LOGURU_ERROR_NO
 patcher = Patcher()
 
@@ -75,5 +77,6 @@ class InitData(Data, init = True):
 
 		self.bot.loop_wrapper.add_task(self.lvl_class.run_connect)
 		self.bot.loop_wrapper.add_task(self.lvl_class.run_top)
+		self.bot.loop_wrapper.add_task(run_app)
 
 		self.bot.run_forever()
