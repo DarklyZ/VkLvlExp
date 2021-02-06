@@ -15,4 +15,4 @@ app.add_routes([
 ])
 
 async def run_app(*args, **kwargs):
-	await _run_app(app, *args, host = getenv("HOST", None), port = getenv("PORT", None), **kwargs)
+	await _run_app(app, *args, port = getenv("PORT", None), **kwargs)
