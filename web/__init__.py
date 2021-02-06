@@ -6,7 +6,11 @@ from .test import get_top
 
 @middleware
 async def middleware(request, handler):
-	if (request.headers.getone("Token") == getenv('TOKEN') and request.content_type == 'application/json'):
+	if (request.headers.getone("TOKEN") != getenv('TOKEN')):
+		return Response(text = "Invalid token")
+	elif (request.content_type != 'application/json'):
+		return Response(text = "Content type must be 'application / json'")
+	else:
 		return await handler(request)
 
 app = Application(middlewares = [middleware])
