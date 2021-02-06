@@ -9,7 +9,7 @@ async def middleware(request, handler):
 	if (request.headers.getone("TOKEN", None) != getenv('TOKEN')):
 		return Response(text = "Invalid token")
 	elif (request.content_type != 'application/json'):
-		return Response(text = "Content type must be 'application / json'")
+		return Response(text = "Content type must be 'application/json'")
 	else:
 		return await handler(request)
 
