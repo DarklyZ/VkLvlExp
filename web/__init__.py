@@ -6,7 +6,7 @@ from .test import get_top
 
 @middleware
 async def middleware(request, handler):
-	if (request.headers.getone("Token") == 'Token' and request.content_type == 'application/json'):
+	if (request.headers.getone("Token") == getenv('TOKEN') and request.content_type == 'application/json'):
 		return await handler(request)
 
 app = Application(middlewares = [middleware])
@@ -15,4 +15,4 @@ app.add_routes([
 ])
 
 async def run_app(*args, **kwargs):
-	await _run_app(app, *args, port = getenv("PORT", None), **kwargs)
+	await _run_app(app, *args, **kwargs)
