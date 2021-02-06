@@ -1,6 +1,7 @@
 from aiohttp.web import (
 	Application, Response, middleware, get, post, _run_app
 )
+from os import getenv
 from .test import get_top
 
 @middleware
@@ -14,4 +15,4 @@ app.add_routes([
 ])
 
 async def run_app(*args, **kwargs):
-	await _run_app(app, *args, **kwargs)
+	await _run_app(app, *args, port = getenv("PORT", 8080), **kwargs)
