@@ -76,7 +76,7 @@ class LVL(LVLABC):
 
 	async def send(self, *ids):
 		lvl = {row['user_id'] : f"{row['lvl']}Ⓛ|{row['exp']}/{row['lvl'] * 2000}Ⓔ"
-				for row in await self.con.fetch("select user_id,lvl,exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)}
+				for row in await self.con.fetch("select user_id, lvl, exp from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id)}
 		await self.user(*ids)
 		self.update({id : f"{self[id]}:{lvl.get(id, 'lvl:error')}" for id in ids})
 
