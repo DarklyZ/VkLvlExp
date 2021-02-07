@@ -15,7 +15,7 @@ async def middleware(request, handler):
 
 app = Application(middlewares = [middleware])
 app.add_routes([
-	post('/{name}', get_users)
+	post('/get_users', get_users)
 ])
 
 async def run_app(*args, **kwargs):
