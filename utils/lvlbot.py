@@ -3,11 +3,10 @@ from vkbottle_types.objects import (
 	WallWallpostAttachmentType as WType,
 	WallCommentAttachmentType as CType
 )
+from .lvlabc import LVLABC
 from datetime import datetime, tzinfo, timedelta
 from asyncio import sleep
-from asyncpg import connect
 from itertools import groupby
-from utils import Data
 from re import split, I
 
 class timezone(tzinfo):
@@ -28,19 +27,7 @@ dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
 
-class LVL(dict, Data):
-	def __init__(self, database_url):
-		super().__init__()
-		self.database_url = database_url
-
-	def __call__(self, peer_id):
-		self.clear()
-		self.peer_id = peer_id
-		return self
-
-	async def run_connect(self):
-		self.con = await connect(self.database_url, ssl = 'require')
-
+class LVL(LVLABC):
 	async def run_top(self):
 		temp_new = lambda: datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 

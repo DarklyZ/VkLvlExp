@@ -1,8 +1,6 @@
-from aiohttp.web import (
-	Application, Response, middleware, get, post, _run_app
-)
+from aiohttp.web import Application, Response, middleware, _run_app
+from .routes import routes
 from os import getenv
-from .test import get_users
 
 @middleware
 async def middleware(request, handler):
@@ -14,9 +12,7 @@ async def middleware(request, handler):
 		return await handler(request)
 
 app = Application(middlewares = [middleware])
-app.add_routes([
-	post('/get_users', get_users)
-])
+app.add_routes(routes)
 
-async def run_app(*args, **kwargs):
-	await _run_app(app, *args, **kwargs)
+async def run_app(**kwargs):
+	await _run_app(app, **kwargs)

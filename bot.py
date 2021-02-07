@@ -6,14 +6,12 @@ from vkbottle import BaseMiddleware, Bot, BotPolling
 from vkbottle.modules import logger
 
 from utils import Data
-from utils.lvls import LVL
+from utils.lvlbot import LVL
 from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
 from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
 from os import getenv
-
-from web import run_app
 
 logger._core.min_level = LOGURU_ERROR_NO
 patcher = Patcher()
@@ -77,6 +75,5 @@ class InitData(Data, init = True):
 
 		self.bot.loop_wrapper.add_task(self.lvl_class.run_connect)
 		self.bot.loop_wrapper.add_task(self.lvl_class.run_top)
-		self.bot.loop_wrapper.add_task(run_app(port = getenv('PORT')))
 
 		self.bot.run_forever()
