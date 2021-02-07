@@ -1,7 +1,7 @@
 from utils import Data
 from utils.lvlweb import LVL
 from vkbottle import Bot
-from web import run_app
+from webutils import run_app
 from os import getenv
 
 class InitData(Data, init = True):
