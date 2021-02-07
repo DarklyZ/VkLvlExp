@@ -1,4 +1,3 @@
 https://github.com/timoniq/vkbottle/archive/master.zip
 asyncpg
 loguru
-uvloop
