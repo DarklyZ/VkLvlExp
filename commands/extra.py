@@ -16,8 +16,8 @@ bl = BotLabeler()
 
 @bl.chat_message(command = ['ban <text>', 'ban'], with_reply_message = True)
 async def ban(message, text = 'не указана'):
-	await data.lvl_class.user(id := message.reply_message.from_id)
-	await message.answer(f"Бан пользователя:\n{data.lvl_class[id]}\nПричина: {text}", keyboard = Keyboard(inline = True)
+	await data.lvlbot.user(id := message.reply_message.from_id)
+	await message.answer(f"Бан пользователя:\n{data.lvlbot[id]}\nПричина: {text}", keyboard = Keyboard(inline = True)
 	              .add(Text(label = 'Ясно-понятно', payload = {'command': 'ban'}), color = KeyboardButtonColor.POSITIVE)
 	              .get_json())
 
@@ -39,8 +39,8 @@ async def twdne(message):
 @bl.chat_message(command = 'date', with_reply_message = True)
 async def date_created(message):
 	date = search(r'<ya:created dc:date="(?P<Y>\d{4})-(?P<M>\d{2})-(?P<D>\d{2}).+?"/>', await data.foaf(id := message.reply_message.from_id))
-	await data.lvl_class.user(id)
-	await message.answer(message = f"Я проследила за пользователем: {data.lvl_class[id]},\nон создал страницу: {date['D']}-{date['M']}-{date['Y']}")
+	await data.lvlbot.user(id)
+	await message.answer(message = f"Я проследила за пользователем: {data.lvlbot[id]},\nон создал страницу: {date['D']}-{date['M']}-{date['Y']}")
 
 @bl.chat_message(command = 'tts <text>')
 async def tts(message, text):

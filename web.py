@@ -5,8 +5,8 @@ from webutils import run_app
 from os import getenv
 
 class InitData(Data, init = True):
-	lvlweb = LVL(getenv('DATABASE_URL'))
 	bot = Bot(getenv('TOKEN'))
+	lvlweb = LVL(getenv('DATABASE_URL'))
 
 	def __init__(self):
 		self.bot.loop_wrapper.add_task(self.lvlweb.run_connect)

@@ -36,12 +36,12 @@ class Register(BaseMiddleware, Data):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		self.set_peer_id(message.peer_id)
-		await self.lvl_class.check_add_user(message.from_id)
-		if not message.payload and (exp := await self.lvl_class.atta(message.text, message.attachments)):
-			await self.lvl_class.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
+		await self.lvlbot.check_add_user(message.from_id)
+		if not message.payload and (exp := await self.lvlbot.atta(message.text, message.attachments)):
+			await self.lvlbot.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
 
 	def set_peer_id(self, peer_id):
-		self.lvl_class(peer_id)
+		self.lvlbot(peer_id)
 		self.amessage(peer_id)
 		self.twdne(peer_id)
 		self.shiki(peer_id)
@@ -55,7 +55,7 @@ class BotPolling(BotPolling):
 
 class InitData(Data, init = True):
 	bot = Bot(getenv('TOKEN'), polling = BotPolling())
-	lvl_class, amessage = LVL(getenv('DATABASE_URL')), AMessage()
+	lvlbot, amessage = LVL(getenv('DATABASE_URL')), AMessage()
 	twdne, shiki = ThisWaifuDoesNotExist(), ShikiApi()
 	speller, foaf = YaSpeller(), FoafPHP()
 
@@ -73,7 +73,7 @@ class InitData(Data, init = True):
 		for custom_labeler in labelers:
 			self.bot.labeler.load(custom_labeler)
 
-		self.bot.loop_wrapper.add_task(self.lvl_class.run_connect)
-		self.bot.loop_wrapper.add_task(self.lvl_class.run_top)
+		self.bot.loop_wrapper.add_task(self.lvlbot.run_connect)
+		self.bot.loop_wrapper.add_task(self.lvlbot.run_top)
 
 		self.bot.run_forever()
