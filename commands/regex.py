@@ -8,7 +8,7 @@ bl = BotLabeler()
 @bl.chat_message(regex = r'^f+$')
 async def f_f(message):
 	rand = choice((457241326,457241327,457241328,457241331,457241332,457241333,457241334,457241338,457241339))
-	await message.answer('Пал боец\nСмертью храбрых', attachment = f'photo-{data.bot.polling.group_id}_{rand}')
+	await message.answer("Пал боец\nСмертью храбрых", attachment = f'photo-{data.bot.polling.group_id}_{rand}')
 
 @bl.chat_message(regex = r'^[^\?]*\?{3}$')
 async def hm_(message):

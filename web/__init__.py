@@ -6,7 +6,7 @@ from .test import get_users
 
 @middleware
 async def middleware(request, handler):
-	if (request.headers.getone("TOKEN", None) != getenv('TOKEN')):
+	if (request.headers.getone('TOKEN', None) != getenv('TOKEN')):
 		return Response(text = "Invalid token")
 	elif (request.content_type != 'application/json'):
 		return Response(text = "Content type must be 'application/json'")
