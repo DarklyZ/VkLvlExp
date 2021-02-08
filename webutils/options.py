@@ -9,7 +9,7 @@ def options(json = False, token = False, content_type = None):
 				if (token and request.headers.getone('TOKEN', None) != getenv('TOKEN')):
 					return Response(text="Invalid token", status = 403)
 				if (request.content_type != content_type):
-					return Response(text="Content type must be 'application/json'", status=400)
+					return Response(text="Content type must be 'application/json'", status = 400)
 				if json:
 					return await coro(**await request.json())
 				return await coro(request)
