@@ -82,6 +82,6 @@ class InitData(Data, init = True):
 
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect)
 		self.bot.loop_wrapper.add_task(self.lvl.run_top)
-		self.bot.loop_wrapper.add_task(run_app(port = getenv('PORT')))
+		self.bot.loop_wrapper.add_task(run_app)
 
 		self.bot.run_forever()

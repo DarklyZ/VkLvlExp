@@ -5,7 +5,7 @@ from os import getenv
 @middleware
 async def middleware(request, handler):
 	if (request.headers.getone('TOKEN', None) != getenv('TOKEN')):
-		return Response(text = "Invalid token", status = 403)
+		return Response(text = "Invalid token", status = 200)
 	elif (request.content_type != 'application/json'):
 		return Response(text = "Content type must be 'application/json'", status = 400)
 	else:
@@ -15,4 +15,4 @@ app = Application(middlewares = [middleware])
 app.add_routes(routes)
 
 async def run_app(**kwargs):
-	await _run_app(app, **kwargs)
+	await _run_app(app, port = getenv('PORT'), **kwargs)
