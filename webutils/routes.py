@@ -8,7 +8,7 @@ routes = RouteTableDef()
 @routes.post('/bot')
 async def bot(request):
 	print(await request.text())
-	await data.bot.router.route(await request.json(), bot.polling.api)
+	await data.bot.router.route(await request.json(), data.bot.polling.api)
 	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
