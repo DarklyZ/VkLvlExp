@@ -5,8 +5,8 @@ from os import getenv
 
 routes = RouteTableDef()
 
-@routes.post('/bot')
-@options(json = True, content_type = 'application/json')
+#@routes.post('/bot')
+#@options(json = True, content_type = 'application/json')
 async def bot(secret, **kwargs):
 	if secret != getenv('SECRET_KEY'):
 		return Response(text = 'Invalid secret_key', status = 403)
