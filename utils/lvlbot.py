@@ -30,7 +30,7 @@ class LVL(LVLABC):
 		temp_new = lambda: datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 
 		temp = temp_new()
-		while not await sleep(5 * 60):
+		while not await sleep(60):
 			if datetime.now(tz) < temp: continue
 			await self.con.execute("update lvl set temp_exp = 0")
 			temp = temp_new()
