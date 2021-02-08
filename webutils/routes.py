@@ -9,7 +9,7 @@ routes = RouteTableDef()
 @options(json = True, content_type = 'application/json')
 async def bot(secret, type, group_id, **kwargs):
 	if secret != getenv('SECRET_KEY'):
-		return Response(text = 'Invalid secret_key', status = 403)
+		return Response(text = 'Invalid secret key', status = 403)
 	if type == 'confirmation':
 		return Response(text = getenv('CONFIRM_KEY'))
 

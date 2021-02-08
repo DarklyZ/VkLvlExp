@@ -6,7 +6,7 @@ def options(json = False, secret_key = False, content_type = None):
 	def decorator(coro):
 		async def new_coro(request):
 			if (secret_key and request.headers.getone('SECRET_KEY', None) != getenv('SECRET_KEY')):
-				return Response(text = "Invalid secret_key", status = 403)
+				return Response(text = "Invalid secret key", status = 403)
 			if (request.content_type != content_type):
 				return Response(text = f"Content type must be '{content_type}'", status = 400)
 			if json:
