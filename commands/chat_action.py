@@ -12,40 +12,40 @@ async def hello_help(message):
 async def hello_plus(message, text = '* Стандартное приветствие *'):
 	try: hello = text.format(title = 'title', user = 'user', name = 'name')
 	except: return await message.answer('Неправильный формат')
-	await data.lvlbot.update_text(text)
+	await data.lvl.update_text(text)
 	await message.answer('Приветствие полученно\n' + hello)
 
 @bl.chat_message(command = 'del hello', is_admin = True)
 async def hello_del(message):
-	await data.lvlbot.update_text()
+	await data.lvl.update_text()
 	await message.answer('Приветствие удалено')
 
 @bl.chat_message(chat_action_rule = MMAStatus.CHAT_INVITE_USER, with_text = True)
 async def add_user(message, text):
-	await data.lvlbot.user(id1 := message.from_id, id2 := message.action.member_id)
+	await data.lvl.user(id1 := message.from_id, id2 := message.action.member_id)
 	if id1 != id2:
-		title = f"* Welcome to the club, buddy. *\nВас призвал(а): {data.lvlbot[id1]}"
+		title = f"* Welcome to the club, buddy. *\nВас призвал(а): {data.lvl[id1]}"
 		bot_name = (await data.bot.api.groups.get_by_id(group_id = data.bot.polling.group_id))[0].name
-		blank = text.format(title = title, user = data.lvlbot[id2], name = bot_name)
+		blank = text.format(title = title, user = data.lvl[id2], name = bot_name)
 		photo = 457241337
 	else:
-		blank = f"Вернулся(ась) {data.lvlbot[id1]}."
+		blank = f"Вернулся(ась) {data.lvl[id1]}."
 		photo = 457241328
 	await message.answer(blank, attachment = f'photo-{data.bot.polling.group_id}_{photo}')
 
 @bl.chat_message(chat_action_rule = MMAStatus.CHAT_KICK_USER, with_text = True, is_admin = True)
 async def remove_user(message, text):
-	await data.lvlbot.user(id2 := message.action.member_id)
-	await message.answer(f"{data.lvlbot[id2]} заебал(а) админа.", attachment = f'photo-{data.bot.polling.group_id}_457241336')
+	await data.lvl.user(id2 := message.action.member_id)
+	await message.answer(f"{data.lvl[id2]} заебал(а) админа.", attachment = f'photo-{data.bot.polling.group_id}_457241336')
 
 @bl.chat_message(chat_action_rule = MMAStatus.CHAT_KICK_USER, with_text = True, is_admin = False)
 async def remove_user(message, text):
-	await data.lvlbot.user(id2 := message.action.member_id)
-	await message.answer(f"{data.lvlbot[id2]} стал(а) натуралом(.", attachment = f'photo-{data.bot.polling.group_id}_457241328')
+	await data.lvl.user(id2 := message.action.member_id)
+	await message.answer(f"{data.lvl[id2]} стал(а) натуралом(.", attachment = f'photo-{data.bot.polling.group_id}_457241328')
 
 @bl.chat_message(chat_action_rule = MMAStatus.CHAT_INVITE_USER_BY_LINK, with_text = True)
 async def add_user_link(message, text):
-	await data.lvlbot.user(id1 := message.from_id)
+	await data.lvl.user(id1 := message.from_id)
 	title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
 	bot_name = (await data.bot.api.groups.get_by_id(group_id = data.bot.polling.group_id))[0].name
-	await message.answer(text.format(title = title, user = data.lvlbot[id1], name = bot_name), attachment = f'photo-{data.bot.polling.group_id}_457241337')
+	await message.answer(text.format(title = title, user = data.lvl[id1], name = bot_name), attachment = f'photo-{data.bot.polling.group_id}_457241337')

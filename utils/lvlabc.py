@@ -4,7 +4,7 @@ from itertools import groupby
 
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 
-class LVLABC(dict, Data):
+class LVLabc(dict, Data):
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url

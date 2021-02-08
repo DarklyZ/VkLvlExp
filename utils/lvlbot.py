@@ -3,7 +3,7 @@ from vkbottle_types.objects import (
 	WallWallpostAttachmentType as WType,
 	WallCommentAttachmentType as CType
 )
-from .lvlabc import LVLABC
+from .lvlabc import LVLabc
 from datetime import datetime, tzinfo, timedelta
 from asyncio import sleep
 from re import split, I
@@ -25,7 +25,7 @@ get = lambda dict, key: dict.get(key, '')
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
 
-class LVL(LVLABC):
+class LVL(LVLabc):
 	async def run_top(self):
 		temp_new = lambda: datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 

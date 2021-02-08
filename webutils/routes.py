@@ -15,11 +15,11 @@ def json_load(coro):
 @routes.post('/get_lvl')
 @json_load
 async def get_lvl(peer_id, user_ids):
-	await data.lvlweb(peer_id).get_lvl(*user_ids)
-	return json_response(data.lvlweb)
+	await data.lvl(peer_id).get_lvl(*user_ids)
+	return json_response(data.lvl)
 
 @routes.post('/get_top')
 @json_load
 async def get_top(peer_id, x, y):
-	await data.lvlweb(peer_id).get_top(x, y)
-	return json_response(data.lvlweb)
+	await data.lvl(peer_id).get_top(x, y)
+	return json_response(data.lvl)

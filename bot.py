@@ -6,8 +6,11 @@ from vkbottle import BaseMiddleware, Bot, BotPolling
 from vkbottle.modules import logger
 
 from utils import Data
-from utils.lvlbot import LVL
+from utils.lvlbot import LVL as LVLbot
+from utils.lvlweb import LVL as LVLweb
 from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
+
+from webutils import run_app
 
 from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
@@ -36,12 +39,12 @@ class Register(BaseMiddleware, Data):
 	async def pre(self, message):
 		if message.peer_id == message.from_id or message.from_id < 0: return False
 		self.set_peer_id(message.peer_id)
-		await self.lvlbot.check_add_user(message.from_id)
-		if not message.payload and (exp := await self.lvlbot.atta(message.text, message.attachments)):
-			await self.lvlbot.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
+		await self.lvl.check_add_user(message.from_id)
+		if not message.payload and (exp := await self.lvl.atta(message.text, message.attachments)):
+			await self.lvl.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
 
 	def set_peer_id(self, peer_id):
-		self.lvlbot(peer_id)
+		self.lvl(peer_id)
 		self.amessage(peer_id)
 		self.twdne(peer_id)
 		self.shiki(peer_id)
@@ -53,11 +56,15 @@ class BotPolling(BotPolling):
 				if isinstance(event, dict): yield event
 				else: break
 
+class LVL(LVLbot, LVLweb):
+	pass
+
 class InitData(Data, init = True):
 	bot = Bot(getenv('TOKEN'), polling = BotPolling())
-	lvlbot, amessage = LVL(getenv('DATABASE_URL')), AMessage()
-	twdne, shiki = ThisWaifuDoesNotExist(), ShikiApi()
+	lvl = LVL(getenv('DATABASE_URL'))
+	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
+	twdne = ThisWaifuDoesNotExist()
 
 	def __init__(self):
 		self.bot.labeler.message_view.register_middleware(Register())
@@ -73,7 +80,8 @@ class InitData(Data, init = True):
 		for custom_labeler in labelers:
 			self.bot.labeler.load(custom_labeler)
 
-		self.bot.loop_wrapper.add_task(self.lvlbot.run_connect)
-		self.bot.loop_wrapper.add_task(self.lvlbot.run_top)
+		self.bot.loop_wrapper.add_task(self.lvl.run_connect)
+		self.bot.loop_wrapper.add_task(self.lvl.run_top)
+		self.bot.loop_wrapper.add_task(run_app(port = getenv('PORT')))
 
 		self.bot.run_forever()
