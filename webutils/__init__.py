@@ -1,9 +1,16 @@
-from aiohttp.web import Application, _run_app
-from .routes import routes
+from aiohttp.web import Response
+from json.decoder import JSONDecodeError
 from os import getenv
 
-app = Application()
-app.add_routes(routes)
-
-async def run_app(**kwargs):
-	await _run_app(app, port = getenv('PORT'), **kwargs)
+def options(json = False, secret_key = False):
+	def decorator(coro):
+		async def new_coro(request):
+			if (secret_key and request.headers.getone('secret', None) != getenv('SECRET_KEY')):
+				return Response(text = "Invalid secret key", status = 403)
+			if json:
+				try: return await coro(**await request.json())
+				except (TypeError, JSONDecodeError) as e:
+					return Response(text = str(e), status = 400)
+			return await coro(request)
+		return new_coro
+	return decorator

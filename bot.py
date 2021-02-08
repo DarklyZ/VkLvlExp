@@ -10,7 +10,8 @@ from utils.lvlbot import LVL as LVLbot
 from utils.lvlweb import LVL as LVLweb
 from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
-from webutils import run_app
+from aiohttp.web import Application, _run_app as run
+from webutils.routes import routes
 
 from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
@@ -53,12 +54,15 @@ class LVL(LVLbot, LVLweb):
 	pass
 
 class InitData(Data, init = True):
-	bot, lvl = Bot(getenv('TOKEN')), LVL(getenv('DATABASE_URL'))
+	app = Application()
+	bot = Bot(getenv('TOKEN'))
+	lvl = LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
 	twdne = ThisWaifuDoesNotExist()
 
 	def __init__(self):
+		self.app.add_routes(routes)
 		self.bot.labeler.message_view.register_middleware(Register())
 
 		for error in (ServerDisconnectedError, ClientOSError):
@@ -74,8 +78,8 @@ class InitData(Data, init = True):
 
 		lp = LoopWrapper()
 
+		lp.add_task(run(self.app, port = getenv('PORT')))
 		lp.add_task(self.lvl.run_connect)
 		lp.add_task(self.lvl.run_top)
-		lp.add_task(run_app)
 
 		lp.run_forever()
