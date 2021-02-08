@@ -5,15 +5,14 @@ from os import getenv
 def options(json = False, token = False, content_type = None):
 	def decorator(coro):
 		async def new_coro(request):
-			try:
-				if (token and request.headers.getone('TOKEN', None) != getenv('TOKEN')):
-					return Response(text="Invalid token", status = 403)
-				if (request.content_type != content_type):
-					return Response(text="Content type must be 'application/json'", status = 400)
-				if json:
-					return await coro(**await request.json())
-				return await coro(request)
-			except (TypeError, JSONDecodeError) as e:
-				return Response(text = str(e), status = 400)
+			if (token and request.headers.getone('TOKEN', None) != getenv('TOKEN')):
+				return Response(text="Invalid token", status = 403)
+			if (request.content_type != content_type):
+				return Response(text=f"Content type must be '{content_type}'", status = 400)
+			if json:
+				try: return await coro(**await request.json())
+				except (TypeError, JSONDecodeError) as e:
+					return Response(text=str(e), status=400)
+			return await coro(request)
 		return new_coro
 	return decorator
