@@ -1,5 +1,5 @@
 from utils import Data as data
-from aiohttp.web import Response, json_response, RouteTableDef, Request
+from aiohttp.web import RouteTableDef, Response, json_response
 from .options import options
 from os import getenv
 
