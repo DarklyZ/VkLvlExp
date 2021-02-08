@@ -6,12 +6,15 @@ from os import getenv
 routes = RouteTableDef()
 
 @routes.post('/bot')
-async def bot(request):
-	request = await request.json()
-	print(request)
-	if (request.get('type') == 'confirmation'):
+@options(json = True, content_type = 'application/json')
+async def bot(secret, **kwargs):
+	if secret != getenv('SECRET_KEY'):
+		return Response(text = 'Invalid secret_key', status = 403)
+	if kwargs.get('type') == 'confirmation':
 		return Response(text = getenv('CONFIRM_KEY'))
-	await data.bot.router.route(request, data.bot.polling.api)
+
+	data.bot.polling.group_id = kwargs['group_id']
+	await data.bot.router.route(kwargs, data.bot.polling.api)
 	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
