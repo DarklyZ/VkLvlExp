@@ -1,7 +1,5 @@
 import override_types
 
-from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
-
 from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
 
@@ -64,11 +62,6 @@ class InitData(Data, init = True):
 	def __init__(self):
 		self.app.add_routes(routes)
 		self.bot.labeler.message_view.register_middleware(Register())
-
-		for error in (ServerDisconnectedError, ClientOSError):
-			@self.bot.error_handler.register_error_handler(error)
-			async def skip_error(e):
-				logger.error(f"{e.__class__.__name__}: restarting...")
 
 		import utils.rules
 		from commands import labelers

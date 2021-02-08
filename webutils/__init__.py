@@ -5,7 +5,7 @@ from os import getenv
 def options(json = False, secret_key = False):
 	def decorator(coro):
 		async def new_coro(request):
-			if (secret_key and request.headers.getone('secret', None) != getenv('SECRET_KEY')):
+			if secret_key and request.headers.getone('secret', None) != getenv('SECRET_KEY'):
 				return Response(text = "Invalid secret key", status = 403)
 			if json:
 				try: return await coro(**await request.json())

@@ -26,14 +26,23 @@ dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
 
 class LVL(LVLabc):
-	async def run_top(self):
-		temp_new = lambda: datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+	async def get_temp(self, method):
+		if method == 'read':
+			if 'temp' not in await self.bot.api.storage.get_keys(user_id = 1, offset = 0, count = 1):
+				return await self.get_temp('write')
+			temp = datetime.fromtimestamp(float((await self.bot.api.storage.get(keys = 'temp', user_id = 1))[0].value))
+			return temp.replace(tzinfo = tz)
+		elif method == 'write':
+			temp = datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+			await self.bot.api.storage.set(key = 'temp', value = str(temp.timestamp()), user_id = 1)
+			return temp
 
-		temp = temp_new()
+	async def run_top(self):
+		temp = await self.get_temp('read')
 		while not await sleep(60):
 			if datetime.now(tz) < temp: continue
 			await self.con.execute("update lvl set temp_exp = 0")
-			temp = temp_new()
+			temp = await self.get_temp('write')
 
 	async def remove_exp(self, id, exp = 0):
 		if allow := (await self.con.fetchrow("select count(user_id) > 0 as bool from lvl where user_id = $1 and exp >= $2 and peer_id = $3", id, exp, self.peer_id))['bool']:

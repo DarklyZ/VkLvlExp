@@ -14,7 +14,7 @@ async def bot(secret, type, group_id, **kwargs):
 		return Response(text = getenv('CONFIRM_KEY'))
 
 	data.bot.polling.group_id = group_id
-	await data.bot.router.route(kwargs | locals(), data.bot.polling.api)
+	await data.bot.router.route(kwargs | locals(), data.bot.api)
 	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
