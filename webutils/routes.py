@@ -1,8 +1,18 @@
 from utils import Data as data
-from aiohttp.web import Response, json_response, RouteTableDef
+from aiohttp.web import Response, json_response, RouteTableDef, Request
 from .options import options
+from os import getenv
 
 routes = RouteTableDef()
+
+@routes.post('/bot')
+async def bot(request):
+	json = await request.json()
+	data.bot.polling.group_id = json["group_id"]
+	return Response(text = getenv('KEY'))
+
+	#await data.bot.router.route(await request.json(), bot.polling.api)
+	#return Response(text = 'ok')
 
 @routes.get('/')
 async def pong(request):
