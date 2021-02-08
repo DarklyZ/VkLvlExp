@@ -84,4 +84,4 @@ class InitData(Data, init = True):
 		self.bot.loop_wrapper.add_task(self.lvl.run_top)
 		self.bot.loop_wrapper.add_task(run_app)
 
-		self.bot.run_forever()
+		self.bot.loop_wrapper.run_forever()

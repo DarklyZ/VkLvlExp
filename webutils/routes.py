@@ -7,16 +7,9 @@ routes = RouteTableDef()
 
 @routes.post('/bot')
 async def bot(request):
-	json = await request.json()
-	data.bot.polling.group_id = json["group_id"]
-	return Response(text = getenv('KEY'))
-
-	#await data.bot.router.route(await request.json(), bot.polling.api)
-	#return Response(text = 'ok')
-
-@routes.get('/')
-async def pong(request):
-	return Response(text = 'Pong!')
+	print(await request.text())
+	await data.bot.router.route(await request.json(), bot.polling.api)
+	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
 @options(json = True, token = True, content_type = 'application/json')
