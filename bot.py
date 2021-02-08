@@ -73,6 +73,7 @@ class InitData(Data, init = True):
 			self.bot.labeler.load(custom_labeler)
 
 		lp = LoopWrapper()
+
 		lp.add_task(self.lvl.run_connect)
 		lp.add_task(self.lvl.run_top)
 		lp.add_task(run_app)
