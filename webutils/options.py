@@ -2,10 +2,10 @@ from aiohttp.web import Response
 from json.decoder import JSONDecodeError
 from os import getenv
 
-def options(json = False, token = False, content_type = None):
+def options(json = False, secret_key = False, content_type = None):
 	def decorator(coro):
 		async def new_coro(request):
-			if (token and request.headers.getone('TOKEN', None) != getenv('TOKEN')):
+			if (secret_key and request.headers.getone('SECRET_KEY', None) != getenv('SECRET_KEY')):
 				return Response(text="Invalid token", status = 403)
 			if (request.content_type != content_type):
 				return Response(text=f"Content type must be '{content_type}'", status = 400)

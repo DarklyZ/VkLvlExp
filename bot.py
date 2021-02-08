@@ -2,7 +2,7 @@ import override_types
 
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
 
-from vkbottle import BaseMiddleware, Bot, BotPolling
+from vkbottle import BaseMiddleware, Bot, BotPolling, LoopWrapper
 from vkbottle.modules import logger
 
 from utils import Data
@@ -80,8 +80,9 @@ class InitData(Data, init = True):
 		for custom_labeler in labelers:
 			self.bot.labeler.load(custom_labeler)
 
-		self.bot.loop_wrapper.add_task(self.lvl.run_connect)
-		self.bot.loop_wrapper.add_task(self.lvl.run_top)
-		self.bot.loop_wrapper.add_task(run_app)
+		lp = LoopWrapper()
+		lp.add_task(self.lvl.run_connect)
+		lp.add_task(self.lvl.run_top)
+		lp.add_task(run_app)
 
 		self.bot.loop_wrapper.run_forever()

@@ -7,8 +7,11 @@ routes = RouteTableDef()
 
 @routes.post('/bot')
 async def bot(request):
-	print(await request.text())
-	await data.bot.router.route(await request.json(), data.bot.polling.api)
+	request = await request.json()
+	print(request)
+	if (request.get('type') == 'confirmation'):
+		return Response(text = getenv('CONFIRM_KEY'))
+	await data.bot.router.route(request, data.bot.polling.api)
 	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
