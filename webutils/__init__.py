@@ -1,17 +1,8 @@
-from aiohttp.web import Application, Response, middleware, _run_app
+from aiohttp.web import Application, _run_app
 from .routes import routes
 from os import getenv
 
-@middleware
-async def middleware(request, handler):
-	if (request.headers.getone('TOKEN', None) != getenv('TOKEN')):
-		return Response(text = "Invalid token", status = 200)
-	elif (request.content_type != 'application/json'):
-		return Response(text = "Content type must be 'application/json'", status = 400)
-	else:
-		return await handler(request)
-
-app = Application(middlewares = [middleware])
+app = Application()
 app.add_routes(routes)
 
 async def run_app(**kwargs):
