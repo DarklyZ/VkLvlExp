@@ -2,7 +2,7 @@ import override_types
 
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientOSError
 
-from vkbottle import BaseMiddleware, Bot, BotPolling, LoopWrapper
+from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
 
 from utils import Data
@@ -49,19 +49,11 @@ class Register(BaseMiddleware, Data):
 		self.twdne(peer_id)
 		self.shiki(peer_id)
 
-class BotPolling(BotPolling):
-	async def listen(self):
-		while not self.stop:
-			async for event in super().listen():
-				if isinstance(event, dict): yield event
-				else: break
-
 class LVL(LVLbot, LVLweb):
 	pass
 
 class InitData(Data, init = True):
-	bot = Bot(getenv('TOKEN'), polling = BotPolling())
-	lvl = LVL(getenv('DATABASE_URL'))
+	bot, lvl = Bot(getenv('TOKEN')), LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
 	twdne = ThisWaifuDoesNotExist()
@@ -85,4 +77,4 @@ class InitData(Data, init = True):
 		lp.add_task(self.lvl.run_top)
 		lp.add_task(run_app)
 
-		self.bot.loop_wrapper.run_forever()
+		lp.run_forever()
