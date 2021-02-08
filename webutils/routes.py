@@ -7,14 +7,14 @@ routes = RouteTableDef()
 
 @routes.post('/bot')
 @options(json = True, content_type = 'application/json')
-async def bot(secret, **kwargs):
+async def bot(secret, type, group_id, **kwargs):
 	if secret != getenv('SECRET_KEY'):
 		return Response(text = 'Invalid secret_key', status = 403)
-	if kwargs['type'] == 'confirmation':
+	if type == 'confirmation':
 		return Response(text = getenv('CONFIRM_KEY'))
 
-	data.bot.polling.group_id = kwargs['group_id']
-	await data.bot.router.route(kwargs, data.bot.polling.api)
+	data.bot.polling.group_id = group_id
+	await data.bot.router.route(kwargs | locals(), data.bot.polling.api)
 	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
