@@ -13,12 +13,11 @@ async def bot(secret, type, headers, group_id, **kw):
 	if type == 'confirmation':
 		return Response(text = getenv('CONFIRM_KEY'))
 	if headers.getone('X-Retry-Counter', False):
-		print('Retry!')
 		return Response(text = 'ok')
 
 	data.bot.polling.group_id = group_id
 	await data.bot.router.route(kw | locals(), data.bot.api)
-	return
+	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
 @options(json = True, secret_key = True)
