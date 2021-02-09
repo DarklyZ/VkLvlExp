@@ -55,7 +55,7 @@ async def shiki_search(message, type, text, page = 1):
 				'Шики: ' + await data.shiki.get_shiki_short_link(item['url']),
 				'Неко: ' + await data.shiki.get_neko_short_link(item['id']) if type == 'animes' else None]
 			for num, item in enumerate(response)]
-		command = '\n'.join('\n'.join(i for i in item if i) for item in objs)
+		text = '\n'.join('\n'.join(i for i in item if i) for item in objs)
 		docs = await data.shiki.get_doc(item['image']['original'] for item in response)
 		await message.answer(text, attachment = ','.join(docs))
 	else: await message.answer('Не найдено')
