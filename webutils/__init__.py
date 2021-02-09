@@ -13,7 +13,7 @@ def options(json = False, secret_key = False, user_key = False):
 				kwargs['user_id'] = await data.lvl.join_key(key)
 				if kwargs['user_id'] is None:
 					return Response(text = "Invalid user key", status = 401)
-			elif not key:
+			elif key is None:
 				return Response(text="Invalid user key", status = 401)
 			if json:
 				try: return await coro(**kwargs | await request.json())
