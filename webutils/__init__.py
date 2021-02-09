@@ -1,4 +1,5 @@
 from aiohttp.web import middleware
+from .routes import routes
 
 @middleware
 async def middleware(request, handler):

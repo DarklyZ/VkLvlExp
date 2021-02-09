@@ -9,8 +9,7 @@ from utils.lvlweb import LVL as LVLweb
 from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
 from aiohttp.web import Application, _run_app as run
-from webutils.routes import routes
-from webutils import middleware
+from webutils import middleware, routes
 
 from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
