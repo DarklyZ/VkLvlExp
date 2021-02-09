@@ -8,7 +8,7 @@ def options(json = False, secret_key = False):
 			if secret_key and request.headers.getone('secret', None) != getenv('SECRET_KEY'):
 				return Response(text = "Invalid secret key", status = 403)
 			if json:
-				try: return await coro(**await request.json())
+				try: return await coro(headers = request.headers, **await request.json())
 				except (TypeError, JSONDecodeError) as e:
 					return Response(text = str(e), status = 400)
 			return await coro(request)
