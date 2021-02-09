@@ -22,8 +22,8 @@ class LVLabc(dict, Data):
 
 		if boost:
 			boost_ids = {row['user_id']: dict_boost[row['row_number']]
-					for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
-					if row['user_id'] in ids and row['row_number'] % 2 != 0}
+				for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
+				if row['user_id'] in ids and row['row_number'] % 2 != 0}
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
 				await self.con.execute("update lvl set exp = exp + $1, temp_exp = temp_exp - $2 where user_id = any($3) and peer_id = $4", exp * key, round(exp * key / (key + 1)) if temp else 0, tuple(group), self.peer_id)
 
