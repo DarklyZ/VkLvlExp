@@ -13,6 +13,7 @@ async def bot(secret, type, headers, group_id, **kw):
 	if type == 'confirmation':
 		return Response(text = getenv('CONFIRM_KEY'))
 	if headers.getone('X-Retry-Counter', False):
+		print('Retry!')
 		return Response(text = 'ok')
 
 	data.bot.polling.group_id = group_id
