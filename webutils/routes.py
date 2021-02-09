@@ -7,7 +7,7 @@ routes = RouteTableDef()
 
 @routes.post('/bot')
 @options(json = True)
-async def bot(secret, type, headers, group_id, **kwargs):
+async def bot(secret, type, headers, group_id, **kw):
 	if secret != getenv('SECRET_KEY'):
 		return Response(text = 'Invalid secret key', status = 403)
 	if type == 'confirmation':
@@ -17,7 +17,7 @@ async def bot(secret, type, headers, group_id, **kwargs):
 
 	data.bot.polling.group_id = group_id
 	await data.bot.router.route(kwargs | locals(), data.bot.api)
-	return Response(text = 'Retry')
+	return
 
 @routes.post('/get_lvl')
 @options(json = True, secret_key = True)
