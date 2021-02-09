@@ -5,6 +5,8 @@ from vkbottle_types.objects import (
 )
 from .lvlabc import LVLabc
 from datetime import datetime, tzinfo, timedelta
+from string import ascii_letters
+from random import choice
 from asyncio import sleep
 from re import split, I
 
@@ -26,6 +28,23 @@ dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
 
 class LVL(LVLabc):
+	async def set_key(self, id, set_null = False):
+		async def get_key(count):
+			key = ''.join(choice(ascii_letters) for _ in range(count))
+			if (await self.con.fetchrow("select count(key) = 0 as bool from lvl where key = $1", key))['bool']:
+				return key
+			else: return await get_key(count)
+
+		if set_null:
+			await self.con.execute("update lvl set key = null where user_id = $1 and peer_id = $2", id, self.peer_id)
+		key = await get_key(10)
+		await self.con.execute("update lvl set key = $1 where user_id = $2 and peer_id = $3", key, id, self.peer_id)
+		return key
+
+	async def get_key(self, id):
+		key = (await self.con.fetchrow("select key from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['key']
+		return key or await self.set_key(id)
+
 	async def get_temp(self, method):
 		if method == 'read':
 			if 'temp' not in await self.bot.api.storage.get_keys(user_id = 1, offset = 0, count = 1):

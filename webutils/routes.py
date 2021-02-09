@@ -14,19 +14,20 @@ async def bot(request, secret, type, group_id, **kwargs):
 		return Response(text = getenv('CONFIRM_KEY'))
 	if request.headers.getone('X-Retry-Counter', False):
 		return Response(text = 'ok')
+	del request
 
 	data.bot.polling.group_id = group_id
 	await data.bot.router.route(kwargs | locals(), data.bot.api)
 	return Response(text = 'ok')
 
 @routes.post('/get_lvl')
-@options(json = True, secret_key = True)
-async def get_lvl(request, peer_id, user_ids):
-	await data.lvl(peer_id).get_lvl(*user_ids)
+@options(json = True, secret_key = True, user_key = True)
+async def get_lvl(request, user_id, user_ids):
+	await data.lvl.get_lvl(*user_ids)
 	return json_response(data.lvl)
 
 @routes.post('/get_top')
-@options(json = True, secret_key = True)
-async def get_top(request, peer_id, x, y):
-	await data.lvl(peer_id).get_top(x, y)
+@options(json = True, secret_key = True, user_key = True)
+async def get_top(request, user_id, x, y):
+	await data.lvl.get_top(x, y)
 	return json_response(data.lvl)

@@ -12,7 +12,6 @@ class LVLabc(dict, Data):
 	def __call__(self, peer_id):
 		self.clear()
 		self.peer_id = peer_id
-		return self
 
 	async def run_connect(self):
 		self.con = await connect(self.database_url, ssl = 'require')
