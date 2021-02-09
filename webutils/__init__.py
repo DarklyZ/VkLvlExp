@@ -9,12 +9,12 @@ def options(json = False, secret_key = False, user_key = False):
 			kwargs = {'request': request}
 			if secret_key and request.headers.getone('secret', None) != getenv('SECRET_KEY'):
 				return Response(text = "Invalid secret key", status = 403)
-			if user_key and (key := request.headers.getone('key', None)):
-				kwargs['user_id'] = await data.lvl.join_key(key)
-				if kwargs['user_id'] is None:
-					return Response(text = "Invalid user key", status = 401)
-			elif key is None:
-				return Response(text="Invalid user key", status = 401)
+			if user_key:
+				if key := request.headers.getone('key', None):
+					kwargs['user_id'] = await data.lvl.join_key(key)
+					if kwargs['user_id'] is None:
+						return Response(text = "Invalid user key", status = 401)
+				else: return Response(text="Invalid user key", status = 401)
 			if json:
 				try: return await coro(**kwargs | await request.json())
 				except (TypeError, JSONDecodeError) as e:
