@@ -10,6 +10,7 @@ from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpel
 
 from aiohttp.web import Application, _run_app as run
 from webutils.routes import routes
+from webutils import middleware
 
 from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
@@ -52,7 +53,7 @@ class LVL(LVLbot, LVLweb):
 	pass
 
 class InitData(Data, init = True):
-	app = Application()
+	app = Application(middlewares = [middleware])
 	bot = Bot(getenv('TOKEN'))
 	lvl = LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
