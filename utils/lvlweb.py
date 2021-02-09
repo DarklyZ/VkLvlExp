@@ -2,9 +2,9 @@ from .lvlabc import LVLabc
 
 class LVL(LVLabc):
 	async def join_key(self, key):
-		row = await self.con.fetchrow("select user_id, peer_id from lvl where key = $1", key)
-		if row: self(row['peer_id'])
-		return row and row['user_id']
+		if row := await self.con.fetchrow("select user_id, peer_id from lvl where key = $1", key):
+			self(row['peer_id'])
+			return row['user_id']
 
 	async def get_lvl(self, *ids):
 		self.update(
