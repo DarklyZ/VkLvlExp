@@ -11,12 +11,14 @@ async def user_id(request):
 
 def params(*keys):
 	async def params(request):
-		if set(obj := await request.json()) == set(keys):
-			return obj
+		obj = await request.json()
+		for key in set(keys):
+			if key not in obj: return
+		return obj
 	return params
 
 @routes.post('/bot')
-@options(params('secret', 'type', 'object', 'group_id', 'event_id'))
+@options(params('secret', 'type', 'group_id'))
 async def bot(request, params):
 	if params['secret'] == getenv('SECRET_KEY'):
 		if params['type'] == 'confirmation':
