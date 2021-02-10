@@ -16,7 +16,7 @@ def params(*keys):
 	return params
 
 @routes.post('/bot')
-@options(params('secret', 'type', 'object', 'group_id'))
+@options(params('secret', 'type', 'object', 'group_id', 'event_id'))
 async def bot(request, params):
 	if params['secret'] == getenv('SECRET_KEY'):
 		if params['type'] == 'confirmation':
