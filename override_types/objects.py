@@ -3,6 +3,7 @@ from .set_anno import Annotation
 
 class ChatSettings(BaseObject):
     title: str
+    photo: MessagesMessageActionPhoto
     owner_id: int
     admin_ids: list
 

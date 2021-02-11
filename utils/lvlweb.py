@@ -24,4 +24,4 @@ class LVL(LVLabc):
 			chat_settings = items[0].chat_settings
 			is_admin = id == chat_settings.owner_id or id in chat_settings.admin_ids
 		else: is_admin = False
-		self.update(response = {'title': chat_settings.title, 'status': 'admin' if is_admin else 'user'})
+		self.update(response = {'title': chat_settings.title, 'photo': chat_settings.photo.photo_50, 'status': 'admin' if is_admin else 'user'})
