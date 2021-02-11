@@ -19,9 +19,6 @@ class LVL(LVLabc):
 			await self.get_lvl(*ids)
 		except: self.update(response = [])
 
-	async def get_status(self, id):
-		if items := (await self.bot.api.messages.get_conversations_by_id(peer_ids = self.peer_id)).items:
-			chat_settings = items[0].chat_settings
-			is_admin = id == chat_settings.owner_id or id in chat_settings.admin_ids
-		else: is_admin = False
+	async def get_status(self, chat_settings, id):
+		is_admin = id == chat_settings.owner_id or id in chat_settings.admin_ids
 		self.update(response = {'title': chat_settings.title, 'photo': chat_settings.photo.photo_50, 'status': 'admin' if is_admin else 'user'})
