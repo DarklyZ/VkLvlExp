@@ -1,9 +1,7 @@
 from vkbottle_types.objects import *
 from .set_anno import Annotation
 
-class ChatSettings(BaseObject):
-    title: str
-    photo: MessagesMessageActionPhoto
+class MessagesConversationChatSettings(MessagesConversationChatSettings):
     owner_id: int
     admin_ids: list
 
@@ -36,7 +34,7 @@ class ClientInfoButtonActions(enum.Enum):
     INTENT_SUBSCRIBE = "intent_subscribe"
     INTENT_UNSUBSCRIBE = "intent_unsubscribe"
 
-Annotation(MessagesConversation).chat_settings(ChatSettings)
+Annotation(MessagesConversation).chat_settings(MessagesConversationChatSettings)
 Annotation(MessagesMessageAttachment).type(MessagesMessageAttachmentType)
 Annotation(MessagesClientInfo).button_actions(List[ClientInfoButtonActions])
 Annotation(WallWallComment).attachments(List[WallCommentAttachment], default = [])
