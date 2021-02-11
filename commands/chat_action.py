@@ -25,7 +25,7 @@ async def add_user(message, text):
 	await data.lvl.user(id1 := message.from_id, id2 := message.action.member_id)
 	if id1 != id2:
 		title = f"* Welcome to the club, buddy. *\nВас призвал(а): {data.lvl[id1]}"
-		bot_name = (await data.bot.api.groups.get_by_id(group_id = data.bot.polling.group_id))[0].name
+		bot_name = (await data.bot.api.groups.get_by_id())[0].name
 		blank = text.format(title = title, user = data.lvl[id2], name = bot_name)
 		photo = 457241337
 	else:
@@ -47,5 +47,5 @@ async def remove_user(message, text):
 async def add_user_link(message, text):
 	await data.lvl.user(id1 := message.from_id)
 	title = f"* Welcome to the club, buddy. *\n* Вы попали в ловушку *"
-	bot_name = (await data.bot.api.groups.get_by_id(group_id = data.bot.polling.group_id))[0].name
+	bot_name = (await data.bot.api.groups.get_by_id())[0].name
 	await message.answer(text.format(title = title, user = data.lvl[id1], name = bot_name), attachment = f'photo-{data.bot.polling.group_id}_457241337')

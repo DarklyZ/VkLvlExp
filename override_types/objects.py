@@ -2,6 +2,7 @@ from vkbottle_types.objects import *
 from .set_anno import Annotation
 
 class ChatSettings(BaseObject):
+    title: str
     owner_id: int
     admin_ids: list
 

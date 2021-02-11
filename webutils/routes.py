@@ -32,7 +32,13 @@ async def bot(request, params):
 
 @routes.get('/get_avatar')
 async def get_avatar(request):
-	return json_response({'response': (await data.bot.api.groups.get_by_id(group_id = data.bot.polling.group_id))[0].photo_200})
+	return json_response({'response': (await data.bot.api.groups.get_by_id())[0].photo_200})
+
+@routes.post('/get_status')
+@options(user_id)
+async def get_status(request, user_id):
+	await data.lvl.get_status(user_id)
+	return json_response(data.lvl)
 
 @routes.post('/get_lvl')
 @options(user_id)
