@@ -69,11 +69,11 @@ class LVL(LVLabc):
 		return allow
 
 	async def user(self, *ids):
-		nick = {row['user_id'] : row['nick']
+		nick = {row['user_id']: row['nick']
 			for row in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id)}
-		top = {row['user_id'] : dict_top[row['row_number']]
+		top = {row['user_id']: dict_top[row['row_number']]
 			for row in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id)}
-		topboost = {row['user_id'] : dict_topboost[row['row_number']]
+		topboost = {row['user_id']: dict_topboost[row['row_number']]
 			for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 			if row['row_number'] % 2 != 0}
 		self.update({user.id : f"{get(top, user.id)}{get(topboost, user.id)}{getcake(user.bdate)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"

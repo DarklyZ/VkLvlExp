@@ -6,9 +6,14 @@ class LVL(LVLabc):
 			self(row['peer_id'])
 			return row['user_id']
 
-	async def get_lvl(self, *ids):
+	async def get_user(self, *ids):
+		nick = {row['user_id']: row['nick']
+			for row in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id)}
+		name = {user.id: user.first_name + ' ' + user.last_name
+		    for user in  await self.bot.api.users.get(user_ids = str(ids)[1:-1], fields = 'photo_50')}
+
 		self.update(
-			response = [{'user_id': row['user_id'], 'lvl': row['lvl'], 'exp': row['exp']}
+			response = [{'user_id': row['user_id'], 'name': name.get(row['user_id']), 'nick': nick.get(row['user_id']), 'lvl': row['lvl'], 'exp': row['exp']}
 				for row in await self.con.fetch("select user_id, lvl, exp from lvl where user_id = any($1) and peer_id = $2 order by lvl desc, exp desc", ids, self.peer_id)]
 		)
 
@@ -16,7 +21,7 @@ class LVL(LVLabc):
 		try:
 			ids = [row['user_id']
 				for row in await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit $2 offset $3", self.peer_id, y - x + 1, x - 1)]
-			await self.get_lvl(*ids)
+			await self.get_user(*ids)
 		except: self.update(response = [])
 
 	async def get_status(self, chat_settings, id):
