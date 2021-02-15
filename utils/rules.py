@@ -1,7 +1,6 @@
 from sys import modules
 
 from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
-from vkbottle_types.objects import MessagesMessageActionStatus as MMAStatus
 from utils import Data
 from re import compile, I, S
 from vbml import Pattern
@@ -87,8 +86,3 @@ class RegexRule(ABCMessageRule):
 
 	async def check(self, message):
 		return bool(self.compile.search(message.text))
-
-@SetRule('chat_action_rule')
-class ChatActionRule(ChatActionRule):
-	def __init__(self, arg):
-		super().__init__([arg] if isinstance(arg, MMAStatus) else arg)
