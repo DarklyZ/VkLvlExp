@@ -42,7 +42,7 @@ async def get_avatar(request):
 @options(user_id, chat_settings)
 async def get_status(request, user_id, chat_settings):
 	status = 'admin' if user_id == chat_settings.owner_id or user_id in chat_settings.admin_ids else 'user'
-	return json_response({'response': {'title': chat_settings.title, 'photo': chat_settings.photo.photo_200, 'status': status}})
+	return json_response({'response': {'title': chat_settings.title, 'status': status}})
 
 @routes.post('/get_user')
 @options(user_id)
