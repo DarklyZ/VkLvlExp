@@ -130,9 +130,9 @@ class LVL(LVLabc):
 			if attachment.type == 'photo':
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
-			elif types is MType and attachment.type == 'wall':
+			elif attachment.type == 'wall':
 				count += await cls.atta(attachment.wall.text, attachment.wall.attachments)
-			elif types is MType and attachment.type == 'wall_reply':
+			elif attachment.type == 'wall_reply':
 				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
 			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
 				count += 20
