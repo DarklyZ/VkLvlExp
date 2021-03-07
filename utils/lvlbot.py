@@ -1,8 +1,3 @@
-from vkbottle_types.objects import (
-	MessagesMessageAttachmentType as MType,
-	WallWallpostAttachmentType as WType,
-	WallCommentAttachmentType as CType
-)
 from .lvlabc import LVLabc
 from datetime import datetime, tzinfo, timedelta
 from string import ascii_letters
