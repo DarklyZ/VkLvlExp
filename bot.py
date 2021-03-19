@@ -4,8 +4,7 @@ from vkbottle import BaseMiddleware, Bot, LoopWrapper
 from vkbottle.modules import logger
 
 from utils import Data
-from utils.lvlbot import LVL as LVLbot
-from utils.lvlweb import LVL as LVLweb
+from utils.lvl import LVL
 from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
 
 from aiohttp.web import Application, _run_app as run
@@ -47,9 +46,6 @@ class Register(BaseMiddleware, Data):
 		self.amessage(peer_id)
 		self.twdne(peer_id)
 		self.shiki(peer_id)
-
-class LVL(LVLbot, LVLweb):
-	pass
 
 class InitData(Data, init = True):
 	app = Application()
