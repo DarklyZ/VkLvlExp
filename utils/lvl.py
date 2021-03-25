@@ -94,6 +94,9 @@ class LVL(dict, Data):
 			else: await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
 		else: await self.con.execute("delete from hello where peer_id = $1", self.peer_id)
 
+	async def sync_users(self, users = []):
+		await self.con.execute("delete from lvl where user_id != all($1) and peer_id = $2", users, self.peer_id)
+
 	#BOT
 
 	async def check_add_user(self, id):

@@ -1,11 +1,14 @@
 import override_types
 
-from vkbottle import BaseMiddleware, Bot, LoopWrapper
+from vkbottle import BaseMiddleware, Bot
 from vkbottle.modules import logger
 
 from utils import Data
 from utils.lvl import LVL
-from utils.api import ShikiApi, ThisWaifuDoesNotExist, AMessage, FoafPHP, YaSpeller
+from utils.api import (
+	ShikiApi, ThisWaifuDoesNotExist,
+	AMessage, FoafPHP, YaSpeller
+)
 
 from aiohttp.web import Application, _run_app as run
 from webutils.routes import routes
@@ -65,10 +68,8 @@ class InitData(Data, init = True):
 		for custom_labeler in labelers:
 			self.bot.labeler.load(custom_labeler)
 
-		lp = LoopWrapper()
+		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
+		self.bot.loop_wrapper.add_task(self.lvl.run_connect)
+		self.bot.loop_wrapper.add_task(self.lvl.run_top)
 
-		lp.add_task(run(self.app, port = getenv('PORT')))
-		lp.add_task(self.lvl.run_connect)
-		lp.add_task(self.lvl.run_top)
-
-		lp.run_forever()
+		self.bot.loop_wrapper.run_forever()

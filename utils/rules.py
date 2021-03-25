@@ -46,11 +46,18 @@ class IsAdmin(ABCMessageRule, Data):
 	def __init__(self, adm):
 		self.adm = adm
 
+	def check_role(self, message, chat_settings):
+		return message.from_id == chat_settings.owner_id or message.from_id in chat_settings.admin_ids
+
 	async def check(self, message):
 		if items := (await self.bot.api.messages.get_conversations_by_id(peer_ids = message.peer_id)).items:
-			chat_settings = items[0].chat_settings
-			is_admin = message.from_id == chat_settings.owner_id or message.from_id in chat_settings.admin_ids
+			is_admin = self.check_role(message, items[0].chat_settings)
 			return self.adm and is_admin or not self.adm and not is_admin
+
+@SetRule('is_owner')
+class IsOwner(IsAdmin):
+	def check_role(self, message, chat_settings):
+		return message.from_id == chat_settings.owner_id
 
 @SetRule('with_text')
 class WithText(ABCMessageRule, Data):

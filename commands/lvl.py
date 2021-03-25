@@ -53,3 +53,14 @@ async def toplvl_send(message, one = 1, two = 10):
 @bl.chat_message(command = ['toptemp <one:pos> <two:pos>', 'toptemp'])
 async def toptemp_send(message, one = 1, two = 10):
 	await message.answer(await data.lvl.toptemp_size(one, two), disable_mentions = True)
+
+@bl.chat_message(command = 'sync', is_owner = True)
+async def sync(message):
+	await data.lvl.sync_users([item.member_id
+		for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items])
+	await message.answer("Лишние учасники были удалены!")
+
+@bl.chat_message(command = 'reset all users', is_owner = True)
+async def reset(message):
+	await data.lvl.sync_users()
+	await message.answer("Память успешно очищена!")

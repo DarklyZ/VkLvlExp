@@ -23,9 +23,9 @@ async def ban(message, text = 'не указана'):
 
 @bl.chat_message(command = ['echo <text>', 'echo'], is_admin = True)
 async def echo(message, text = 'Сообщение не указано'):
-	await message.answer(f'{text}\n' + ''.join(f"[id{item['member_id']}|💬]"
+	await message.answer(f'{text}\n' + ''.join(f"[id{item.member_id}|💬]"
 		for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
-		if item['member_id'] > 0 and item['member_id'] != message.from_id))
+		if item.member_id > 0 and item.member_id != message.from_id))
 
 @bl.chat_message(command = 'ord', with_reply_message = True)
 async def ordo(message):
