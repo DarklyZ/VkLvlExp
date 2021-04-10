@@ -2,23 +2,24 @@ from utils import Data as data
 from vkbottle.bot import BotLabeler
 
 help = [
-	'/MyLVL - мой уровень',
-	'/LVL & <rep_mes> - посмотреть уровень участника',
-	'/Tele <count> & <rep_mes> - передать свою exp другому',
-	'/TopLVL[ <от> <до>] - топ 10 участников',
-	'/TopTemp[ <от> <до>] - временный топ 10 участников',
-	'/Info & <rep_mes> - узнать вес сообщения'
+	"/MyLVL - мой уровень",
+	"/LVL & <rep_mes> - посмотреть уровень участника",
+	"/Tele <count> & <rep_mes> - передать свою exp другому",
+	"/TopLVL[ <от> <до>] - топ 10 участников",
+	"/TopTemp[ <от> <до>] - временный топ 10 участников",
+	"/Info & <rep_mes> - узнать вес сообщения"
 ]
+
 bl = BotLabeler()
 
 @bl.chat_message(command = 'mylvl')
 async def mylvl(message):
-	await data.lvl.send(id := message.from_id)
+	await data.lvl.send_work(id := message.from_id)
 	await message.answer(data.lvl[id])
 
 @bl.chat_message(command = 'lvl', with_reply_message = True)
 async def lvl(message):
-	await data.lvl.send(id := message.reply_message.from_id)
+	await data.lvl.send_work(id := message.reply_message.from_id)
 	await message.answer(data.lvl[id])
 
 @bl.chat_message(command = ['tele <exp:pos>', 'tele <exp:inc[up]>'], with_reply_message = True, from_id_pos = True)

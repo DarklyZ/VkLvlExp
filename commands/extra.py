@@ -5,11 +5,11 @@ from random import randint, choice
 from re import search
 
 help = [
-	'/BAN[ <причина>] & <rep_mes> - типо бан',
-	'/Ord <chr>+ - код в юникоде символов',
-	'/TWDNE - покажет рандомную вайфу с сайта ThisWaifuDoesNotExist',
-	'/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>',
-	'/TTS <text> - озвучит <text>'
+	"/BAN[ <причина>] & <rep_mes> - типо бан",
+	"/Ord <chr>+ - код в юникоде символов",
+	"/TWDNE - покажет рандомную вайфу с сайта ThisWaifuDoesNotExist",
+	"/SS Animes|Mangas|Ranobe|Characters|People[ <стр>] <Название/Имя>",
+	"/TTS <text> - озвучит <text>"
 ]
 
 bl = BotLabeler()
@@ -22,14 +22,14 @@ async def ban(message, text = 'не указана'):
 		.get_json())
 
 @bl.chat_message(command = ['echo <text>', 'echo'], is_admin = True)
-async def echo(message, text = 'Сообщение не указано'):
+async def echo(message, text = "Сообщение не указано"):
 	await message.answer(f'{text}\n' + ''.join(f"[id{item.member_id}|💬]"
 		for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
 		if item.member_id > 0 and item.member_id != message.from_id))
 
 @bl.chat_message(command = 'ord', with_reply_message = True)
 async def ordo(message):
-	await message.answer(f'Не знаю зачем тебе, но получай: {[ord(text) for text in message.reply_message.text]}')
+	await message.answer(f"Не знаю зачем тебе, но получай: {[ord(text) for text in message.reply_message.text]}")
 
 @bl.chat_message(command = 'twdne')
 async def twdne(message):
@@ -58,4 +58,4 @@ async def shiki_search(message, type, text, page = 1):
 		text = '\n'.join('\n'.join(i for i in item if i) for item in objs)
 		docs = await data.shiki.get_doc(item['image']['original'] for item in response)
 		await message.answer(text, attachment = ','.join(docs))
-	else: await message.answer('Не найдено')
+	else: await message.answer("Не найдено")

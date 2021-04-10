@@ -5,19 +5,19 @@ bl = BotLabeler()
 
 @bl.chat_message(command = 'hello', is_admin = True)
 async def hello_help(message):
-	await message.answer('Ключевые слова:\n{title} - заголовок\n{user} - пользователь\n{name} - имя бота')
+	await message.answer("Ключевые слова:\n{title} - заголовок\n{user} - пользователь\n{name} - имя бота")
 
 @bl.chat_message(command = ['set hello <text>', 'set hello'], is_admin = True)
-async def hello_plus(message, text = '* Стандартное приветствие *'):
+async def hello_plus(message, text = "* Стандартное приветствие *"):
 	try: hello = text.format(title = 'title', user = 'user', name = 'name')
-	except: return await message.answer('Неправильный формат')
+	except: return await message.answer("Неправильный формат")
 	await data.lvl.update_text(text)
-	await message.answer('Приветствие полученно\n' + hello)
+	await message.answer("Приветствие полученно\n" + hello)
 
 @bl.chat_message(command = 'del hello', is_admin = True)
 async def hello_del(message):
 	await data.lvl.update_text()
-	await message.answer('Приветствие удалено')
+	await message.answer("Приветствие удалено")
 
 @bl.chat_message(action = 'chat_invite_user', with_text = True)
 async def add_user(message, text):

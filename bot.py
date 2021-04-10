@@ -42,7 +42,7 @@ class Register(BaseMiddleware, Data):
 		self.set_peer_id(message.peer_id)
 		await self.lvl.check_add_user(message.from_id)
 		if not message.payload and (exp := await self.lvl.atta(message.text, message.attachments)):
-			await self.lvl.update_lvl(message.from_id, exp = exp, boost = True, temp = True)
+			await self.lvl.update_lvl(message.from_id, exp = exp, boost = True, temp = True, slave = True)
 
 	def set_peer_id(self, peer_id):
 		self.lvl(peer_id)
@@ -70,6 +70,6 @@ class InitData(Data, init = True):
 
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect)
-		self.bot.loop_wrapper.add_task(self.lvl.run_top)
 
+		# self.bot.run_forever()
 		self.bot.loop_wrapper.run_forever()
