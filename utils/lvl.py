@@ -113,7 +113,7 @@ class LVL(dict, Data):
 		lvl, master, slcount = await self.con.fetchrow("select lvl, master, slcount from lvl where user_id = $1 and peer_id = $2", slave, self.peer_id)
 		if id == slave or id == master: return False
 		if await self.remove_exp(id, exp := getprice(slcount, lvl)):
-			await self.con.execute("update lvl set master = $1, slcount = slcount + 1 where user_id = $2 and peer_id = $3", id, slave, self.peer_id)
+			await self.con.execute("update lvl set master = $1, slcount = slcount + 1, work = null where user_id = $2 and peer_id = $3", id, slave, self.peer_id)
 			await self.update_lvl(master, exp = exp)
 			return master, exp
 		else: return False
