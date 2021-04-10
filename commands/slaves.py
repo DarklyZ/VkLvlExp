@@ -20,10 +20,12 @@ async def slave_buy(message):
 
 @bl.chat_message(command = 'slave work <work:max[20]>', with_reply_message = True)
 async def slave_work(message, work):
-	await data.lvl.send(slave := message.reply_message.from_id)
-	if await data.lvl.slave_work(message.from_id, slave, work):
+	if await data.lvl.slave_work(message.from_id, slave := message.reply_message.from_id, work):
+		await data.lvl.send(slave)
 		await message.answer(f"Раб:\n{data.lvl[slave]}\nУстроен на работу: {work}")
-	else: await message.answer(f"Вы не можете сменить работу у {data.lvl[slave]}")
+	else:
+		await data.lvl.send(slave)
+		await message.answer(f"Вы не можете сменить работу у {data.lvl[slave]}")
 
 @bl.chat_message(command = 'myslaves')
 async def my_slaves(message):
