@@ -158,9 +158,9 @@ class LVL(dict, Data):
 		await self.send(*{row['user_id'] for row in fetch})
 		string = ''
 		for key, group in groupby(fetch, lambda row: row['work']):
-			string += f"На работе {key}:\n" if key else "Без работы:"
+			string += f"На работе {key}:\n" if key else "Без работы:\n"
 			for row in group:
-				string += self[row['user_id']]
+				string += self[row['user_id']] + '\n'
 		return string
 
 	async def set_key(self, id, set_null = False):
