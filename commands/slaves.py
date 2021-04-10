@@ -18,7 +18,7 @@ async def slave_buy(message):
 			(f"{extra[1]:+}Ⓔ:\n{data.lvl[master]}" if master else ''))
 	else: await message.answer("Недостаточно exp")
 
-@bl.chat_message(command = 'slave work <work>', with_reply_message = True)
+@bl.chat_message(command = 'slave work <work:max[20]>', with_reply_message = True)
 async def slave_work(message, work):
 	await data.lvl.send(slave := message.reply_message.from_id)
 	if await data.lvl.slave_work(message.from_id, slave, work):
