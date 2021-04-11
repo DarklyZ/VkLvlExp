@@ -62,6 +62,10 @@ class InitData(Data, init = True):
 		self.app.add_routes(routes)
 		self.bot.labeler.message_view.register_middleware(Register())
 
+		@self.bot.error_handler.register_error_handler(AssertionError)
+		async def assert_handler(e):
+			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
+
 		import utils.rules
 		from commands import labelers
 

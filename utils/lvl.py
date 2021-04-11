@@ -27,7 +27,7 @@ def getprice(slcount, lvl):
 	else: return maxexp
 
 get = lambda dict, key: dict.get(key, '')
-getpercent = lambda slcounts: percent if (percent := int(50 / 20 * slcounts)) < 50 else 50
+getpercent = lambda slcounts: percent if (percent := int(5 * slcounts)) < 50 else 50
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
@@ -41,7 +41,7 @@ class LVL(dict, Data):
 		self.clear()
 		self.peer_id = peer_id
 
-	#RUN
+	# RUN
 
 	async def get_temp(self, method):
 		if method == 'read':
@@ -63,7 +63,7 @@ class LVL(dict, Data):
 			await self.con.execute("update lvl set temp_exp = 0")
 			temp = await self.get_temp('write')
 
-	#ALL
+	# ALL
 
 	async def update_lvl(self, *ids, lvl = 0, exp = 0, boost = False, temp = False, slave = False):
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
@@ -93,35 +93,35 @@ class LVL(dict, Data):
 			else: await self.con.execute("delete from lvl where user_id = $1 and peer_id = $2", row['user_id'], self.peer_id)
 
 	async def remove_exp(self, id, exp = 0):
-		if allow := (await self.con.fetchrow("select count(user_id) > 0 as bool from lvl where user_id = $1 and exp >= $2 and peer_id = $3", id, exp, self.peer_id))['bool']:
-			await self.update_lvl(id, exp = -exp)
-		return allow
+		row = await self.con.fetchrow("select exp from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
+		assert row['exp'] >= exp, f"Не хватает {exp - row['exp']} exp"
+		await self.update_lvl(id, exp = -exp)
 
 	async def update_nick(self, *ids, nick = None):
 		await self.con.execute("update lvl set nick = $1 where user_id = any($2) and peer_id = $3", nick, ids, self.peer_id)
 
 	async def update_text(self, text = None):
-		if text:
-			if await self.hello_text(): await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id)
-			else: await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
+		if text and await self.con.execute("update hello set text = $1 where peer_id = $2", text, self.peer_id) == 'UPDATE 0':
+			await self.con.execute("insert into hello (peer_id, text) values ($1, $2)", self.peer_id, text)
 		else: await self.con.execute("delete from hello where peer_id = $1", self.peer_id)
 
-	async def sync_users(self, users = []):
+	async def sync_users(self, *users):
 		await self.con.execute("delete from lvl where user_id != all($1) and peer_id = $2", users, self.peer_id)
 
 	async def slave_buy(self, id, slave):
 		lvl, master, slcount = await self.con.fetchrow("select lvl, master, slcount from lvl where user_id = $1 and peer_id = $2", slave, self.peer_id)
-		if id == slave or id == master: return False
-		if await self.remove_exp(id, exp := getprice(slcount, lvl)):
-			await self.con.execute("update lvl set master = $1, slcount = slcount + 1, work = null where user_id = $2 and peer_id = $3", id, slave, self.peer_id)
-			await self.update_lvl(master, exp = exp)
-			return master, exp
-		else: return False
+		assert id != slave and id != master, "Нельзя купить себя или своего раба"
 
-	async def slave_work(self, id, slave, work = None):
-		return not await self.con.execute("update lvl set work = $1 where user_id = $2 and master = $3 and peer_id = $4", work, slave, id, self.peer_id) == 'UPDATE 0'
+		await self.remove_exp(id, exp := getprice(slcount, lvl))
+		await self.update_lvl(master, exp = exp)
+		await self.con.execute("update lvl set master = $1, slcount = slcount + 1, work = null where user_id = $2 and peer_id = $3", id, slave, self.peer_id)
+		return master, exp
 
-	#BOT
+	async def slave_work(self, id, slave, work, slave_name = None):
+		execute = await self.con.execute("update lvl set work = $1 where user_id = $2 and master = $3 and peer_id = $4", work, slave, id, self.peer_id)
+		assert execute != 'UPDATE 0', f"Вы не можете сменить работу у {slave_name}"
+
+	# BOT
 
 	async def check_add_user(self, id):
 		if (await self.con.fetchrow("select count(user_id) = 0 as bool from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['bool']:
@@ -155,12 +155,7 @@ class LVL(dict, Data):
 	async def slaves_by(self, id):
 		fetch = await self.con.fetch("select user_id, work from lvl where master = $1 and peer_id = $2", id, self.peer_id)
 		await self.send(*{row['user_id'] for row in fetch})
-		string = ''
-		for key, group in groupby(fetch, lambda row: row['work']):
-			string += f"На работе {key}:\n" if key else "Без работы:\n"
-			for row in group:
-				string += self[row['user_id']] + '\n'
-		return string
+		self['SLAVES'] = '\n'.join((f"На работе {key}:\n" if key else "Без работы:\n") + '\n'.join(self[row['user_id']] for row in group) for key, group in groupby(fetch, lambda row: row['work']))
 
 	async def set_key(self, id, set_null = False):
 		async def get_key(count):
@@ -169,34 +164,35 @@ class LVL(dict, Data):
 				return key
 			else: return await get_key(count)
 
-		if set_null:
-			await self.con.execute("update lvl set key = null where user_id = $1 and peer_id = $2", id, self.peer_id)
-		key = await get_key(10)
-		await self.con.execute("update lvl set key = $1 where user_id = $2 and peer_id = $3", key, id, self.peer_id)
-		return key
+		if not set_null:
+			self['KEY'] = await get_key(10)
+			await self.con.execute("update lvl set key = $1 where user_id = $2 and peer_id = $3", self['KEY'], id, self.peer_id)
+		else: await self.con.execute("update lvl set key = null where user_id = $1 and peer_id = $2", id, self.peer_id)
 
 	async def get_key(self, id):
-		key = (await self.con.fetchrow("select key from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['key']
-		return key or await self.set_key(id)
+		self['KEY'] = (await self.con.fetchrow("select key from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['key']
+		self['KEY'] or await self.set_key(id)
 
 	async def hello_text(self):
 		return (row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)) and row['text']
 
 	async def toplvl_size(self, x, y):
-		try: rows = await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
-		except: return f'Я не могу отобразить {x} - {y}'
-		if rows:
-			await self.user(*(row['user_id'] for row in rows))
-			return f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
-		else: return "TOPLVL пустой"
+		assert x <= y, f"Я не могу отобразить {x} - {y}"
+
+		rows = await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
+		assert rows, "TOPLVL пустой"
+
+		await self.user(*{row['user_id'] for row in rows})
+		self['TOPLVL'] = f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
 
 	async def toptemp_size(self, x, y):
-		try: rows = await self.con.fetch("select row_number() over (order by temp_exp desc), user_id, temp_exp from lvl where temp_exp > 0 and peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
-		except: return f'Я не могу отобразить {x} - {y}'
-		if rows:
-			await self.user(*(row['user_id'] for row in rows))
-			return f"TOPTEMP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['temp_exp']}ⓉⒺ" for row in rows)
-		else: return "TOPTEMP пустой"
+		assert x <= y, f"Я не могу отобразить {x} - {y}"
+
+		rows = await self.con.fetch("select row_number() over (order by temp_exp desc), user_id, temp_exp from lvl where temp_exp > 0 and peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
+		assert rows, "TOPTEMP пустой"
+
+		await self.user(*{row['user_id'] for row in rows})
+		self['TOPTEMP'] = f"TOPTEMP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['temp_exp']}ⓉⒺ" for row in rows)
 
 	@classmethod
 	async def atta(cls, text = '', attachments = [], negative = False, return_errors = False):
@@ -228,7 +224,7 @@ class LVL(dict, Data):
 		count *= -1 if negative else 1
 		return (count, dict_errors) if return_errors else count
 
-	#WEB
+	# WEB
 
 	async def join_key(self, key):
 		if row := await self.con.fetchrow("select user_id, peer_id from lvl where key = $1", key):
