@@ -65,7 +65,8 @@ class WithText(ABCMessageRule, Data):
 		self.wt = wt
 
 	async def check(self, message):
-		if text := await self.lvl.hello_text(): text = {'text': text}
+		await self.lvl.hello_text()
+		if text := self.lvl.get('HELLO'): text = {'text': text}
 		return self.wt and text or not self.wt and not text
 
 @SetRule('with_reply_message')

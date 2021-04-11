@@ -174,7 +174,8 @@ class LVL(dict, Data):
 		self['KEY'] or await self.set_key(id)
 
 	async def hello_text(self):
-		return (row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id)) and row['text']
+		if row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id):
+			self['HELLO'] = row['text']
 
 	async def toplvl_size(self, x, y):
 		assert x <= y, f"Я не могу отобразить {x} - {y}"
