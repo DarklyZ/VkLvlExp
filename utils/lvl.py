@@ -27,7 +27,7 @@ def getprice(slcount, lvl):
 	else: return maxexp
 
 get = lambda dict, key: dict.get(key, '')
-getpercent = lambda slcounts: percent if (percent := int(5 * slcounts)) < 50 else 50
+getpercent = lambda slcounts: percent if (percent := 5 * slcounts + 5) < 50 else 50
 dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
 dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
 dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
