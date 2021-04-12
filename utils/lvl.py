@@ -172,7 +172,7 @@ class LVL(dict, Data):
 
 	async def get_key(self, id):
 		self['KEY'] = (await self.con.fetchrow("select key from lvl where user_id = $1 and peer_id = $2", id, self.peer_id))['key']
-		self['KEY'] or await self.set_key(id)
+		if not self['KEY']: await self.set_key(id)
 
 	async def hello_text(self):
 		if row := await self.con.fetchrow("select text from hello where peer_id = $1", self.peer_id):
