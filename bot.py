@@ -10,7 +10,7 @@ from utils.api import (
 	AMessage, FoafPHP, YaSpeller
 )
 
-from aiohttp.web import Application, _run_app as run
+from aiohttp.web import Application, _run_app as run_app
 from webutils.routes import routes
 
 from loguru._defaults import LOGURU_ERROR_NO
@@ -58,6 +58,10 @@ class InitData(Data, init = True):
 	speller, foaf = YaSpeller(), FoafPHP()
 	twdne = ThisWaifuDoesNotExist()
 
+	async def run_bot(self):
+		await self.lvl.run_connect()
+		await run_app(self.app, port=getenv('PORT'))
+
 	def __init__(self):
 		self.app.add_routes(routes)
 		self.bot.labeler.message_view.register_middleware(Register())
@@ -72,8 +76,7 @@ class InitData(Data, init = True):
 		for custom_labeler in labelers:
 			self.bot.labeler.load(custom_labeler)
 
-		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
-		self.bot.loop_wrapper.add_task(self.lvl.run_connect)
+		self.bot.loop_wrapper.add_task(self.run_bot)
+		self.bot.loop_wrapper.add_task(self.lvl.run_top)
 
-		# self.bot.run_forever()
 		self.bot.loop_wrapper.run_forever()

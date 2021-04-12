@@ -43,6 +43,9 @@ class LVL(dict, Data):
 
 	# RUN
 
+	async def run_connect(self):
+		self.con = await connect(self.database_url, ssl = 'require')
+
 	async def get_temp(self, method):
 		if method == 'read':
 			if 'temp' not in await self.bot.api.storage.get_keys(user_id = 1, offset = 0, count = 1):
@@ -54,9 +57,7 @@ class LVL(dict, Data):
 			await self.bot.api.storage.set(key = 'temp', value = str(temp.timestamp()), user_id = 1)
 			return temp
 
-	async def run_connect(self):
-		self.con = await connect(self.database_url, ssl = 'require')
-
+	async def run_top(self):
 		temp = await self.get_temp('read')
 		while not await sleep(60):
 			if datetime.now(tz) < temp: continue
