@@ -206,22 +206,20 @@ class LVL(dict, Data):
 			count, dict_errors = 0, {}
 
 		for attachment in attachments:
-			if attachment.type == 'photo':
+			if attachment.type.value == 'photo':
 				pixel = max(size.width * size.height for size in attachment.photo.sizes)
 				count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
-			elif attachment.type == 'wall':
-				count += await cls.atta(attachment.wall.text, attachment.wall.attachments)
-			elif attachment.type == 'wall_reply':
-				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments)
-			elif attachment.type == 'doc' and attachment.doc.ext == 'gif':
-				count += 20
-			elif attachment.type == 'audio_message':
+			elif attachment.type.value == 'wall':
+				count += await cls.atta(attachment.wall.text, attachment.wall.attachments or [])
+			elif attachment.type.value == 'wall_reply':
+				count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments or [])
+			elif attachment.type.value == 'doc' and attachment.doc.ext == 'gif': count += 20
+			elif attachment.type.value == 'audio_message':
 				count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
-			elif attachment.type == 'video':
+			elif attachment.type.value == 'video':
 				count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
-			elif attachment.type == 'sticker':
-				count += 10
-			elif attachment.type == 'audio':
+			elif attachment.type.value == 'sticker': count += 10
+			elif attachment.type.value == 'audio':
 				count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
 		count *= -1 if negative else 1
 		return (count, dict_errors) if return_errors else count
