@@ -60,7 +60,7 @@ class InitData(Data, init = True):
 
 	async def run_bot(self):
 		await self.lvl.run_connect()
-		await run_app(self.app, port=getenv('PORT'))
+		await run_app(self.app, port = getenv('PORT'))
 
 	def __init__(self):
 		self.app.add_routes(routes)
