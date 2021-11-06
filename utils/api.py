@@ -42,9 +42,9 @@ class ShikiApi(Data):
 		self.peer_id = peer_id
 
 	async def search(self, type, text, page, limit = 5):
-		data, types = {'search': text}, ['characters', 'people']
-		if type not in types: data.update({'censored': 'false', 'page': page, 'limit': limit})
-		else: type += '/search'
+		data, types = {'search': text}, ('characters', 'people')
+		if type in types: type += '/search'
+		else: data.update({'censored': 'false', 'page': page, 'limit': limit})
 		async with request('GET', self.url_shiki_api.format(method = type), data = data) as response:
 			res = await response.json()
 			return res[(page - 1) * limit : (page - 1) * limit + limit] if len(data) == 1 else res
@@ -56,8 +56,7 @@ class ShikiApi(Data):
 		return (await self.bot.api.utils.get_short_link(self.url_neko_anime.format(id = id))).short_url[8:]
 
 	async def get_doc(self, urls):
-		server = await self.bot.api.photos.get_messages_upload_server(peer_id = self.peer_id)
-		saves = []
+		server, saves = await self.bot.api.photos.get_messages_upload_server(peer_id = self.peer_id), []
 		for url in urls:
 			async with request('GET', 'http://shikimori.one' + url) as response:
 				with BytesIO(await response.read()) as bfile:
