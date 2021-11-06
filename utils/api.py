@@ -10,7 +10,7 @@ class YaSpeller:
 			ignore_uppercase = False, find_repeat_words = False, flag_latin = False,
 			by_words = False):
 
-		self.lang = lang or ['en', 'ru']
+		self.lang = lang or ('en', 'ru')
 
 		self.options = 0
 		if ignore_uppercase: self.options |= 1
