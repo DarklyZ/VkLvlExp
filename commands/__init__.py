@@ -22,4 +22,4 @@ bl = BotLabeler()
 async def help(message, extra = None):
 	await message.answer(f"Команды{f' {extra.title()}' if extra else ''}:\n" + '\n'.join(f'{n + 1}) {comm}' for n, comm in enumerate(dict_help.get(extra, help_none))))
 
-labelers = [bl, lvl.bl, slaves.bl, nick.bl, extra.bl, key.bl, chat_action.bl, regex.bl]
+labelers = (bl, lvl.bl, slaves.bl, nick.bl, extra.bl, key.bl, chat_action.bl, regex.bl)
