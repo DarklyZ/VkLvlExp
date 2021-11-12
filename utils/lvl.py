@@ -77,10 +77,8 @@ class LVL(dict, Data):
 				await self.con.execute("update lvl set exp = exp + $1, temp_exp = temp_exp - $2 where user_id = any($3) and peer_id = $4", exp * key, round(exp * key / (key + 1)) if temp else 0, tuple(group), self.peer_id)
 
 		if slave:
-			masters = {row['master']: row['slcount']
-				for row in await self.con.fetch("select master, slcount from lvl where user_id = any($1) and work is not null and peer_id = $2", ids, self.peer_id)}
-			for key, group in groupby(masters, lambda id: masters[id]):
-				await self.update_lvl(*group, exp = round(exp * getpercent(key) / 100))
+			for row in await self.con.fetch("select master, slcount from lvl where user_id = any($1) and work is not null and peer_id = $2", ids, self.peer_id):
+				await self.con.execute("update lvl set exp = exp + $1 where user_id = $2 and peer_id = $3", round(exp * getpercent(row['slcount']) / 100), row['master'], self.peer_id)
 
 		for row in await self.con.fetch("select user_id, lvl, exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = $1", self.peer_id):
 			row_lvl, row_exp = row['lvl'], row['exp']
