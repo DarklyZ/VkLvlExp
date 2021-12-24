@@ -134,7 +134,7 @@ class LVL(dict, Data):
 		topboost = {row['user_id']: dict_topboost[row['row_number']]
 			for row in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 			if row['row_number'] % 2 != 0}
-		for user in await self.bot.api.users.get(user_ids = str(ids)[1:-1], fields = 'bdate'):
+		for user in await self.bot.api.users.get(user_ids = ','.join(str(id) for id in ids), fields = 'bdate'):
 			self[user.id] = f"{get(top, user.id)}{get(topboost, user.id)}{getcake(user.bdate)}{nick.get(user.id) or user.first_name + ' ' + user.last_name[:3]}"
 
 	async def send(self, *ids):
