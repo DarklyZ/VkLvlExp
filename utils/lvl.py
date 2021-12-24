@@ -233,7 +233,7 @@ class LVL(dict, Data):
 		nick = {row['user_id']: row['nick']
 			for row in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id)}
 		usr = {user.id: [user.first_name + ' ' + user.last_name, user.photo_50]
-		    for user in await self.bot.api.users.get(user_ids = str(ids)[1:-1], fields = 'photo_50')}
+		    for user in await self.bot.api.users.get(user_ids = ','.join(str(id) for id in ids), fields = 'photo_50')}
 		self['response'] = [{'user_id': row['user_id'], 'name': usr[row['user_id']][0], 'nick': nick.get(row['user_id']),
 				'photo': usr[row['user_id']][1], 'lvl': row['lvl'], 'exp': row['exp']}
 			for row in await self.con.fetch("select user_id, lvl, exp from lvl where user_id = any($1) and peer_id = $2 order by lvl desc, exp desc", ids, self.peer_id)]
