@@ -1,9 +1,10 @@
 from utils import Data as data
+from utils.rules import custom_rules
 from vkbottle.bot import BotLabeler
 from random import choice
 from os import getenv
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(regex = r'^f+$')
 async def f_f(message):

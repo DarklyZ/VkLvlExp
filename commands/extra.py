@@ -1,4 +1,5 @@
 from utils import Data as data
+from utils.rules import custom_rules
 from vkbottle.tools import Keyboard, Text, KeyboardButtonColor
 from vkbottle.bot import BotLabeler
 from random import randint, choice
@@ -12,7 +13,7 @@ help = [
 	"/TTS <text> - озвучит <text>"
 ]
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(command = ['ban <text>', 'ban'], with_reply_message = True)
 async def ban(message, text = 'не указана'):

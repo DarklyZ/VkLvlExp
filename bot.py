@@ -12,6 +12,7 @@ from utils.api import (
 
 from aiohttp.web import Application, _run_app as run_app
 from webutils.routes import routes
+from commands import labelers
 
 from loguru._defaults import LOGURU_ERROR_NO
 from vbml import Patcher
@@ -37,12 +38,12 @@ def inc_validator(value, *extra):
 	return value.lower() if value.lower() in extra else None
 
 class Register(BaseMiddleware, Data):
-	async def pre(self, message):
-		if message.peer_id == message.from_id or message.from_id < 0: return False
-		self.set_peer_id(message.peer_id)
-		await self.lvl.check_add_user(message.from_id)
-		if not message.payload and (exp := await self.lvl.atta(message.text, message.attachments)):
-			await self.lvl.update_lvl(message.from_id, exp = exp, boost = True, temp = True, slave = True)
+	async def pre(self):
+		if self.event.peer_id == self.event.from_id or self.event.from_id < 0: return False
+		self.set_peer_id(self.event.peer_id)
+		await self.lvl.check_add_user(self.event.from_id)
+		if not self.event.payload and (exp := await self.lvl.atta(self.event.text, self.event.attachments)):
+			await self.lvl.update_lvl(self.event.from_id, exp = exp, boost = True, temp = True, slave = True)
 
 	def set_peer_id(self, peer_id):
 		self.lvl(peer_id)
@@ -64,17 +65,14 @@ class InitData(Data, init = True):
 
 	def __init__(self):
 		self.app.add_routes(routes)
-		self.bot.labeler.message_view.register_middleware(Register())
+		self.bot.labeler.message_view.register_middleware(Register)
+
+		for custom_labeler in labelers:
+			self.bot.labeler.load(custom_labeler)
 
 		@self.bot.error_handler.register_error_handler(AssertionError)
 		async def assert_handler(e):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
-
-		import utils.rules
-		from commands import labelers
-
-		for custom_labeler in labelers:
-			self.bot.labeler.load(custom_labeler)
 
 		self.bot.loop_wrapper.add_task(self.run_bot)
 		self.bot.loop_wrapper.add_task(self.lvl.run_top)

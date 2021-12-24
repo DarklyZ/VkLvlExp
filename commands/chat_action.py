@@ -1,7 +1,8 @@
 from utils import Data as data
+from utils.rules import custom_rules
 from vkbottle.bot import BotLabeler
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(command = 'hello', is_admin = True)
 async def hello_help(message):

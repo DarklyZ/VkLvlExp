@@ -1,4 +1,5 @@
 from utils import Data as data
+from utils.rules import custom_rules
 from vkbottle.bot import BotLabeler
 
 def replace_smile(str):
@@ -11,7 +12,7 @@ help = [
 	"/Del Nick - вернуть имя"
 ]
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(command = 'set nick <nick:max[12]>', with_reply_message = False)
 async def set_nick(message, nick):

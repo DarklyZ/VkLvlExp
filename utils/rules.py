@@ -1,18 +1,17 @@
-from sys import modules
-
-from vkbottle.dispatch.rules.bot import ABCMessageRule, ChatActionRule, VBMLRule
+from vkbottle.dispatch.rules.base import ABCRule, ChatActionRule, VBMLRule
+from vkbottle.framework.labeler.base import DEFAULT_CUSTOM_RULES
 from utils import Data
 from re import compile, I, S
 from vbml import Pattern
 
-class SetRule:
-	from vkbottle.framework.bot.labeler.default import DEFAULT_CUSTOM_RULES
+custom_rules = DEFAULT_CUSTOM_RULES.copy()
 
+class SetRule:
 	def __init__(self, name):
 		self.name = name
 
 	def __call__(self, cls):
-		self.DEFAULT_CUSTOM_RULES[self.name] = cls
+		custom_rules[self.name] = cls
 		return cls
 
 @SetRule('command')
@@ -42,7 +41,7 @@ class AudioMessage(VBMLRule, Data):
 			and (text := self.amessage.get_text(audio_message)): await super().check(self.AM(text = text))
 
 @SetRule('is_admin')
-class IsAdmin(ABCMessageRule, Data):
+class IsAdmin(ABCRule, Data):
 	def __init__(self, adm):
 		self.adm = adm
 
@@ -60,7 +59,7 @@ class IsOwner(IsAdmin):
 		return message.from_id == chat_settings.owner_id
 
 @SetRule('with_text')
-class WithText(ABCMessageRule, Data):
+class WithText(ABCRule, Data):
 	def __init__(self, wt):
 		self.wt = wt
 
@@ -70,7 +69,7 @@ class WithText(ABCMessageRule, Data):
 		return self.wt and text or not self.wt and not text
 
 @SetRule('with_reply_message')
-class WithReplyMessage(ABCMessageRule):
+class WithReplyMessage(ABCRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
 	
@@ -79,7 +78,7 @@ class WithReplyMessage(ABCMessageRule):
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
 
 @SetRule('from_id_pos')
-class FromIdPos(ABCMessageRule):
+class FromIdPos(ABCRule):
 	def __init__(self, fip):
 		self.fip = fip
 	
@@ -88,7 +87,7 @@ class FromIdPos(ABCMessageRule):
 		return self.fip and is_fip or not self.fip and not is_fip
 
 @SetRule('regex')
-class RegexRule(ABCMessageRule):
+class RegexRule(ABCRule):
 	def __init__(self, regex):
 		self.compile = compile(regex, flags = I | S)
 

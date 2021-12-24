@@ -1,4 +1,5 @@
 from utils import Data as data
+from utils.rules import custom_rules
 from vkbottle.bot import BotLabeler
 
 help = [
@@ -8,7 +9,7 @@ help = [
 	"/Slaves & <rep_mes> - рабы"
 ]
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(command = 'slave buy', with_reply_message = True)
 async def slave_buy(message):

@@ -1,7 +1,8 @@
 from utils import Data as data
+from utils.rules import custom_rules
 from vkbottle.bot import BotLabeler
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(command = 'get key')
 async def get_key(message):

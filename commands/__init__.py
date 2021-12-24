@@ -1,3 +1,4 @@
+from utils.rules import custom_rules
 from vkbottle.bot import BotLabeler
 
 from . import lvl, nick, extra, chat_action, regex, key, slaves
@@ -16,7 +17,7 @@ dict_help = {
 	'extra': extra.help,
 }
 
-bl = BotLabeler()
+bl = BotLabeler(custom_rules = custom_rules)
 
 @bl.chat_message(command = ['help', 'help <extra:inc[lvl,slaves,nick,extra]>'])
 async def help(message, extra = None):
