@@ -41,28 +41,31 @@ class LVL(dict, Data):
 		self.clear()
 		self.peer_id = peer_id
 
-	# RUN
+	async def var(self, n, v = None):
+		if not v: return (await self.con.fetchrow(f"select {n} from variables"))[n]
+		else: await self.con.execute(f"update variables set {n} = $1", v)
 
-	async def run_connect(self):
-		self.con = await connect(self.database_url, ssl = 'require')
+	# RUN
 
 	async def get_temp(self, method):
 		if method == 'read':
-			if 'temp' not in await self.bot.api.storage.get_keys(user_id = 1, offset = 0, count = 1):
-				return await self.get_temp('write')
-			temp = datetime.fromtimestamp(float((await self.bot.api.storage.get(keys = 'temp', user_id = 1))[0].value))
-			return temp.replace(tzinfo = tz)
+			if temp := await self.var('update_date'):
+				return datetime.fromtimestamp(temp).replace(tzinfo = tz)
+			else: return await self.get_temp('write')
 		elif method == 'write':
 			temp = datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
-			await self.bot.api.storage.set(key = 'temp', value = str(temp.timestamp()), user_id = 1)
+			await self.var('update_date', temp.timestamp())
 			return temp
 
-	async def run_top(self):
-		temp = await self.get_temp('read')
-		while not await sleep(60):
-			if datetime.now(tz) < temp: continue
-			await self.con.execute("update lvl set temp_exp = 0")
-			temp = await self.get_temp('write')
+	async def run_connect(self, run_top = False):
+		self.con = await connect(self.database_url, ssl = 'require')
+
+		if run_top:
+			temp = await self.get_temp('read')
+			while not await sleep(60):
+				if datetime.now(tz) < temp: continue
+				await self.con.execute("update lvl set temp_exp = 0")
+				temp = await self.get_temp('write')
 
 	# ALL
 

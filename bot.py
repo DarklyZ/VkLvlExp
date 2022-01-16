@@ -59,10 +59,6 @@ class InitData(Data, init = True):
 	speller, foaf = YaSpeller(), FoafPHP()
 	twdne = ThisWaifuDoesNotExist()
 
-	async def run_bot(self):
-		await self.lvl.run_connect()
-		await run_app(self.app, port = getenv('PORT'))
-
 	def __init__(self):
 		self.app.add_routes(routes)
 		self.bot.labeler.message_view.register_middleware(Register)
@@ -74,7 +70,7 @@ class InitData(Data, init = True):
 		async def assert_handler(e):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
-		self.bot.loop_wrapper.add_task(self.run_bot)
-		self.bot.loop_wrapper.add_task(self.lvl.run_top)
+		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
+		self.bot.loop_wrapper.add_task(run_app(self.app, port = getenv('PORT')))
 
 		self.bot.loop_wrapper.run_forever()
