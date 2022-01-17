@@ -1,5 +1,3 @@
-# import override_types
-
 from vkbottle import BaseMiddleware, Bot
 from vkbottle.modules import logger
 
