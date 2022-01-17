@@ -10,7 +10,9 @@ from utils.api import (
 	AMessage, FoafPHP, YaSpeller
 )
 
-from aiohttp.web import Application, _run_app as run_app
+from aiohttp.web import (
+	Application as App, _run_app as run_app
+)
 from webutils.routes import routes
 from commands import labelers
 
@@ -52,8 +54,7 @@ class Register(BaseMiddleware, Data):
 		self.shiki(peer_id)
 
 class InitData(Data, init = True):
-	app = Application()
-	bot = Bot(getenv('TOKEN'))
+	app, bot = App(), Bot(getenv('TOKEN'))
 	lvl = LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
