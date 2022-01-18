@@ -9,7 +9,7 @@ from utils.api import (
 )
 
 from aiohttp.web import (
-	Application as App, _run_app as run_app
+	Application as App, _run_app as run
 )
 from webutils.routes import routes
 from commands import labelers
@@ -70,6 +70,6 @@ class InitData(Data, init = True):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
-		self.bot.loop_wrapper.add_task(run_app(self.app, port = getenv('PORT')))
+		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 
 		self.bot.loop_wrapper.run_forever()
