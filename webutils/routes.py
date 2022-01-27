@@ -16,9 +16,8 @@ async def chat_settings(request):
 def params(*keys):
 	async def params(request):
 		obj = await request.json()
-		for key in set(keys):
-			if key not in obj: return
-		return obj
+		if all(key in obj for key in set(keys)):
+			return obj
 	return params
 
 @routes.post('/bot')
