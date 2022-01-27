@@ -16,6 +16,24 @@ class SetRule:
 
 @SetRule('command')
 class CommandVBMLRule(VBMLRule):
+	patcher = Patcher()
+
+	@patcher.validator(key = 'int')
+	def int_validator(value):
+		return int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
+
+	@patcher.validator(key = 'pos')
+	def pos_validator(value):
+		return int(value) if value.isdigit() or value[:1] == '+' and value[1:].isdigit() else None
+
+	@patcher.validator(key = 'max')
+	def max_validator(value, extra):
+		return value if len(value) <= int(extra) else None
+
+	@patcher.validator(key = 'inc')
+	def inc_validator(value, *extra):
+		return value.lower() if value.lower() in extra else None
+
 	def __init__(self, pattern):
 		regex = r'[\./!:]{}$'
 
