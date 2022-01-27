@@ -2,7 +2,7 @@ from vkbottle.dispatch.rules.base import ABCRule, ChatActionRule, VBMLRule
 from vkbottle.framework.labeler.base import DEFAULT_CUSTOM_RULES
 from utils import Data
 from re import compile, I, S
-from vbml import Pattern
+from vbml import Patcher, Pattern
 
 custom_rules = DEFAULT_CUSTOM_RULES.copy()
 
@@ -17,19 +17,17 @@ class SetRule:
 @SetRule('command')
 class CommandVBMLRule(VBMLRule):
 	def __init__(self, pattern):
-		self.config['vbml_flags'] = I | S
-
 		regex = r'[\./!:]{}$'
 
 		if isinstance(pattern, str):
-			pattern = [Pattern(pattern, regex = regex, flags = self.config['vbml_flags'])]
+			pattern = [Pattern(pattern, regex = regex, flags = I | S)]
 		elif isinstance(pattern, Pattern):
 			pattern = [pattern]
 		elif isinstance(pattern, list):
-			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = self.config['vbml_flags']) for p in pattern]
+			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = I | S) for p in pattern]
 
 		self.patterns = pattern
-		self.patcher = self.config["vbml_patcher"]
+		self.patcher = Patcher()
 
 @SetRule('audio_message')
 class AudioMessage(VBMLRule, Data):
