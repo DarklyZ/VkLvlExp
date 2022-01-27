@@ -15,7 +15,6 @@ from webutils.routes import routes
 from commands import labelers
 
 from loguru._defaults import LOGURU_ERROR_NO
-from vbml import Patcher
 from os import getenv
 
 logger._core.min_level = LOGURU_ERROR_NO

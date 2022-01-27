@@ -45,7 +45,6 @@ class CommandVBMLRule(VBMLRule):
 			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = I | S) for p in pattern]
 
 		self.patterns = pattern
-		self.patcher = Patcher()
 
 @SetRule('audio_message')
 class AudioMessage(VBMLRule, Data):
