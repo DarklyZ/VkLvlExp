@@ -42,8 +42,8 @@ class InitData(Data, init = True):
 
 	def __init__(self):
 		self.app.add_routes(routes)
-		for custom_labeler in labelers:
-			self.bot.labeler.load(custom_labeler)
+		for labeler in labelers:
+			self.bot.labeler.load(labeler)
 
 		self.bot.labeler.message_view.register_middleware(Register)
 		@self.bot.error_handler.register_error_handler(AssertionError)
