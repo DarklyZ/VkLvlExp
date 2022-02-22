@@ -14,7 +14,7 @@ bl = BotLabeler(custom_rules = custom_rules)
 @bl.chat_message(command = 'slave buy', with_reply_message = True)
 async def slave_buy(message):
 	master, price = await data.lvl.slave_buy(id := message.from_id, slave := message.reply_message.from_id)
-	await data.lvl.send(id, slave, *filter(bool, {master}))
+	await data.lvl.send(*filter(bool, (id, slave, master)))
 	await message.answer(f"Раб успешно приобретён:\n{data.lvl[slave]}\n{-price:+}Ⓔ:\n{data.lvl[id]}\n" +
 		(f"{extra[1]:+}Ⓔ:\n{data.lvl[master]}" if master else ''))
 
