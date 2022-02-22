@@ -112,10 +112,11 @@ class LVL(dict, Data):
 
 	async def slave_buy(self, id, slave):
 		lvl, master, slcount = await self.con.fetchrow("select lvl, master, slcount from lvl where user_id = $1 and peer_id = $2", slave, self.peer_id)
-		assert id != slave and id != master, "Нельзя купить себя или своего раба"
+		master_id, = await self.con.fetchrow("select master from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
+		assert id != slave and id != master and slave != master_id, "Нельзя купить себя, своего раба или своего хозяина"
 
 		await self.remove_exp(id, exp := getprice(slcount, lvl))
-		await self.update_lvl(master, exp = exp)
+		if master: await self.update_lvl(master, exp = exp)
 		await self.con.execute("update lvl set master = $1, slcount = slcount + 1, work = null where user_id = $2 and peer_id = $3", id, slave, self.peer_id)
 		return master, exp
 
