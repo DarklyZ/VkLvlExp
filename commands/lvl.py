@@ -56,8 +56,8 @@ async def toptemp_send(message, one = 1, two = 10):
 
 @bl.chat_message(command = 'sync', is_owner = True)
 async def sync(message):
-	await data.lvl.sync_users(*{item.member_id
-		for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items})
+	await data.lvl.sync_users(*[item.member_id
+		for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items])
 	await message.answer("Лишние учасники были удалены")
 
 @bl.chat_message(command = 'reset all users', is_owner = True)
