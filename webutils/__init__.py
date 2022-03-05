@@ -23,7 +23,7 @@ class Options:
 
 	@staticmethod
 	async def chat_settings(request):
-		if items := (await data.bot.api.messages.get_conversations_by_id(peer_ids=data.lvl.peer_id)).items:
+		if items := (await data.bot.api.messages.get_conversations_by_id(peer_ids = data.lvl.peer_id)).items:
 			return items[0].chat_settings
 
 	@staticmethod
