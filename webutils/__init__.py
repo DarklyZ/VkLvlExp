@@ -32,5 +32,4 @@ class Options:
 			obj = await request.json()
 			if all(key in obj for key in set(keys)):
 				return obj
-
 		return params

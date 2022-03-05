@@ -30,23 +30,23 @@ class CommandVBMLRule(VBMLRule):
 
 		self.patterns = pattern
 
-	@patcher.validator(key = 'int')
 	@staticmethod
+	@patcher.validator(key = 'int')
 	def int_validator(value):
 		return int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
 
-	@patcher.validator(key = 'pos')
 	@staticmethod
+	@patcher.validator(key = 'pos')
 	def pos_validator(value):
 		return int(value) if value.isdigit() or value[:1] == '+' and value[1:].isdigit() else None
 
-	@patcher.validator(key = 'max')
 	@staticmethod
+	@patcher.validator(key = 'max')
 	def max_validator(value, extra):
 		return value if len(value) <= int(extra) else None
 
-	@patcher.validator(key = 'inc')
 	@staticmethod
+	@patcher.validator(key = 'inc')
 	def inc_validator(value, *extra):
 		return value.lower() if value.lower() in extra else None
 
