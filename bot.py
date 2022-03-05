@@ -31,26 +31,27 @@ class InitData(Data, init = True):
 		for labeler in labelers:
 			self.bot.labeler.load(labeler)
 
-		@self.bot.labeler.message_view.register_middleware
-		class Register(BaseMiddleware, Data):
-			async def pre(self):
-				if self.event.peer_id == self.event.from_id or self.event.from_id < 0: return False
-				self.set_peer_id(self.event.peer_id)
-				await self.lvl.check_add_user(self.event.from_id)
-				if not self.event.payload and (exp := await self.lvl.atta(self.event.text, self.event.attachments)):
-					await self.lvl.update_lvl(self.event.from_id, exp = exp, boost = True, temp = True, slave = True)
-
-			def set_peer_id(self, peer_id):
-				self.lvl(peer_id)
-				self.amessage(peer_id)
-				self.twdne(peer_id)
-				self.shiki(peer_id)
-
-		@self.bot.error_handler.register_error_handler(AssertionError)
-		async def assert_handler(e):
-			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
-
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 
 		self.bot.loop_wrapper.run_forever()
+
+	@bot.labeler.message_view.register_middleware
+	class Register(BaseMiddleware, Data):
+		async def pre(self):
+			if self.event.peer_id == self.event.from_id or self.event.from_id < 0: return False
+			self.set_peer_id(self.event.peer_id)
+			await self.lvl.check_add_user(self.event.from_id)
+			if not self.event.payload and (exp := await self.lvl.atta(self.event.text, self.event.attachments)):
+				await self.lvl.update_lvl(self.event.from_id, exp = exp, boost = True, temp = True, slave = True)
+
+		def set_peer_id(self, peer_id):
+			self.lvl(peer_id)
+			self.amessage(peer_id)
+			self.twdne(peer_id)
+			self.shiki(peer_id)
+
+	@staticmethod
+	@bot.error_handler.register_error_handler(AssertionError)
+	async def assert_handler(e):
+		await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
