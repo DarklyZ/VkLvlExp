@@ -223,6 +223,7 @@ class LVL(dict, Data):
 			elif attachment.type.value == 'sticker': count += 10
 			elif attachment.type.value == 'audio':
 				count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
+
 		count *= -1 if negative else 1
 		return (count, dict_errors) if return_errors else count
 
