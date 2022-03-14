@@ -66,7 +66,7 @@ class InitData(Data, init = True):
 	@staticmethod
 	@bot.error_handler.register_error_handler(AssertionError)
 	async def _assert_handler(e):
-		await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
+		await InitData.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
 	@staticmethod
 	@bot.error_handler.register_undefined_error_handler
@@ -74,5 +74,5 @@ class InitData(Data, init = True):
 		pass
 
 	async def _update_callback(self):
-		await self.bot.callback.setup_group_id()
-		await self.bot.callback.edit_callback_server(1)
+		await InitData.bot.callback.setup_group_id()
+		await InitData.bot.callback.edit_callback_server(1)
