@@ -34,6 +34,7 @@ async def archi(message):
 
 @bl.chat_message(regex = r'\b(?:украин.+?)|(?:хохо?л)\b')
 async def uk(message):
-	await message.ctx_api.messages.delete(
+	try: await message.ctx_api.messages.delete(
 		delete_for_all = True, peer_id = message.peer_id, cmids = message.conversation_message_id
 	)
+	except: pass
