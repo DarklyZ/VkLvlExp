@@ -34,16 +34,11 @@ class InitData(Data, init = True):
 		for labeler in labelers:
 			self.bot.labeler.load(labeler)
 
-		self.bot.loop_wrapper.add_task(self.update_callback)
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 
 		self.bot.loop_wrapper.run_forever()
 		# self.bot.run_forever()
-
-	async def update_callback(self):
-		await self.bot.callback.setup_group_id()
-		await self.bot.callback.edit_callback_server(0)
 
 	@bot.labeler.message_view.register_middleware
 	class Register(BaseMiddleware, Data):
@@ -66,6 +61,12 @@ class InitData(Data, init = True):
 			self.amessage(peer_id)
 			self.twdne(peer_id)
 			self.shiki(peer_id)
+
+	@bot.loop_wrapper.add_task
+	@classmethod
+	async def update_callback(cls):
+		await cls.bot.callback.setup_group_id()
+		await cls.bot.callback.edit_callback_server(0)
 
 	@staticmethod
 	@bot.error_handler.register_error_handler(AssertionError)
