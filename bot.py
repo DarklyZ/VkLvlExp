@@ -34,10 +34,10 @@ class InitData(Data, init = True):
 		for labeler in labelers:
 			self.bot.labeler.load(labeler)
 
+		self._register_handlers()
+
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
-
-		self.register_handlers()
 
 		self.bot.loop_wrapper.run_forever()
 		# self.bot.run_forever()
@@ -64,16 +64,16 @@ class InitData(Data, init = True):
 			self.twdne(peer_id)
 			self.shiki(peer_id)
 
-	async def register_handlers(self):
+	def _register_handlers(self):
 		@self.bot.loop_wrapper.add_task
-		async def _update_callback():
+		async def update_callback():
 			await self.bot.callback.setup_group_id()
 			await self.bot.callback.edit_callback_server(1)
 
 		@self.bot.error_handler.register_error_handler(AssertionError)
-		async def _assert_handler(e):
+		async def assert_handler(e):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
 		@self.bot.error_handler.register_undefined_error_handler
-		async def _error_handler(e):
+		async def error_handler(e):
 			pass
