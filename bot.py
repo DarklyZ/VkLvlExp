@@ -65,8 +65,8 @@ class InitData(Data, init = True):
 	@staticmethod
 	@bot.loop_wrapper.add_task
 	async def update_callback():
-		await InitData.bot.callback.setup_group_id()
-		await InitData.bot.callback.edit_callback_server(1)
+		await bot.callback.setup_group_id()
+		await bot.callback.edit_callback_server(1)
 
 	@staticmethod
 	@bot.error_handler.register_error_handler(AssertionError)
