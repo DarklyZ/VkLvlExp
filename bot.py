@@ -49,7 +49,7 @@ class InitData(Data, init = True):
 
 		async def post(self):
 			if len(
-				rule for handler in self.handlers for rule in handler.rules if isinstance(rule, CommandVBMLRule)
+				[rule for handler in self.handlers for rule in handler.rules if isinstance(rule, CommandVBMLRule)]
 			): await self.bot.api.messages.delete(
 				delete_for_all = True, peer_id = self.event.peer_id, cmids = self.event.conversation_message_id
 			)
