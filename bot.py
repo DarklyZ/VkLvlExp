@@ -3,6 +3,7 @@ from vkbottle.modules import logger
 
 from utils import Data
 from utils.lvl import LVL
+from utils.rules import CommandVBMLRule
 from utils.api import (
 	ShikiApi, ThisWaifuDoesNotExist,
 	AMessage, FoafPHP, YaSpeller
@@ -35,6 +36,7 @@ class InitData(Data, init = True):
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 
 		self.bot.loop_wrapper.run_forever()
+		# self.bot.run_forever()
 
 	@bot.labeler.message_view.register_middleware
 	class Register(BaseMiddleware, Data):
@@ -44,6 +46,13 @@ class InitData(Data, init = True):
 			await self.lvl.check_add_user(self.event.from_id)
 			if not self.event.payload and (exp := await self.lvl.atta(self.event.text, self.event.attachments)):
 				await self.lvl.update_lvl(self.event.from_id, exp = exp, boost = True, temp = True, slave = True)
+
+		async def post(self):
+			for type_rule in (type(rule) for handler in self.handlers for rule in handler.rules):
+				if type_rule is CommandVBMLRule:
+					await self.bot.api.messages.delete(
+						delete_for_all = True, peer_id = self.event.peer_id, cmids = self.event.conversation_message_id
+					)
 
 		def set_peer_id(self, peer_id):
 			self.lvl(peer_id)
