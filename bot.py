@@ -1,5 +1,5 @@
 from vkbottle import BaseMiddleware, Bot
-from vkbottle.callback import BotCallback
+from vkbottle.callback import BotCallback as CB
 from vkbottle.modules import logger
 
 from utils import Data
@@ -22,8 +22,10 @@ from os import getenv
 logger._core.min_level = LOGURU_ERROR_NO
 
 class InitData(Data, init = True):
-	_cb = BotCallback(getenv('URL') + '/bot', 'BOT')
-	bot = Bot(getenv('TOKEN'), callback = _cb)
+	bot = Bot(
+		token = getenv('TOKEN'),
+		callback = CB(f"{getenv('URL')}/bot", 'BOT')
+	)
 	app, lvl = App(), LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
