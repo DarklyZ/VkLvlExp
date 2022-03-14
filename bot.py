@@ -48,11 +48,12 @@ class InitData(Data, init = True):
 				await self.lvl.update_lvl(self.event.from_id, exp = exp, boost = True, temp = True, slave = True)
 
 		async def post(self):
-			for type_rule in (type(rule) for handler in self.handlers for rule in handler.rules):
-				if type_rule is CommandVBMLRule:
-					await self.bot.api.messages.delete(
-						delete_for_all = True, peer_id = self.event.peer_id, cmids = self.event.conversation_message_id
-					)
+			if len(
+				rule for handler in self.handlers for rule in handler.rules if isinstance(rule, CommandVBMLRule)
+			):
+				await self.bot.api.messages.delete(
+					delete_for_all = True, peer_id = self.event.peer_id, cmids = self.event.conversation_message_id
+				)
 
 		def set_peer_id(self, peer_id):
 			self.lvl(peer_id)
