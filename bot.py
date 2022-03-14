@@ -36,12 +36,13 @@ class InitData(Data, init = True):
 
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
+		self.bot.loop_wrapper.add_task(self._update_callback)
 
 		self.bot.loop_wrapper.run_forever()
 		# self.bot.run_forever()
 
 	@bot.labeler.message_view.register_middleware
-	class Register(BaseMiddleware, Data):
+	class _Register(BaseMiddleware, Data):
 		async def pre(self):
 			if self.event.peer_id == self.event.from_id or self.event.from_id < 0: return False
 			self.set_peer_id(self.event.peer_id)
@@ -63,17 +64,15 @@ class InitData(Data, init = True):
 			self.shiki(peer_id)
 
 	@staticmethod
-	@bot.loop_wrapper.add_task
-	async def update_callback():
-		await bot.callback.setup_group_id()
-		await bot.callback.edit_callback_server(1)
-
-	@staticmethod
 	@bot.error_handler.register_error_handler(AssertionError)
-	async def assert_handler(e):
+	async def _assert_handler(e):
 		await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
 	@staticmethod
 	@bot.error_handler.register_undefined_error_handler
-	async def error_handler(e):
+	async def _error_handler(e):
 		pass
+
+	async def _update_callback(self):
+		await self.bot.callback.setup_group_id()
+		await self.bot.callback.edit_callback_server(1)
