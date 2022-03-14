@@ -8,14 +8,14 @@ routes = RouteTableDef()
 @routes.post('/bot')
 @Op(Op.params('secret', 'type', 'group_id'))
 async def bot(request, params):
-	if params['secret'] == getenv('SECRET_KEY'):
+	if params['secret'] == data.bot.callback.secret_key:
 		if params['type'] == 'confirmation':
 			return Response(text = getenv('CONFIRM_KEY'))
 		if request.headers.getone('X-Retry-Counter', False):
 			return Response(text = 'ok')
 
-		data.bot.polling.group_id = params['group_id']
-		await data.bot.router.route(params, data.bot.api)
+		data.bot.callback.group_id = params['group_id']
+		await data.bot.process_event(params)
 		return Response(text = 'ok')
 
 @routes.get('/get_avatar')

@@ -1,4 +1,5 @@
 from vkbottle import BaseMiddleware, Bot
+from vkbottle.callback import BotCallback
 from vkbottle.modules import logger
 
 from utils import Data
@@ -21,8 +22,10 @@ from os import getenv
 logger._core.min_level = LOGURU_ERROR_NO
 
 class InitData(Data, init = True):
-	app, bot = App(), Bot(getenv('TOKEN'))
-	lvl = LVL(getenv('DATABASE_URL'))
+	bot = Bot(getenv('TOKEN'), callback = BotCallback(
+		secret_key = getenv('SECRET_KEY')
+	))
+	app, lvl = App(), LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
 	twdne = ThisWaifuDoesNotExist()
