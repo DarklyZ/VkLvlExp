@@ -6,7 +6,7 @@ from os import getenv
 routes = RouteTableDef()
 
 @routes.post('/bot')
-@Op(Op.params('secret', 'type', 'group_id'))
+@Op(Op.params('secret', 'type'))
 async def bot(request, params):
 	if params['secret'] == data.bot.callback.secret_key:
 		if params['type'] == 'confirmation':
@@ -14,7 +14,6 @@ async def bot(request, params):
 		if request.headers.getone('X-Retry-Counter', False):
 			return Response(text = 'ok')
 
-		data.bot.callback.group_id = params['group_id']
 		await data.bot.process_event(params)
 		return Response(text = 'ok')
 
