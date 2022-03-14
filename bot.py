@@ -21,10 +21,10 @@ from os import getenv
 
 logger._core.min_level = LOGURU_ERROR_NO
 
+cb = BotCallback(getenv('URL') + '/bot', 'BOT')
+
 class InitData(Data, init = True):
-	bot = Bot(getenv('TOKEN'), callback = BotCallback(
-		secret_key = getenv('SECRET_KEY')
-	))
+	bot = Bot(getenv('TOKEN'), callback = cb)
 	app, lvl = App(), LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
@@ -35,6 +35,7 @@ class InitData(Data, init = True):
 		for labeler in labelers:
 			self.bot.labeler.load(labeler)
 
+		self.bot.loop_wrapper.add_task(self.bot.callback.edit_callback_server(0))
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 
