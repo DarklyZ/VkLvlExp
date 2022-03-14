@@ -32,7 +32,7 @@ async def archi(message):
 	await message.answer(sticker_id = 9805)
 	await message.answer(f"[id{getenv('archi_id', message.from_id)}|💬][id{message.from_id}|🃏]Ожидайте бана…")
 
-@bl.chat_message(regex = r'\b(?:украин.+?)|(?:хохо?л)\b')
+@bl.chat_message(regex = r'\b(?:украин.{0,3})|(?:хохо?л.?)\b')
 async def uk(message):
 	await message.ctx_api.messages.delete(
 		delete_for_all = True, peer_id = message.peer_id, cmids = message.conversation_message_id
