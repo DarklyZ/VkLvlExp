@@ -66,7 +66,7 @@ class InitData(Data, init = True):
 	@classmethod
 	async def update_callback(cls):
 		await cls.bot.callback.setup_group_id()
-		await cls.bot.callback.edit_callback_server(0)
+		await cls.bot.callback.edit_callback_server(1)
 
 	@staticmethod
 	@bot.error_handler.register_error_handler(AssertionError)
