@@ -68,7 +68,7 @@ class InitData(Data, init = True):
 	async def assert_handler(e):
 		await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
-	# @staticmethod
-	# @bot.error_handler.register_undefined_error_handler
-	# async def error_handler(e):
-	# 	pass
+	@staticmethod
+	@bot.error_handler.register_undefined_error_handler
+	async def error_handler(e):
+		pass
