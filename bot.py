@@ -62,11 +62,11 @@ class InitData(Data, init = True):
 			self.twdne(peer_id)
 			self.shiki(peer_id)
 
+	@staticmethod
 	@bot.loop_wrapper.add_task
-	@classmethod
-	async def update_callback(cls):
-		await cls.bot.callback.setup_group_id()
-		await cls.bot.callback.edit_callback_server(1)
+	async def update_callback():
+		await InitData.bot.callback.setup_group_id()
+		await InitData.bot.callback.edit_callback_server(1)
 
 	@staticmethod
 	@bot.error_handler.register_error_handler(AssertionError)
