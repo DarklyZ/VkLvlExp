@@ -1,7 +1,7 @@
 from utils import Data as data
 
 class Rules(list):
-	def __init__(self, rules, keys = set()):
+	def __init__(self, rules, keys):
 		super().__init__()
 		self.keys = keys
 		if self.keys:
