@@ -6,9 +6,9 @@ class Options:
 		self.handlers = []
 		if keys:
 			self.json_keys = keys
-			self.handlers.append(self.__dict__['body'])
+			self.handlers.append(type(self).__dict__['body'])
 		if rules:
-			self.handlers.extend(v for k, v in self.__dict__.items() if k in rules)
+			self.handlers.extend(v for k, v in type(self).__dict__.items() if k in rules)
 
 	def __call__(self, coro):
 		async def new_coro(request):
