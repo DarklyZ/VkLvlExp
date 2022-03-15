@@ -3,6 +3,8 @@ from utils import Data as data
 class Rules(list):
 	def __init__(self, rules, keys):
 		super().__init__()
+		if keys:
+			self.append(type(self).__dict__['body'])
 		for rule in rules:
 			self.append(type(self).__dict__[rule])
 		self.keys = keys
