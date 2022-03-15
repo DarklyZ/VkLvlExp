@@ -4,6 +4,7 @@ from .rules import Rules
 class Options:
 	def __init__(self, *, rules = set(), keys = set()):
 		self.rules = Rules(rules, keys)
+		print(self.rules)
 
 	def __call__(self, coro):
 		async def new_coro(request):
