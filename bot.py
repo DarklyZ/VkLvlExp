@@ -1,5 +1,5 @@
 from vkbottle import BaseMiddleware, Bot
-from vkbottle.callback import BotCallback as CB
+from vkbottle.callback import BotCallback
 from vkbottle.modules import logger
 
 from utils import Data
@@ -24,8 +24,11 @@ logger._core.min_level = LOGURU_ERROR_NO
 class InitData(Data, init = True):
 	bot = Bot(
 		token = getenv('TOKEN'),
-		callback = CB(f"{getenv('URL')}/bot", 'BOT')
+		callback = BotCallback(
+			secret_key = getenv('SECRET_KEY')
+		)
 	)
+
 	app, lvl = App(), LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
@@ -66,11 +69,6 @@ class InitData(Data, init = True):
 			self.shiki(peer_id)
 
 	def _register_handlers(self):
-		@self.bot.loop_wrapper.add_task
-		async def update_callback():
-			await self.bot.callback.setup_group_id()
-			await self.bot.callback.edit_callback_server(1)
-
 		@self.bot.error_handler.register_error_handler(AssertionError)
 		async def assert_handler(e):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
