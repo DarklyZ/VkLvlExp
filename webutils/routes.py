@@ -6,7 +6,7 @@ from os import getenv
 routes = RouteTableDef()
 
 @routes.post('/bot')
-@Options(rules = {'secret_key'}, keys = {'secret', 'type'})
+@Options(body = {'secret', 'type'}, secret_key = True)
 async def bot(request, body, secret_key):
 	if body['type'] == 'confirmation':
 		return Response(text = getenv('CONFIRM_KEY'))
@@ -21,19 +21,19 @@ async def get_avatar(request):
 	return json_response({'response': (await data.bot.api.groups.get_by_id())[0].photo_200})
 
 @routes.post('/get_status')
-@Options(rules = {'user_id', 'chat_settings'})
+@Options(user_id = True, chat_settings = True)
 async def get_status(request, user_id, chat_settings):
 	status = 'admin' if user_id == chat_settings.owner_id or user_id in chat_settings.admin_ids else 'user'
 	return json_response({'response': {'title': chat_settings.title, 'status': status}})
 
 @routes.post('/get_user')
-@Options(rules = {'user_id'})
+@Options(user_id = True)
 async def get_user(request, user_id):
 	await data.lvl.get_user(user_id)
 	return json_response(data.lvl)
 
 @routes.post('/get_top')
-@Options(rules = {'user_id'}, keys = {'x', 'y'})
+@Options(body = {'x', 'y'}, user_id = True)
 async def get_top(request, body, user_id):
 	await data.lvl.get_top(body['x'], body['y'])
 	return json_response(data.lvl)

@@ -2,8 +2,8 @@ from aiohttp.web import Response
 from .rules import Rules
 
 class Options:
-	def __init__(self, *, rules, keys = set()):
-		self.rules = Rules(rules, keys)
+	def __init__(self, **kwargs):
+		self.rules = Rules(**kwargs)
 
 	def __call__(self, coro):
 		async def new_coro(request):

@@ -1,17 +1,15 @@
 from utils import Data as data
 
 class Rules(list):
-	def __init__(self, rules, keys):
+	def __init__(self, **kwargs):
 		super().__init__()
-		self.keys = keys
-		if self.keys:
-			self.append(self.body)
-		for rule in rules:
+		self.kwargs = kwargs
+		for rule in kwargs:
 			self.append(getattr(self, rule))
 
 	async def body(self, request):
 		self.json = await request.json()
-		if all(key in self.json for key in self.keys):
+		if all(key in self.json for key in self.kwargs['body']):
 			return self.json
 
 	async def secret_key(self, request):
