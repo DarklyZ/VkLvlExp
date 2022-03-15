@@ -1,11 +1,11 @@
 from utils import Data as data
 
 class Rules(list):
-	def __init__(self, rules, keys):
+	def __init__(self, rules, keys = set()):
 		super().__init__()
 		self.keys = keys
 		if self.keys:
-			self.append(type(self).__dict__['body'])
+			self.append(type(self).body)
 		for rule in rules:
 			self.append(type(self).__dict__[rule])
 

@@ -2,7 +2,7 @@ from aiohttp.web import Response
 from .rules import Rules
 
 class Options:
-	def __init__(self, *, rules = set(), keys = set()):
+	def __init__(self, *, rules, keys = set()):
 		self.rules = Rules(rules, keys)
 
 	def __call__(self, coro):
