@@ -8,12 +8,12 @@ class Options:
 
 	def __call__(self, coro):
 		async def new_coro(request):
-			try:
-				kwargs = {handler.__name__: await handler(self.rules, request)
-					for handler in self.rules}
-				if all(kwargs.values()):
-					try: return await coro(request, **kwargs)
-					except TypeError: return Response(text = 'TypeError!', status = 500)
-				else: return Response(text = 'RulesError!', status = 400)
-			except Exception as e: return Response(text = str(e), status = 400)
+			# try:
+			kwargs = {handler.__name__: await handler(self.rules, request)
+				for handler in self.rules}
+			if all(kwargs.values()):
+				try: return await coro(request, **kwargs)
+				except TypeError: return Response(text = 'TypeError!', status = 500)
+			else: return Response(text = 'RulesError!', status = 400)
+			# except: return Response(text = 'Error!', status = 400)
 		return new_coro
