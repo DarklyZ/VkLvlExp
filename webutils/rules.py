@@ -5,9 +5,9 @@ class Rules(list):
 		super().__init__()
 		self.keys = keys
 		if self.keys:
-			self.append(type(self).body)
+			self.append(self.body)
 		for rule in rules:
-			self.append(type(self).__dict__[rule])
+			self.append(getattr(self, rule))
 
 	async def body(self, request):
 		self.json = await request.json()

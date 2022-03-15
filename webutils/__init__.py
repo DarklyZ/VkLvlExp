@@ -8,7 +8,7 @@ class Options:
 	def __call__(self, coro):
 		async def new_coro(request):
 			try:
-				kwargs = {handler.__name__: await handler(self.rules, request)
+				kwargs = {handler.__name__: await handler(request)
 					for handler in self.rules}
 				if all(kwargs.values()):
 					try: return await coro(request, **kwargs)
