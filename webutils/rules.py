@@ -9,7 +9,8 @@ class Rules(list):
 
 	async def body(self, request):
 		self.json = await request.json()
-		if all(key in self.json for key in self.kwargs['body']):
+		keys = self.kwargs['body']
+		if keys is True or all(key in self.json for key in keys):
 			return self.json
 
 	async def secret_key(self, request):
