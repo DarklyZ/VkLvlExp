@@ -1,5 +1,5 @@
 from aiohttp.web import Response
-from rules import Rules
+from .rules import Rules
 
 class Options:
 	def __init__(self, *, rules = set(), keys = set()):
