@@ -15,8 +15,8 @@ class Rules(list):
 			return self.json
 
 	async def secret_key(self, request):
-		if self.json['secret_key'] == data.bot.callback.secret_key:
-			return self.json['secret_key']
+		if self.json['secret'] == data.bot.callback.secret_key:
+			return self.json['secret']
 
 	async def user_id(self, request):
 		if key := request.headers.getone('key', False):
