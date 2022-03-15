@@ -10,9 +10,10 @@ class Options:
 			try:
 				kwargs = {handler.__name__: await handler(self.rules, request)
 					for handler in self.rules}
+				print(kwargs, self.rules)
 				if all(kwargs.values()):
 					try: return await coro(request, **kwargs)
 					except TypeError: return Response(text = 'Error!', status = 500)
-				else: pass # return Response(text = 'Error!', status = 400)
-			except: pass # return Response(text = 'Error!', status = 400)
+				else: return Response(text = 'Error!', status = 400)
+			except: return Response(text = 'Error!', status = 400)
 		return new_coro
