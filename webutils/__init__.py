@@ -12,10 +12,9 @@ class Options:
 					for handler in self.rules}
 				if all(kwargs.values()):
 					try:
-						result = await coro(request, **kwargs)
-						await self.rules.post()
-						return result
+						return await coro(request, **kwargs)
 					except TypeError: return Response(text = 'TypeError!', status = 500)
 				else: return Response(text = 'Error!', status = 400)
 			except: return Response(text = 'Error!', status = 400)
+			finally: await self.rules.post()
 		return new_coro
