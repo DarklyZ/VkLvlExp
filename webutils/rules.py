@@ -1,11 +1,20 @@
+from asyncio import iscoroutinefunction
 from utils import Data as data
 
 class Rules(list):
 	def __init__(self, **kwargs):
 		super().__init__()
+		self.post_fs = []
 		self.kwargs = kwargs
 		for rule in kwargs:
 			self.append(getattr(self, rule))
+
+	async def post(self):
+		for func in self.post_fs:
+			if iscoroutinefunction(func):
+				await func()
+			else: func()
+		self.post_fs.clear()
 
 	async def body(self, request):
 		self.json = await request.json()
@@ -17,6 +26,7 @@ class Rules(list):
 			return self.json['secret']
 
 	async def user_id(self, request):
+		self.post_fs.append(lambda: data.lvl.clear())
 		if key := request.headers.getone('key', False):
 			return await data.lvl.join_key(key)
 
