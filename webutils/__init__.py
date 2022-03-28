@@ -1,7 +1,8 @@
+from utils import Data
 from aiohttp.web import Response
 from .rules import Rules
 
-class Options:
+class Options(Data):
 	def __init__(self, **kwargs):
 		self.rules = Rules(**kwargs)
 
@@ -11,10 +12,10 @@ class Options:
 				kwargs = {handler.__name__: await handler(request)
 					for handler in self.rules}
 				if all(kwargs.values()):
-					try:
-						return await coro(request, **kwargs)
+					try: return await coro(request, **kwargs)
 					except TypeError: return Response(text = 'TypeError!', status = 500)
+					finally:
+						if 'user_id' in kwargs: self.lvl.clear()
 				else: return Response(text = 'Error!', status = 400)
 			except: return Response(text = 'Error!', status = 400)
-			finally: await self.rules.post()
 		return new_coro
