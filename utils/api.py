@@ -1,14 +1,23 @@
 from utils import Data
 from io import BytesIO
-from aiohttp import request
+from aiohttp import ClientSession
 
-class YaSpeller:
+class API:
+	def __init__(self):
+		self.session = ClientSession()
+
+	def __del__(self):
+		if not self.session.closed:
+			self.session.close()
+
+class YaSpeller(API):
 	url = 'http://speller.yandex.net/services/spellservice.json/checkText'
 
 	def __init__(self, lang = None, ignore_urls = False, ignore_capitalization = False,
 			ignore_digits = False, ignore_latin = False, ignore_roman_numerals = False,
 			ignore_uppercase = False, find_repeat_words = False, flag_latin = False,
 			by_words = False):
+		super().__init__()
 
 		self.lang = lang or ('en', 'ru')
 
@@ -30,10 +39,10 @@ class YaSpeller:
 			'options': self.options,
 			'lang': lang,
 		}
-		async with request('POST', self.url, data = data) as response:
+		async with self.session.post(self.url, data = data) as response:
 			return await response.json()
 
-class ShikiApi(Data):
+class ShikiApi(API, Data):
 	url_shiki = 'http://shikimori.one{url}'
 	url_shiki_api = url_shiki.format(url = '/api/{method}')
 	url_neko_anime = 'https://nekomori.ch/anime/-{id}/general'
@@ -45,9 +54,9 @@ class ShikiApi(Data):
 		data, types = {'search': text}, ('characters', 'people')
 		if type in types: type += '/search'
 		else: data.update({'censored': 'false', 'page': page, 'limit': limit})
-		async with request('GET', self.url_shiki_api.format(method = type), data = data) as response:
+		async with self.session.get(self.url_shiki_api.format(method = type), data = data) as response:
 			res = await response.json()
-			return res[(page - 1) * limit : (page - 1) * limit + limit] if len(data) == 1 else res
+		return res[(page - 1) * limit : (page - 1) * limit + limit] if len(data) == 1 else res
 
 	async def get_shiki_short_link(self, url):
 		return (await self.bot.api.utils.get_short_link(self.url_shiki.format(url = url))).short_url[8:]
@@ -58,15 +67,16 @@ class ShikiApi(Data):
 	async def get_doc(self, urls):
 		server, saves = await self.bot.api.photos.get_messages_upload_server(peer_id = self.peer_id), []
 		for url in urls:
-			async with request('GET', 'http://shikimori.one' + url) as response:
-				with BytesIO(await response.read()) as bfile:
-					bfile.name = '.jpg'
-					async with request('POST', server.upload_url, data = {'photo': bfile}) as response:
-						res = await response.json(content_type = 'text/html')
-						saves.append(await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash']))
+			async with self.session.get('http://shikimori.one' + url) as response:
+				res = await response.read()
+			with BytesIO(res) as bfile:
+				bfile.name = '.jpg'
+				async with self.session.post(server.upload_url, data = {'photo': bfile}) as response:
+					res = await response.json(content_type = 'text/html')
+			saves.append(await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash']))
 		return [f'photo{save[0].owner_id}_{save[0].id}' for save in saves]
 
-class AMessage(Data):
+class AMessage(API, Data):
 	url = 'http://tts.voicetech.yandex.net/tts'
 	data = {'voice': 'alyss', 'emotion': 'evil', 'speed': 1.1}
 
@@ -75,16 +85,18 @@ class AMessage(Data):
 
 	async def get_doc(self, text):
 		server = await self.bot.api.docs.get_messages_upload_server(type = 'audio_message', peer_id = self.peer_id)
-		async with request('GET', self.url, data = {'text': text, **self.data}) as response:
-			with BytesIO(await response.read()) as bfile:
-				async with request('POST', server.upload_url, data = {'file': bfile}) as response:
-					save = await self.bot.api.docs.save(file = (await response.json())['file'])
+		async with self.session.get(self.url, data = {'text': text, **self.data}) as response:
+			res = await response.read()
+		with BytesIO(res) as bfile:
+			async with self.session.post(server.upload_url, data = {'file': bfile}) as response:
+				res = await response.json()
+		save = await self.bot.api.docs.save(file = res['file'])
 		return f'doc{save.audio_message.owner_id}_{save.audio_message.id}'
 
 	async def get_text(self, audio_message):
 		pass
 
-class ThisWaifuDoesNotExist(Data):
+class ThisWaifuDoesNotExist(API, Data):
 	url = 'https://www.thiswaifudoesnotexist.net/example-{id}.jpg'
 
 	def __call__(self, peer_id):
@@ -92,17 +104,18 @@ class ThisWaifuDoesNotExist(Data):
 
 	async def get_doc(self, id):
 		server = await self.bot.api.photos.get_messages_upload_server(peer_id = self.peer_id)
-		async with request('GET', self.url.format(id = id)) as response:
-			with BytesIO(await response.read()) as bfile:
-				bfile.name = '.jpg'
-				async with request('POST', server.upload_url, data = {'photo': bfile}) as response:
-					res = await response.json(content_type = 'text/html')
-					save = await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash'])
+		async with self.session.get(self.url.format(id = id)) as response:
+			res = await response.read()
+		with BytesIO(res) as bfile:
+			bfile.name = '.jpg'
+			async with self.session.post(server.upload_url, data = {'photo': bfile}) as response:
+				res = await response.json(content_type = 'text/html')
+		save = await self.bot.api.photos.save_messages_photo(server = res['server'], photo = res['photo'], hash = res['hash'])
 		return f'photo{save[0].owner_id}_{save[0].id}'
 
-class FoafPHP(Data):
+class FoafPHP(API, Data):
 	url = 'https://vk.com/foaf.php'
 
 	async def __call__(self, id):
-		async with request('GET', self.url, params = {'id': str(id)}) as response:
+		async with self.session.get(self.url, params = {'id': str(id)}) as response:
 			return await response.text('WINDOWS-1251')
