@@ -21,14 +21,9 @@ from os import getenv
 
 logger._core.min_level = LOGURU_ERROR_NO
 
-class InitData(Data, init = True):
-	bot = Bot(
-		token = getenv('TOKEN'),
-		callback = BotCallback(
-			secret_key = getenv('SECRET_KEY')
-		)
-	)
-
+class InitData(Data, write = True):
+	bot = Bot(getenv('TOKEN'),
+		callback = BotCallback(secret_key = getenv('SECRET_KEY')))
 	app, lvl = App(), LVL(getenv('DATABASE_URL'))
 	shiki, amessage = ShikiApi(), AMessage()
 	speller, foaf = YaSpeller(), FoafPHP()
@@ -44,6 +39,7 @@ class InitData(Data, init = True):
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
 
+	def __run__(self):
 		self.bot.loop_wrapper.run_forever()
 		# self.bot.run_forever()
 
@@ -80,3 +76,5 @@ class InitData(Data, init = True):
 		@self.bot.error_handler.register_undefined_error_handler
 		async def error_handler(e):
 			pass
+
+InitData().run()
