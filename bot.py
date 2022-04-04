@@ -76,5 +76,3 @@ class InitData(Data, write = True):
 		@self.bot.error_handler.register_undefined_error_handler
 		async def error_handler(e):
 			pass
-
-InitData().run()
