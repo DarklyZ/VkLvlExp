@@ -5,4 +5,4 @@ class Data:
 		if write:
 			for k, v in cls.__dict__.items():
 				if k == '__run__': setattr(cls, 'run', v)
-				elif not k[0] == '_': setattr(Data, k, v)
+				elif k[0] != '_': setattr(Data, k, v)
