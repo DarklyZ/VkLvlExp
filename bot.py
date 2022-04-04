@@ -21,7 +21,7 @@ from os import getenv
 
 logger._core.min_level = LOGURU_ERROR_NO
 
-class InitData(Data, write = True):
+class InitData(Data, write = True, run = True):
 	bot = Bot(getenv('TOKEN'),
 		callback = BotCallback(secret_key = getenv('SECRET_KEY')))
 	app, lvl = App(), LVL(getenv('DATABASE_URL'))
