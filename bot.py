@@ -21,16 +21,25 @@ from os import getenv
 
 logger._core.min_level = LOGURU_ERROR_NO
 
-class InitData(Data, write = True, run = True):
-	bot = Bot(getenv('TOKEN'),
-		callback = BotCallback(secret_key = getenv('SECRET_KEY')))
-	app, lvl = App(), LVL(getenv('DATABASE_URL'))
-	shiki, amessage = ShikiApi(), AMessage()
-	speller, foaf = YaSpeller(), FoafPHP()
-	twdne = ThisWaifuDoesNotExist()
+class BotApp(Data, run = True):
+	bot: Data = Bot(
+		token = getenv('TOKEN'),
+		callback = BotCallback(
+			secret_key = getenv('SECRET_KEY')
+		)
+	)
+	app: Data = App()
+	lvl: Data = LVL(
+		database_url = getenv('DATABASE_URL')
+	)
+	shiki: Data = ShikiApi()
+	amessage: Data = AMessage()
+	speller: Data = YaSpeller()
+	foaf: Data = FoafPHP()
+	twdne: Data = ThisWaifuDoesNotExist()
 
 	@bot.labeler.message_view.register_middleware
-	class _Register(BaseMiddleware, Data):
+	class Register(BaseMiddleware, Data):
 		is_conversation = property(lambda self: self.event.peer_id != self.event.from_id or self.event.from_id > 0)
 
 		async def pre(self):
@@ -59,16 +68,6 @@ class InitData(Data, write = True, run = True):
 		for labeler in labelers:
 			self.bot.labeler.load(labeler)
 
-		self._register_handlers()
-
-		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
-		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
-
-	def __run__(self):
-		self.bot.loop_wrapper.run_forever()
-		# self.bot.run_forever()
-
-	def _register_handlers(self):
 		@self.bot.error_handler.register_error_handler(AssertionError)
 		async def assert_handler(e):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
@@ -76,3 +75,10 @@ class InitData(Data, write = True, run = True):
 		@self.bot.error_handler.register_undefined_error_handler
 		async def error_handler(e):
 			pass
+
+		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
+		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
+
+	def __run__(self):
+		self.bot.loop_wrapper.run_forever()
+		# self.bot.run_forever()
