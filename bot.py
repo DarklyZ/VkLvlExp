@@ -29,20 +29,6 @@ class InitData(Data, write = True, run = True):
 	speller, foaf = YaSpeller(), FoafPHP()
 	twdne = ThisWaifuDoesNotExist()
 
-	def __init__(self):
-		self.app.add_routes(routes)
-		for labeler in labelers:
-			self.bot.labeler.load(labeler)
-
-		self._register_handlers()
-
-		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
-		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
-
-	def __run__(self):
-		self.bot.loop_wrapper.run_forever()
-		# self.bot.run_forever()
-
 	@bot.labeler.message_view.register_middleware
 	class _Register(BaseMiddleware, Data):
 		is_conversation = property(lambda self: self.event.peer_id != self.event.from_id or self.event.from_id > 0)
@@ -67,6 +53,20 @@ class InitData(Data, write = True, run = True):
 			self.amessage(peer_id)
 			self.twdne(peer_id)
 			self.shiki(peer_id)
+
+	def __init__(self):
+		self.app.add_routes(routes)
+		for labeler in labelers:
+			self.bot.labeler.load(labeler)
+
+		self._register_handlers()
+
+		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
+		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
+
+	def __run__(self):
+		self.bot.loop_wrapper.run_forever()
+		# self.bot.run_forever()
 
 	def _register_handlers(self):
 		@self.bot.error_handler.register_error_handler(AssertionError)
