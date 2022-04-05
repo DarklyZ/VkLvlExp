@@ -216,14 +216,13 @@ class LVL(dict, Data):
 					count += await cls.atta(attachment.wall.text, attachment.wall.attachments or [])
 				case 'wall_reply':
 					count += await cls.atta(attachment.wall_reply.text, attachment.wall_reply.attachments or [])
-				case 'doc':
-					count += 20 if attachment.doc.ext == 'gif' else 0
 				case 'audio_message':
 					count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
 				case 'video':
 					count += round(attachment.video.duration * 80 / 30) if attachment.video.duration < 30 else 80
 				case 'audio':
 					count += round(attachment.audio.duration * 60 / 180) if attachment.audio.duration < 180 else 60
+				case 'doc' if attachment.doc.ext == 'gif': count += 20
 				case 'sticker': count += 10
 
 		count *= -1 if negative else 1
