@@ -25,7 +25,8 @@ class BotApp(Data, run = True):
 	bot: Data = Bot(
 		token = getenv('TOKEN'),
 		callback = BotCallback(
-			secret_key = getenv('SECRET_KEY')
+			secret_key = getenv('SECRET_KEY'),
+			group_id = getenv('GROUP_ID')
 		)
 	)
 	app: Data = App()
@@ -64,9 +65,6 @@ class BotApp(Data, run = True):
 			self.shiki(peer_id)
 
 	def __init__(self):
-		self.app.on_startup.append(
-			self.bot.callback.setup_group_id
-		)
 		self.app.add_routes(routes)
 		for labeler in labelers:
 			self.bot.labeler.load(labeler)
