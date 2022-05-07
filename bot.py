@@ -45,14 +45,18 @@ class BotApp(Data, run = True):
 
 		async def pre(self):
 			if not self.is_conversation: return False
+
 			self.set_peer_id(self.event.peer_id)
 			await self.lvl.check_add_user(self.event.from_id)
+
 			if not self.event.payload and (exp := await self.lvl.atta(self.event.text, self.event.attachments)):
 				await self.lvl.update_lvl(self.event.from_id, exp = exp, boost = True, temp = True, slave = True)
 
 		async def post(self):
 			if not self.is_conversation: return False
+
 			self.set_peer_id(None)
+
 			if any(isinstance(rule, CommandVBMLRule) for handler in self.handlers for rule in handler.rules):
 				await self.bot.api.messages.delete(
 					delete_for_all = True, peer_id = self.event.peer_id, cmids = self.event.conversation_message_id
