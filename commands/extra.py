@@ -61,7 +61,7 @@ async def shiki_search(message, type, text, page = 1):
 
 			] for num, item in enumerate(response)
 		]
-		text = '\n'.join('\n'.join(i for i in item if i) for item in objs)
+		text = '\n'.join('\n'.join(filter(bool, item)) for item in objs)
 		docs = await data.shiki.get_doc(item['image']['original'] for item in response)
 		await message.answer(text, attachment = ','.join(docs))
 	else: await message.answer("Не найдено")
