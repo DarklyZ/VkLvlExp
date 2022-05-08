@@ -149,7 +149,7 @@ class LVL(dict, Data):
 
 	async def send_work(self, *ids):
 		await self.user(*chain(
-			*self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
+			*await self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
 		))
 		masters = self.copy()
 		await self.send(*ids)
