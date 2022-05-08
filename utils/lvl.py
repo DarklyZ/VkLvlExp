@@ -1,6 +1,6 @@
 from . import Data
 from asyncpg import connect
-from itertools import groupby
+from itertools import groupby, chain
 from datetime import datetime, tzinfo, timedelta
 from string import ascii_letters
 from random import choice
@@ -148,8 +148,9 @@ class LVL(dict, Data):
 				(f"->{getpercent(row['slcount'])}%" if row['work'] else '')
 
 	async def send_work(self, *ids):
-		await self.user(*{row['master']
-			for row in await self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)})
+		await self.user(*chain(
+			*self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
+		))
 		masters = self.copy()
 		await self.send(*ids)
 		for row in await self.con.fetch("select user_id, master, work from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id):
