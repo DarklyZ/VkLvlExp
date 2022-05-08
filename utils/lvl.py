@@ -95,8 +95,8 @@ class LVL(dict, Data):
 			else: await self.con.execute("delete from lvl where user_id = $1 and peer_id = $2", row['user_id'], self.peer_id)
 
 	async def remove_exp(self, id, exp = 0):
-		row = await self.con.fetchrow("select exp from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
-		assert row['exp'] >= exp, f"Не хватает {exp - row['exp']} exp"
+		max_exp, = await self.con.fetchrow("select exp from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
+		assert max_exp >= exp, f"Не хватает {exp - max_exp} exp"
 		await self.update_lvl(id, exp = -exp)
 
 	async def update_nick(self, *ids, nick = None):
