@@ -152,8 +152,8 @@ class LVL(dict, Data):
 			self[user_id] += f":{lvl}Ⓛ|{exp}/{lvl * 2000}Ⓔ:Ⓟ{getprice(slcount, lvl)}Ⓔ" + (f"->{getpercent(slcount)}%" if work else '')
 
 	async def send_work(self, *ids):
-		await self.user(*chain(
-			*await self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
+		await self.user(*(
+			master for master, in await self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
 		))
 		self.save(masters := {})
 		await self.send(*ids)
@@ -162,8 +162,8 @@ class LVL(dict, Data):
 
 	async def slaves_by(self, id):
 		users = await self.con.fetch("select user_id, work from lvl where master = $1 and peer_id = $2", id, self.peer_id)
-		await self.send(*starmap(lambda user_id, _: user_id, users))
-		self['SLAVES'] = '\n'.join((f"На работе {key}:\n" if key else "Без работы:\n") + '\n'.join(self[row['user_id']] for row in group) for key, group in groupby(users, lambda row: row['work']))
+		await self.send(*(user['user_id'] for user in users))
+		self['SLAVES'] = '\n'.join((f"На работе {key}:\n" if key else "Без работы:\n") + '\n'.join(self[user['user_id']] for user in users) for key, group in groupby(users, lambda row: row['work']))
 
 	async def set_key(self, id, set_null = False):
 		async def get_key(count):
@@ -188,20 +188,22 @@ class LVL(dict, Data):
 	async def toplvl_size(self, x, y):
 		assert x <= y, f"Я не могу отобразить {x} - {y}"
 
-		rows = await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
-		assert rows, "TOPLVL пустой"
+		users = await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id, lvl, exp from lvl where peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
+		assert users, "TOPLVL пустой"
 
-		await self.user(*{row['user_id'] for row in rows})
-		self['TOPLVL'] = f"TOP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['lvl']}Ⓛ|{row['exp']}Ⓔ" for row in rows)
+		await self.user(*(user['user_id'] for user in users))
+		self['TOPLVL'] = f"TOP {users[0]['row_number']} - {users[-1]['row_number']}\n" + '\n'.join(f"[id{user_id}|{row_number}]:{self[user_id]}:{lvl}Ⓛ|{exp}Ⓔ"
+		    for row_number, user_id, lvl, exp in users)
 
 	async def toptemp_size(self, x, y):
 		assert x <= y, f"Я не могу отобразить {x} - {y}"
 
-		rows = await self.con.fetch("select row_number() over (order by temp_exp desc), user_id, temp_exp from lvl where temp_exp > 0 and peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
-		assert rows, "TOPTEMP пустой"
+		users = await self.con.fetch("select row_number() over (order by temp_exp desc), user_id, temp_exp from lvl where temp_exp > 0 and peer_id = $1 limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
+		assert users, "TOPTEMP пустой"
 
-		await self.user(*{row['user_id'] for row in rows})
-		self['TOPTEMP'] = f"TOPTEMP {rows[0]['row_number']} - {rows[-1]['row_number']}\n" + '\n'.join(f"[id{row['user_id']}|{row['row_number']}]:{self[row['user_id']]}:{row['temp_exp']}ⓉⒺ" for row in rows)
+		await self.user(*(user['user_id'] for user in users))
+		self['TOPTEMP'] = f"TOPTEMP {users[0]['row_number']} - {users[-1]['row_number']}\n" + '\n'.join(f"[id{user_id}|{row_number}]:{self[user_id]}:{temp_exp}ⓉⒺ"
+			for row_number, user_id, temp_exp in rows)
 
 	@classmethod
 	async def atta(cls, text = '', attachments = [], negative = False, return_errors = False):
@@ -250,9 +252,9 @@ class LVL(dict, Data):
 
 	async def get_top(self, x, y):
 		try:
-			ids = [row['user_id']
-				for row in await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit $2 offset $3", self.peer_id, y - x + 1, x - 1)]
-			await self.get_user(*ids)
+			await self.get_user(*(
+				user_id for user_id, in await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
+			))
 		except: self['response'] = []
 
 	async def get_status(self, chat_settings, id):
