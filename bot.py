@@ -77,9 +77,9 @@ class BotApp(Data, run = True):
 		async def assert_handler(e):
 			await self.bot.api.messages.send(peer_id = self.lvl.peer_id, message = str(e), random_id = 0)
 
-		# @self.bot.error_handler.register_undefined_error_handler
-		# async def error_handler(e):
-		# 	pass
+		@self.bot.error_handler.register_undefined_error_handler
+		async def error_handler(e):
+			pass
 
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
