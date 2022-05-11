@@ -1,6 +1,6 @@
 from . import Data
 from asyncpg import connect
-from itertools import groupby, chain, starmap
+from itertools import groupby
 from datetime import datetime, tzinfo, timedelta
 from string import ascii_letters
 from random import choice
