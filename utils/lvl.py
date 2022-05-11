@@ -138,9 +138,10 @@ class LVL(dict, Data):
 		for user_id, nick in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id):
 			users[user_id][0] = nick
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id):
-			users[user_id][1] = dict_top[row_number]
+			if user_id in users:
+				users[user_id][1] = dict_top[row_number]
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id):
-			if row['row_number'] % 2 != 0:
+			if user_id in users and row_number % 2 != 0:
 				users[user_id][2] = dict_topboost[row_number]
 		for user in await self.bot.api.users.get(user_ids = ','.join(map(str, ids)), fields = 'bdate'):
 			self[user.id] = f"{users[user.id][1]}{users[user.id][2]}{getcake(user.bdate)}{users[user.id][0] or user.first_name + ' ' + user.last_name[:3]}"
