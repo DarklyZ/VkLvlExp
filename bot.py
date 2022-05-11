@@ -79,7 +79,7 @@ class BotApp(Data, run = True):
 
 		@self.bot.error_handler.register_undefined_error_handler
 		async def error_handler(e):
-			pass
+			if getenv('IGNORE_ERROR', 'false') == 'false': raise e
 
 		self.bot.loop_wrapper.add_task(self.lvl.run_connect(run_top = True))
 		self.bot.loop_wrapper.add_task(run(self.app, port = getenv('PORT')))
