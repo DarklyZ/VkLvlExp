@@ -134,7 +134,7 @@ class LVL(dict, Data):
 			await self.con.execute("insert into lvl (user_id, peer_id) values ($1, $2)", id, self.peer_id)
 
 	async def user(self, *ids):
-		users = dict.fromkeys(ids, ['', '', ''])
+		users = {i: ['', '', ''] for i in ids}
 		for user_id, nick in await self.con.fetch("select user_id, nick from lvl where user_id = any($1) and nick is not null and peer_id = $2", ids, self.peer_id):
 			users[user_id][0] = nick
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id):
@@ -203,7 +203,7 @@ class LVL(dict, Data):
 
 		await self.user(*(user['user_id'] for user in users))
 		self['TOPTEMP'] = f"TOPTEMP {users[0]['row_number']} - {users[-1]['row_number']}\n" + '\n'.join(f"[id{user_id}|{row_number}]:{self[user_id]}:{temp_exp}ⓉⒺ"
-			for row_number, user_id, temp_exp in rows)
+			for row_number, user_id, temp_exp in users)
 
 	@classmethod
 	async def atta(cls, text = '', attachments = [], negative = False, return_errors = False):
