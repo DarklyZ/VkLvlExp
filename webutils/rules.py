@@ -7,6 +7,14 @@ class Rules(list, Data):
 		for rule in kwargs:
 			self.append(getattr(self, rule))
 
+	def __call__(self, request):
+		class Kwargs:
+			async def __aenter__(*_, **__):
+				return {handler.__name__: await handler(request) for handler in self}
+			async def __aexit__(*_, **__):
+				if self.user_id in self: self.lvl(None)
+		return Kwargs()
+
 	async def body(self, request):
 		self.json = await request.json()
 		if all(key in self.json for key in self.kwargs['body']):
