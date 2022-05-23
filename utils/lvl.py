@@ -1,6 +1,6 @@
 from . import Data
 from asyncpg import connect
-from itertools import groupby
+from itertools import groupby, chain
 from datetime import datetime, tzinfo, timedelta
 from string import ascii_letters
 from random import choice
@@ -152,8 +152,8 @@ class LVL(dict, Data):
 			self[user_id] += f":{lvl}Ⓛ|{exp}/{lvl * 2000}Ⓔ:Ⓟ{getprice(slcount, lvl)}Ⓔ" + (f"->{getpercent(slcount)}%" if work else '')
 
 	async def send_work(self, *ids):
-		await self.user(*(
-			master for master, in await self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
+		await self.user(*chain(
+			*await self.con.fetch("select master from lvl where user_id = any($1) and master is not null and peer_id = $2", ids, self.peer_id)
 		))
 		self.save(masters := {})
 		await self.send(*ids)
@@ -252,8 +252,8 @@ class LVL(dict, Data):
 
 	async def get_top(self, x, y):
 		try:
-			await self.get_user(*(
-				user_id for user_id, in await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
+			await self.get_user(*chain(
+				*await self.con.fetch("select user_id from lvl where peer_id = $1 order by lvl desc, exp desc limit $2 offset $3", self.peer_id, y - x + 1, x - 1)
 			))
 		except: self['response'] = []
 
