@@ -33,8 +33,10 @@ class Custom(Data):
 		if 'user_id' in self.rules: self.lvl(None)
 
 	async def coro(self, request):
-		async with self(request) as kwargs:
-			if all(kwargs.values()):
-				try: return await self.base(request, **kwargs)
-				except TypeError: return Response(text = 'TypeError', status = 500)
-			else: print(kwargs)
+		try:
+			async with self(request) as kwargs:
+				if all(kwargs.values()):
+					try: return await self.base(request, **kwargs)
+					except TypeError: return Response(text = 'TypeError', status = 500)
+				else: return Response(text = 'Error', status = 400)
+		except: return Response(text = 'Error', status = 400)
