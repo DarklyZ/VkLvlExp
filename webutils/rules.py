@@ -10,7 +10,7 @@ class SecretKey(Custom.Rule, name = 'secret_key'):
 	async def check(self, request):
 		json = await request.json()
 		if json['secret'] == self.bot.callback.secret_key:
-			return self.json['secret']
+			return json['secret']
 
 class UserId(Custom.Rule, name = 'user_id'):
 	async def check(self, request):
