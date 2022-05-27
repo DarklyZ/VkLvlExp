@@ -13,7 +13,7 @@ from utils.api import (
 from aiohttp.web import (
 	Application as App, _run_app as run
 )
-from webutils.routes import routes
+from webutils import routes
 from commands import labelers
 
 from loguru._defaults import LOGURU_ERROR_NO
