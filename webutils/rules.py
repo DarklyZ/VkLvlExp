@@ -19,5 +19,5 @@ class UserId(Custom.Rule, name = 'user_id'):
 
 class ChatSettings(Custom.Rule, name = 'chat_settings'):
 	async def check(self, request):
-		if items := (await self.bot.api.messages.get_conversations_by_id(peer_ids=self.lvl.peer_id)).items:
+		if items := (await self.bot.api.messages.get_conversations_by_id(peer_ids = self.lvl.peer_id)).items:
 			return items[0].chat_settings

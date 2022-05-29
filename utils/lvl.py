@@ -1,37 +1,21 @@
-from . import Data
+from .base import (
+	Data, TimeZone, getcake, getprice, getpercent
+)
 from asyncpg import connect
 from itertools import groupby, chain
-from datetime import datetime, tzinfo, timedelta
+from datetime import datetime
 from string import ascii_letters
 from random import choice
 from asyncio import sleep
 from re import split, I
 
-class timezone(tzinfo):
-	utcoffset = lambda self, dt: timedelta(hours = 5)
-	dst = lambda self, dt: timedelta()
-	tzname = lambda self, dt: '+05:00'
-
-tz = timezone()
-
-def getcake(bdate):
-	if isinstance(bdate, str):
-		bdate, date = datetime.strptime(bdate, '%d.%m' if bdate.count('.') == 1 else '%d.%m.%Y'), datetime.now(tz)
-		return '🎂' if bdate.day == date.day and bdate.month == date.month else ''
-	else: return ''
-
-def getprice(slcount, lvl):
-	if slcount == 0: return 120
-	elif (price := round((1.1 ** slcount - 1) * 1e4)) < (maxexp := lvl * 2000 - 50):
-		return price
-	else: return maxexp
-
-getpercent = lambda slcounts: percent if (percent := 5 * slcounts + 5) < 50 else 50
-dict_boost = {1: 2, 3: 2, 5: 1, 7: 1}
-dict_top = {1: '🥇', 2: '🥈', 3: '🥉'}
-dict_topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
-
 class LVL(dict, Data):
+	tz = TimeZone()
+
+	boost = {1: 2, 3: 2, 5: 1, 7: 1}
+	top = {1: '🥇', 2: '🥈', 3: '🥉'}
+	topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
+	
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url
@@ -54,10 +38,10 @@ class LVL(dict, Data):
 	async def get_temp(self, method):
 		if method == 'read':
 			if temp := await self.var('update_date'):
-				return datetime.fromtimestamp(temp).replace(tzinfo = tz)
+				return datetime.fromtimestamp(temp).replace(tzinfo = self.tz)
 			else: return await self.get_temp('write')
 		elif method == 'write':
-			temp = datetime.now(tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+			temp = datetime.now(self.tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 			await self.var('update_date', temp.timestamp())
 			return temp
 
@@ -67,7 +51,7 @@ class LVL(dict, Data):
 		if run_top:
 			temp = await self.get_temp('read')
 			while not await sleep(60):
-				if datetime.now(tz) < temp: continue
+				if datetime.now(self.tz) < temp: continue
 				await self.con.execute("update lvl set temp_exp = 0")
 				temp = await self.get_temp('write')
 
@@ -77,7 +61,7 @@ class LVL(dict, Data):
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
 
 		if boost:
-			boost_ids = {user_id: dict_boost[row_number]
+			boost_ids = {user_id: self.boost[row_number]
 				for row_number, user_id in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 					if user_id in ids and row_number % 2 != 0}
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
@@ -139,10 +123,10 @@ class LVL(dict, Data):
 			users[user_id][0] = nick
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id):
 			if user_id in users:
-				users[user_id][1] = dict_top[row_number]
+				users[user_id][1] = self.top[row_number]
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id):
 			if user_id in users and row_number % 2 != 0:
-				users[user_id][2] = dict_topboost[row_number]
+				users[user_id][2] = self.topboost[row_number]
 		for user in await self.bot.api.users.get(user_ids = ','.join(map(str, ids)), fields = 'bdate'):
 			self[user.id] = f"{users[user.id][1]}{users[user.id][2]}{getcake(user.bdate)}{users[user.id][0] or user.first_name + ' ' + user.last_name[:3]}"
 

@@ -1,4 +1,4 @@
-from utils.rules import custom_rules
+from utils import custom_rules
 from vkbottle.bot import BotLabeler
 
 from . import lvl, nick, extra, chat_action, regex, key, slaves

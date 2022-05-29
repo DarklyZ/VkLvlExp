@@ -2,18 +2,11 @@ from vkbottle import BaseMiddleware, Bot
 from vkbottle.callback import BotCallback
 from vkbottle.modules import logger
 
-from utils import Data
-from utils.lvl import LVL
-from utils.rules import CommandVBMLRule
-from utils.api import (
-	ShikiApi, ThisWaifuDoesNotExist,
-	AMessage, FoafPHP, YaSpeller
-)
-
 from aiohttp.web import (
 	Application as App, _run_app as run
 )
-from webutils import routes
+from utils import *
+from webutils import *
 from commands import labelers
 
 from loguru._defaults import LOGURU_ERROR_NO
@@ -57,7 +50,7 @@ class BotApp(Data, run = True):
 
 			self.set_peer_id(None)
 
-			if any(isinstance(rule, CommandVBMLRule) for handler in self.handlers for rule in handler.rules):
+			if any(isinstance(rule, custom_rules['command']) for handler in self.handlers for rule in handler.rules):
 				await self.bot.api.messages.delete(
 					delete_for_all = True, peer_id = self.event.peer_id, cmids = self.event.conversation_message_id
 				)

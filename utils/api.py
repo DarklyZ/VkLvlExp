@@ -1,14 +1,5 @@
-from utils import Data
+from .base import Data, API
 from io import BytesIO
-from aiohttp import ClientSession
-
-class API:
-	def __init__(self):
-		self.session = ClientSession()
-
-	def __del__(self):
-		if not self.session.closed:
-			self.session.close()
 
 class YaSpeller(API):
 	url = 'http://speller.yandex.net/services/spellservice.json/checkText'

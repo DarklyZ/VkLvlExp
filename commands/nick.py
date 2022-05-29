@@ -1,5 +1,4 @@
-from utils import Data as data
-from utils.rules import custom_rules
+from utils import Data as data, custom_rules
 from vkbottle.bot import BotLabeler
 
 def replace_smile(str):

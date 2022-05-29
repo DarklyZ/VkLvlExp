@@ -1,5 +1,4 @@
-from utils import Data as data
-from utils.rules import custom_rules
+from utils import Data as data, custom_rules
 from vkbottle.tools import Keyboard, Text, KeyboardButtonColor
 from vkbottle.bot import BotLabeler
 from random import randint, choice
@@ -18,15 +17,17 @@ bl = BotLabeler(custom_rules = custom_rules)
 @bl.chat_message(command = ['ban <text>', 'ban'], with_reply_message = True)
 async def ban(message, text = 'не указана'):
 	await data.lvl.user(id := message.reply_message.from_id)
-	await message.answer(f"Бан пользователя:\n{data.lvl[id]}\nПричина: {text}", keyboard = Keyboard(inline = True)
-		.add(Text(label = 'Ясно-понятно', payload = {'command': 'ban'}), color = KeyboardButtonColor.POSITIVE)
-		.get_json())
+	await message.answer(
+		message = f"Бан пользователя:\n{data.lvl[id]}\nПричина: {text}",
+		keyboard = Keyboard(inline = True)
+			.add(Text(label = 'Ясно-понятно', payload = {'command': 'ban'}), color = KeyboardButtonColor.POSITIVE).get_json()
+	)
 
 @bl.chat_message(command = ['echo <text>', 'echo'], is_admin = True)
 async def echo(message, text = "Сообщение не указано"):
-	await message.answer(f'{text}\n' + ''.join(f"[id{item.member_id}|💬]"
+	await message.answer(f"{text}\n" + ''.join(f"[id{item.member_id}|💬]"
 		for item in (await data.bot.api.messages.get_conversation_members(peer_id = message.peer_id)).items
-		if item.member_id > 0 and item.member_id != message.from_id))
+			if item.member_id > 0 and item.member_id != message.from_id))
 
 @bl.chat_message(command = 'ord', with_reply_message = True)
 async def ordo(message):

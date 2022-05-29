@@ -1,38 +1,13 @@
 from vkbottle.dispatch.rules.base import ABCRule, ChatActionRule, VBMLRule
-from vkbottle.framework.labeler.base import DEFAULT_CUSTOM_RULES
-from utils import Data
+from .base import Data, SetRule, MyPatcher
 from re import compile, I, S
-from vbml import Patcher, Pattern
+from vbml import Pattern
 
-custom_rules = DEFAULT_CUSTOM_RULES.copy()
-
-class SetRule:
-	def __init__(self, name):
-		self.name = name
-
-	def __call__(self, cls):
-		custom_rules[self.name] = cls
-		return cls
-
-def get_patcher():
-	patcher = Patcher()
-	@patcher.validator(key = 'int')
-	def int_validator(value):
-		return int(value) if value.isdigit() or value[:1] in '+-' and value[1:].isdigit() else None
-	@patcher.validator(key = 'pos')
-	def pos_validator(value):
-		return int(value) if value.isdigit() or value[:1] == '+' and value[1:].isdigit() else None
-	@patcher.validator(key = 'max')
-	def max_validator(value, extra):
-		return value if len(value) <= int(extra) else None
-	@patcher.validator(key = 'inc')
-	def inc_validator(value, *extra):
-		return value.lower() if value.lower() in extra else None
-	return patcher
+custom_rules = SetRule.custom_rules
 
 @SetRule('command')
 class CommandVBMLRule(VBMLRule):
-	patcher = get_patcher()
+	patcher = MyPatcher()
 
 	def __init__(self, pattern):
 		regex = r'[\./!:]{}$'
@@ -87,7 +62,7 @@ class WithText(ABCRule, Data):
 class WithReplyMessage(ABCRule):
 	def __init__(self, wrm):
 		self.wrm = wrm
-	
+
 	async def check(self, message):
 		is_wrm = message.reply_message and message.reply_message.from_id > 0
 		return self.wrm and is_wrm or not self.wrm and not is_wrm
@@ -96,7 +71,7 @@ class WithReplyMessage(ABCRule):
 class FromIdPos(ABCRule):
 	def __init__(self, fip):
 		self.fip = fip
-	
+
 	async def check(self, message):
 		is_fip = message.from_id > 0
 		return self.fip and is_fip or not self.fip and not is_fip
