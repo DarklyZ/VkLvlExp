@@ -1,4 +1,5 @@
 from datetime import datetime, tzinfo, timedelta
+from re import split, I
 from .base import Data
 
 @object.__new__

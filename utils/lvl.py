@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from string import ascii_letters
 from random import choice
 from asyncio import sleep
-from re import split, I
 
 class LVL(dict, Data):
 	def __init__(self, database_url):
