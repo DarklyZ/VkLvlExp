@@ -52,7 +52,9 @@ class DateBase:
 		utcoffset = lambda self, dt: timedelta(hours = 5)
 		dst = lambda self, dt: timedelta()
 		tzname = lambda self, dt: '+05:00'
-	tz = tz()
+
+	def __init_subclass__(cls):
+		cls.tz = DateBase.tz()
 
 	@property
 	def now(self):
