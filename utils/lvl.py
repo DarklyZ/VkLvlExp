@@ -115,7 +115,7 @@ class LVL(dict, Data):
 			users[user_id][0] = nick
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id):
 			if user_id in users:
-				users[user_id][1] = self.stop[row_number]
+				users[user_id][1] = tool.stop[row_number]
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id):
 			if user_id in users and row_number % 2 != 0:
 				users[user_id][2] = tool.sboost[row_number]
