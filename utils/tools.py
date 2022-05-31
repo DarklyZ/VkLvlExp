@@ -29,9 +29,9 @@ class AttachmentsTools(Data):
 					pixel = max(size.width * size.height for size in attachment.photo.sizes)
 					count += round(pixel * 50 / (1280 * 720)) if pixel < 1280 * 720 else 50
 				case 'wall':
-					count += await self.attachments(attachment.wall.text, attachment.wall.attachments or [])
+					count += await self.exp(attachment.wall.text, attachment.wall.attachments or [])
 				case 'wall_reply':
-					count += await self.attachments(attachment.wall_reply.text, attachment.wall_reply.attachments or [])
+					count += await self.exp(attachment.wall_reply.text, attachment.wall_reply.attachments or [])
 				case 'audio_message':
 					count += attachment.audio_message.duration if attachment.audio_message.duration < 25 else 25
 				case 'video':
