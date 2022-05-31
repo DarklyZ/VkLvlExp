@@ -1,4 +1,4 @@
-from vkbottle.dispatch.rules.base import ABCRule, ChatActionRule, VBMLRule
+from vkbottle.dispatch.rules.base import ABCRule, VBMLRule
 from .base import Data, SetRule, MyPatcher
 from re import compile, I, S
 from vbml import Pattern
