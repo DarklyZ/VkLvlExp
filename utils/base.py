@@ -48,13 +48,11 @@ class MyPatcher(Patcher):
 			return value.lower() if value.lower() in extra else None
 
 class DateBase:
+	@tzinfo.__new__
 	class tz(tzinfo):
 		utcoffset = lambda self, dt: timedelta(hours = 5)
 		dst = lambda self, dt: timedelta()
 		tzname = lambda self, dt: '+05:00'
-
-	def __init_subclass__(cls):
-		cls.tz = DateBase.tz()
 
 	@property
 	def now(self):
