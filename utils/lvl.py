@@ -1,5 +1,5 @@
 from .base import (
-	Data, TimeZone, getcake, getprice, getpercent
+	Data, DateBase, getcake, getprice, getpercent
 )
 from asyncpg import connect
 from itertools import groupby, chain
@@ -9,9 +9,7 @@ from random import choice
 from asyncio import sleep
 from re import split, I
 
-class LVL(dict, Data):
-	tz = TimeZone()
-
+class LVL(dict, Data, DateBase):
 	boost = {1: 2, 3: 2, 5: 1, 7: 1}
 	top = {1: '🥇', 2: '🥈', 3: '🥉'}
 	topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
@@ -41,7 +39,7 @@ class LVL(dict, Data):
 				return datetime.fromtimestamp(temp).replace(tzinfo = self.tz)
 			else: return await self.get_temp('write')
 		elif method == 'write':
-			temp = datetime.now(self.tz).replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+			temp = self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 			await self.var('update_date', temp.timestamp())
 			return temp
 
@@ -51,7 +49,7 @@ class LVL(dict, Data):
 		if run_top:
 			temp = await self.get_temp('read')
 			while not await sleep(60):
-				if datetime.now(self.tz) < temp: continue
+				if self.now < temp: continue
 				await self.con.execute("update lvl set temp_exp = 0")
 				temp = await self.get_temp('write')
 
@@ -128,7 +126,7 @@ class LVL(dict, Data):
 			if user_id in users and row_number % 2 != 0:
 				users[user_id][2] = self.topboost[row_number]
 		for user in await self.bot.api.users.get(user_ids = ','.join(map(str, ids)), fields = 'bdate'):
-			self[user.id] = f"{users[user.id][1]}{users[user.id][2]}{getcake(user.bdate)}{users[user.id][0] or user.first_name + ' ' + user.last_name[:3]}"
+			self[user.id] = f"{users[user.id][1]}{users[user.id][2]}{getcake(user.bdate, self.now)}{users[user.id][0] or user.first_name + ' ' + user.last_name[:3]}"
 
 	async def send(self, *ids):
 		await self.user(*ids)

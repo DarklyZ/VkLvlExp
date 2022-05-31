@@ -28,11 +28,6 @@ class SetRule:
 		self.custom_rules[self.name] = cls
 		return cls
 
-class TimeZone(tzinfo):
-	utcoffset = lambda self, dt: timedelta(hours = 5)
-	dst = lambda self, dt: timedelta()
-	tzname = lambda self, dt: '+05:00'
-
 class MyPatcher(Patcher):
 	def __init__(self):
 		super().__init__()
@@ -52,10 +47,21 @@ class MyPatcher(Patcher):
 		def inc_validator(value, *extra):
 			return value.lower() if value.lower() in extra else None
 
-def getcake(bdate):
+class DateBase:
+	class tz(tzinfo):
+		utcoffset = lambda self, dt: timedelta(hours = 5)
+		dst = lambda self, dt: timedelta()
+		tzname = lambda self, dt: '+05:00'
+	tz = tz()
+
+	@property
+	def now(self):
+		return datetime.now(self.tz)
+
+def getcake(bdate, now):
 	if isinstance(bdate, str):
-		bdate, date = datetime.strptime(bdate, '%d.%m' if bdate.count('.') == 1 else '%d.%m.%Y'), datetime.now(tz)
-		return '🎂' if bdate.day == date.day and bdate.month == date.month else ''
+		bdate = datetime.strptime(bdate, '%d.%m' if bdate.count('.') == 1 else '%d.%m.%Y')
+		return '🎂' if bdate.day == now.day and bdate.month == now.month else ''
 	return ''
 
 def getprice(slcount, lvl):
