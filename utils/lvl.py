@@ -3,7 +3,7 @@ from .base import (
 )
 from asyncpg import connect
 from itertools import groupby, chain
-from datetime import datetime
+from datetime import datetime, timedelta
 from string import ascii_letters
 from random import choice
 from asyncio import sleep
