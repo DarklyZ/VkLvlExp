@@ -49,7 +49,7 @@ async def tts(message, text):
 	await message.answer(attachment = await data.amessage.get_doc(text))
 
 @bl.chat_message(command = ['ss <type:inc[animes,mangas,ranobe,characters,people]> <page:pos> <text>',
-		'ss <type:inc[animes,mangas,ranobe,characters,people]> <text>'])
+	'ss <type:inc[animes,mangas,ranobe,characters,people]> <text>'])
 async def shiki_search(message, type, text, page = 1):
 	response = await data.shiki.search(type, text, page)
 	if response:
