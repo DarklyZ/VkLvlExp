@@ -1,6 +1,4 @@
-from .base import (
-	Data, DateBase, getcake, getprice, getpercent
-)
+from .base import Data, Tools as tool
 from asyncpg import connect
 from itertools import groupby, chain
 from datetime import datetime, timedelta
@@ -9,11 +7,7 @@ from random import choice
 from asyncio import sleep
 from re import split, I
 
-class LVL(dict, Data, DateBase):
-	boost = {1: 2, 3: 2, 5: 1, 7: 1}
-	top = {1: '🥇', 2: '🥈', 3: '🥉'}
-	topboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
-	
+class LVL(dict, Data):
 	def __init__(self, database_url):
 		super().__init__()
 		self.database_url = database_url
@@ -36,10 +30,10 @@ class LVL(dict, Data, DateBase):
 	async def get_temp(self, method):
 		if method == 'read':
 			if temp := await self.var('update_date'):
-				return datetime.fromtimestamp(temp).replace(tzinfo = self.tz)
+				return datetime.fromtimestamp(temp).replace(tzinfo = tool.tz)
 			else: return await self.get_temp('write')
 		elif method == 'write':
-			temp = self.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
+			temp = tool.now.replace(hour = 0, minute = 0, second = 0) + timedelta(days = 1)
 			await self.var('update_date', temp.timestamp())
 			return temp
 
@@ -49,7 +43,7 @@ class LVL(dict, Data, DateBase):
 		if run_top:
 			temp = await self.get_temp('read')
 			while not await sleep(60):
-				if self.now < temp: continue
+				if tool.now < temp: continue
 				await self.con.execute("update lvl set temp_exp = 0")
 				temp = await self.get_temp('write')
 
@@ -59,7 +53,7 @@ class LVL(dict, Data, DateBase):
 		await self.con.execute("update lvl set lvl = lvl + $1, exp = exp + $2, temp_exp = temp_exp + $3 where user_id = any($4) and peer_id = $5", lvl, exp, exp if temp else 0, ids, self.peer_id)
 
 		if boost:
-			boost_ids = {user_id: self.boost[row_number]
+			boost_ids = {user_id: tool.boost[row_number]
 				for row_number, user_id in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id)
 					if user_id in ids and row_number % 2 != 0}
 			for key, group in groupby(boost_ids, lambda id: boost_ids[id]):
@@ -67,7 +61,7 @@ class LVL(dict, Data, DateBase):
 
 		if slave:
 			for master, slcount in await self.con.fetch("select master, slcount from lvl where user_id = any($1) and work is not null and peer_id = $2", ids, self.peer_id):
-				await self.con.execute("update lvl set exp = exp + $1 where user_id = $2 and peer_id = $3", round(exp * getpercent(slcount) / 100), master, self.peer_id)
+				await self.con.execute("update lvl set exp = exp + $1 where user_id = $2 and peer_id = $3", round(exp * tool.percent(slcount) / 100), master, self.peer_id)
 
 		for user_id, lvl, exp in await self.con.fetch("select user_id, lvl, exp from lvl where (exp < 0 or lvl < 1 or exp >= lvl * 2000) and peer_id = $1", self.peer_id):
 			while exp >= lvl * 2000:
@@ -100,7 +94,7 @@ class LVL(dict, Data, DateBase):
 		master_id, = await self.con.fetchrow("select master from lvl where user_id = $1 and peer_id = $2", id, self.peer_id)
 		assert id != slave and id != master and slave != master_id, "Нельзя купить себя, своего раба или своего хозяина"
 
-		await self.remove_exp(id, exp := getprice(slcount, lvl))
+		await self.remove_exp(id, exp := tool.price(slcount, lvl))
 		if master: await self.update_lvl(master, exp = exp)
 		await self.con.execute("update lvl set master = $1, slcount = slcount + 1, work = null where user_id = $2 and peer_id = $3", id, slave, self.peer_id)
 		return master, exp
@@ -121,17 +115,17 @@ class LVL(dict, Data, DateBase):
 			users[user_id][0] = nick
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by lvl desc, exp desc), user_id from lvl where peer_id = $1 limit 3", self.peer_id):
 			if user_id in users:
-				users[user_id][1] = self.top[row_number]
+				users[user_id][1] = self.stop[row_number]
 		for row_number, user_id in await self.con.fetch("select row_number() over (order by temp_exp desc), user_id from lvl where temp_exp > 0 and peer_id = $1 limit 7", self.peer_id):
 			if user_id in users and row_number % 2 != 0:
-				users[user_id][2] = self.topboost[row_number]
+				users[user_id][2] = tool.sboost[row_number]
 		for user in await self.bot.api.users.get(user_ids = ','.join(map(str, ids)), fields = 'bdate'):
-			self[user.id] = f"{users[user.id][1]}{users[user.id][2]}{getcake(user.bdate, self.now)}{users[user.id][0] or user.first_name + ' ' + user.last_name[:3]}"
+			self[user.id] = f"{users[user.id][1]}{users[user.id][2]}{tool.cake(user.bdate)}{users[user.id][0] or user.first_name + ' ' + user.last_name[:3]}"
 
 	async def send(self, *ids):
 		await self.user(*ids)
 		for user_id, lvl, exp, slcount, work in await self.con.fetch("select user_id, lvl, exp, slcount, work from lvl where user_id = any($1) and peer_id = $2", ids, self.peer_id):
-			self[user_id] += f":{lvl}Ⓛ|{exp}/{lvl * 2000}Ⓔ:Ⓟ{getprice(slcount, lvl)}Ⓔ" + (f"->{getpercent(slcount)}%" if work else '')
+			self[user_id] += f":{lvl}Ⓛ|{exp}/{lvl * 2000}Ⓔ:Ⓟ{tool.price(slcount, lvl)}Ⓔ" + (f"->{tool.percent(slcount)}%" if work else '')
 
 	async def send_work(self, *ids):
 		await self.user(*chain(

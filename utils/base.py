@@ -47,7 +47,12 @@ class MyPatcher(Patcher):
 		def inc_validator(value, *extra):
 			return value.lower() if value.lower() in extra else None
 
-class DateBase:
+@object.__new__
+class Tools:
+	boost = {1: 2, 3: 2, 5: 1, 7: 1}
+	stop = {1: '🥇', 2: '🥈', 3: '🥉'}
+	sboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
+
 	@tzinfo.__new__
 	class tz(tzinfo):
 		utcoffset = lambda self, dt: timedelta(hours = 5)
@@ -58,17 +63,17 @@ class DateBase:
 	def now(self):
 		return datetime.now(self.tz)
 
-def getcake(bdate, now):
-	if isinstance(bdate, str):
-		bdate = datetime.strptime(bdate, '%d.%m' if bdate.count('.') == 1 else '%d.%m.%Y')
-		return '🎂' if bdate.day == now.day and bdate.month == now.month else ''
-	return ''
+	def cake(self, bdate):
+		if isinstance(bdate, str):
+			bdate = datetime.strptime(bdate, '%d.%m' if bdate.count('.') == 1 else '%d.%m.%Y')
+			return '🎂' if bdate.day == self.now.day and bdate.month == self.now.month else ''
+		return ''
 
-def getprice(slcount, lvl):
-	if slcount == 0: return 120
-	elif (price := round((1.1 ** slcount - 1) * 1e4)) < (maxexp := lvl * 2000 - 50):
-		return price
-	return maxexp
+	def price(self, slcount, lvl):
+		if slcount == 0: return 120
+		elif (price := round((1.1 ** slcount - 1) * 1e4)) < (maxexp := lvl * 2000 - 50):
+			return price
+		return maxexp
 
-def getpercent(slcounts):
-	return percent if (percent := 5 * slcounts + 5) < 50 else 50
+	def percent(self, slcounts):
+		return percent if (percent := 5 * slcounts + 5) < 50 else 50
