@@ -1,4 +1,4 @@
-from utils import Data as data, custom_rules
+from utils import Data as data, custom_rules, attachments
 from vkbottle.bot import BotLabeler
 
 help = [
@@ -24,7 +24,7 @@ async def lvl(message):
 
 @bl.chat_message(command = ['tele <exp:pos>', 'tele <exp:inc[up]>'], with_reply_message = True, from_id_pos = True)
 async def tele(message, exp):
-	if exp == 'up': exp = await data.lvl.atta(message.reply_message.text, message.reply_message.attachments)
+	if exp == 'up': exp = await attachments.exp(message.reply_message.text, message.reply_message.attachments)
 	await data.lvl.remove_exp(id1 := message.from_id, exp = exp)
 	await data.lvl.update_lvl(id2 := message.reply_message.from_id, exp = exp)
 	await data.lvl.send(id1, id2)
@@ -32,14 +32,14 @@ async def tele(message, exp):
 
 @bl.chat_message(command = ['exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'], is_admin = True, with_reply_message = True)
 async def exp(message, exp, lvl = 0):
-	if exp in ('up', 'down'): exp = await data.lvl.atta(message.reply_message.text, message.reply_message.attachments, exp == 'down')
+	if exp in ('up', 'down'): exp = await attachments.exp(message.reply_message.text, message.reply_message.attachments, exp == 'down')
 	await data.lvl.update_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
 	await data.lvl.send(id)
 	await message.answer((f"{lvl:+}Ⓛ|" if lvl else '') + f"{exp:+}Ⓔ:\n" + data.lvl[id])
 
 @bl.chat_message(command = 'info', with_reply_message = True)
 async def info(message):
-	exp, errors = await data.lvl.atta(message.reply_message.text, message.reply_message.attachments, return_errors = True)
+	exp, errors = await attachments.exp(message.reply_message.text, message.reply_message.attachments, return_errors = True)
 	extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 	await message.answer(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
 
