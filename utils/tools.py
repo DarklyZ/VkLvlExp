@@ -63,5 +63,5 @@ class LVLTools(DateTools.__class__):
 			return price
 		return maxexp
 
-	def percent(self, slcounts):
-		return percent if (percent := 5 * slcounts + 5) < 50 else 50
+	def percent(self, slcount):
+		return percent if (percent := 5 * slcount + 5) < 50 else 50
