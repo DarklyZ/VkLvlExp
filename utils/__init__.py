@@ -4,5 +4,5 @@ from .api import (
 	ThisWaifuDoesNotExist, FoafPHP
 )
 from .lvl import LVL
-from .tools import AttachmentsTools as attachments
+from .tools import attachmentsT
 from .rules import custom_rules

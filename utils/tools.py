@@ -3,7 +3,7 @@ from re import split, I
 from .base import Data
 
 @object.__new__
-class DateTools:
+class dateT:
 	@tzinfo.__new__
 	class tz(tzinfo):
 		utcoffset = lambda self, dt: timedelta(hours = 5)
@@ -15,7 +15,7 @@ class DateTools:
 		return datetime.now(self.tz)
 
 @object.__new__
-class AttachmentsTools(Data):
+class attachmentsT(Data):
 	async def exp(self, text = '', attachments = [], negative = False, return_errors = False):
 		if text:
 			dict_errors = {change['word']: change['s'] for change in await self.speller.spell(text)}
@@ -46,7 +46,7 @@ class AttachmentsTools(Data):
 		return (count, dict_errors) if return_errors else count
 
 @object.__new__
-class LVLTools(DateTools.__class__):
+class lvlT(dateT.__class__):
 	boost = {1: 2, 3: 2, 5: 1, 7: 1}
 	stop = {1: '🥇', 2: '🥈', 3: '🥉'}
 	sboost = {1: '❸', 3: '❸', 5: '❷', 7: '❷'}
