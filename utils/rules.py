@@ -11,7 +11,7 @@ class CommandVBMLRule(VBMLRule):
 	regex = r'[\./!:]{}$'
 
 	def __init__(self, pattern):
-		if isinstance(pattern, (str, Pattern)):
+		if isinstance(pattern, str | Pattern):
 			pattern = pattern,
 		self.patterns = [
 			p if isinstance(p, Pattern) else Pattern(p, regex = self.regex, flags = I | S) for p in pattern
