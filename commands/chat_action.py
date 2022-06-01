@@ -7,7 +7,7 @@ bl = BotLabeler(custom_rules = custom_rules)
 async def hello_help(message):
 	await message.answer("Ключевые слова:\n{title} - заголовок\n{user} - пользователь\n{name} - имя бота")
 
-@bl.chat_message(command = ['set hello <text>', 'set hello'], is_admin = True)
+@bl.chat_message(command = ('set hello <text>', 'set hello'), is_admin = True)
 async def hello_plus(message, text = "* Стандартное приветствие *"):
 	try: hello = text.format(title = 'title', user = 'user', name = 'name')
 	except: return await message.answer("Неправильный формат")

@@ -8,18 +8,17 @@ custom_rules = SetRule.custom_rules
 @SetRule('command')
 class CommandVBMLRule(VBMLRule):
 	patcher = MyPatcher()
+	regex = r'[\./!:]{}$'
 
 	def __init__(self, pattern):
-		regex = r'[\./!:]{}$'
+		match pattern:
+			case str():
+				pattern = Pattern(pattern, regex = self.regex, flags = I | S),
+			case Pattern(): pattern = pattern,
 
-		if isinstance(pattern, str):
-			pattern = [Pattern(pattern, regex = regex, flags = I | S)]
-		elif isinstance(pattern, Pattern):
-			pattern = [pattern]
-		elif isinstance(pattern, list):
-			pattern = [p if isinstance(p, Pattern) else Pattern(p, regex = regex, flags = I | S) for p in pattern]
-
-		self.patterns = pattern
+		self.patterns = [
+			p if isinstance(p, Pattern) else Pattern(p, regex = self.regex, flags = I | S) for p in pattern
+		]
 
 @SetRule('audio_message')
 class AudioMessage(VBMLRule, Data):

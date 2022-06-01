@@ -22,7 +22,7 @@ async def lvl(message):
 	await data.lvl.send_work(id := message.reply_message.from_id)
 	await message.answer(data.lvl[id])
 
-@bl.chat_message(command = ['tele <exp:pos>', 'tele <exp:inc[up]>'], with_reply_message = True, from_id_pos = True)
+@bl.chat_message(command = ('tele <exp:pos>', 'tele <exp:inc[up]>'), with_reply_message = True, from_id_pos = True)
 async def tele(message, exp):
 	if exp == 'up': exp = await attachmentsT.exp(message.reply_message.text, message.reply_message.attachments)
 	await data.lvl.remove_exp(id1 := message.from_id, exp = exp)
@@ -30,7 +30,7 @@ async def tele(message, exp):
 	await data.lvl.send(id1, id2)
 	await message.answer(f"{exp:+}Ⓔ:\n{data.lvl[id2]}\n{-exp:+}Ⓔ:\n{data.lvl[id1]}")
 
-@bl.chat_message(command = ['exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'], is_admin = True, with_reply_message = True)
+@bl.chat_message(command = ('exp <exp:int>', 'exp <exp:inc[up,down]>', 'exp <lvl:int> <exp:int>'), is_admin = True, with_reply_message = True)
 async def exp(message, exp, lvl = 0):
 	if exp in ('up', 'down'): exp = await attachmentsT.exp(message.reply_message.text, message.reply_message.attachments, exp == 'down')
 	await data.lvl.update_lvl(id := message.reply_message.from_id, exp = exp, lvl = lvl)
@@ -43,12 +43,12 @@ async def info(message):
 	extra = '\nВозможные ошибки:\n' + ' / '.join(f"{err} -> {', '.join(errors[err])}" if errors[err] else err for err in errors) if errors else ''
 	await message.answer(f"Стоимость сообщения {exp:+}Ⓔ" + extra)
 
-@bl.chat_message(command = ['toplvl <one:pos> <two:pos>', 'toplvl'])
+@bl.chat_message(command = ('toplvl <one:pos> <two:pos>', 'toplvl'))
 async def toplvl_send(message, one = 1, two = 10):
 	await data.lvl.toplvl_size(one, two)
 	await message.answer(data.lvl['TOPLVL'], disable_mentions = True)
 
-@bl.chat_message(command = ['toptemp <one:pos> <two:pos>', 'toptemp'])
+@bl.chat_message(command = ('toptemp <one:pos> <two:pos>', 'toptemp'))
 async def toptemp_send(message, one = 1, two = 10):
 	await data.lvl.toptemp_size(one, two)
 	await message.answer(data.lvl['TOPTEMP'], disable_mentions = True)
